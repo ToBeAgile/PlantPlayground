@@ -12,13 +12,20 @@ ys = []
 x_increment = 0
 
 def animate(i):
-    ax1.clear()
-    ax1.plot(xs, ys)
+    #vget data y1 and y2
+    # plt.cla()
+    # plt.plot(x, y1, label='Channel 0')
+    # plt.plot(x, y2, label='Channel 1')
+    # ani = animation.FuncAnimation(fig=fig, func=animate, interval=1000)
+    # plt.show()
+    
+    # plt.legend(loc='upper left')
+    # plt.tight_layout()
+    
     
 def my_plot(value):
     ys.append(value)
     xs.append(x_increment)
     x_increment += 1
     
-ani = animation.FuncAnimation(fig=fig, func=animate, interval=1000)
-plt.show()
+

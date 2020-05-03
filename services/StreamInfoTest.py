@@ -3,7 +3,7 @@ import StreamInfo
 
 class StreamInfoTest(unittest.TestCase):
     def test_retrieving_parameters_after_construction(self):
-        si = StreamInfo.StreamInfo('Open', 16, 8, 1)
+        si = StreamInfo.StreamInfo('Open', gain=16, data_rate=8, 1)
         self.assertEqual('Open', si.getStatus())
         self.assertEqual(16, si.getGain())
         self.assertEqual(8, si.getDataRate())
