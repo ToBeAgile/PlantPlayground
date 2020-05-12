@@ -32,8 +32,8 @@ CH1SLEEPTIME = 30
 reader = ADS1115Reader()
 
 # channel 0 is the control (a potato) gets read a second every minute
-reader.open(channel=CHANNEL0, gain=GAIN, data_rate=DATA_RATE, sleep=CH0SLEEPTIME) #open channel 0 stream
-reader.open(channel=CHANNEL1, gain=GAIN, data_rate=DATA_RATE, sleep=CH1SLEEPTIME) #open channel 1 stream
+reader.open(differential=0, gain=GAIN, data_rate=DATA_RATE, sleep=CH0SLEEPTIME) #open channel 0 stream
+reader.open(differential=3, gain=GAIN, data_rate=DATA_RATE, sleep=CH1SLEEPTIME) #open channel 1 stream
 
 #instantiate the writer and write the header
 dl= DataLogger()
