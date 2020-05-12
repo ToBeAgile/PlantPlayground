@@ -15,7 +15,7 @@ import datetime
 
 GAIN = 16
 DATA_RATE = 8
-SLEEP = 60
+SLEEP = 2
 NUMBEROFCHANNELS = 2
 DIFFERENTIAL1 = 0
 DIFFERENTIAL2 = 3
@@ -24,22 +24,22 @@ DIFFERENTIAL2 = 3
 
 CHANNEL0 = 0
 CHANNEL1 = 1
-CH0SLEEPTIME = 1
-CH1SLEEPTIME = 9
+CH0SLEEPTIME = 60
+CH1SLEEPTIME = 60
 
 #create an instance of ADS1115 Reader
 reader = ADS1115Reader()
 
 # channel 0 is the control (a potato) gets read a second every minute
-reader.open(channel=CHANNEL0, gain=GAIN, data_rate=DATA_RATE, sleep=CH0SLEEPTIME) #open channel 0 stream
-reader.open(channel=CHANNEL1, gain=GAIN, data_rate=DATA_RATE, sleep=CH1SLEEPTIME) #open channel 1 stream
+reader.open(differential=0, gain=GAIN, data_rate=DATA_RATE, sleep=CH0SLEEPTIME) #open channel 0 stream
+reader.open(differential=3, gain=GAIN, data_rate=DATA_RATE, sleep=CH1SLEEPTIME) #open channel 1 stream
 
 #instantiate the writer and write the header
 dl= DataLogger()
 dl.write("Plant bioelectric data log. Project: Setup")
 dl.write(dl.filename)
-dl.write("Channel0 is the control (a potato) sampled once every minute for a second.")
-dl.write("Channel1 is the plant connected to tinned copper wire and sampled every minute for 59 seconds.")
+dl.write("Channel0 is the control (a potato).")
+dl.write("Channel1 is the plant connected to tinned copper wire.")
 dl.write("Gain: " + str(GAIN))
 dl.write("Volts per division: " + str(reader.voltsPerDivision))
 dl.write("Data rate: " + str(DATA_RATE))

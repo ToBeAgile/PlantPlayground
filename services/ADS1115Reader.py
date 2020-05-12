@@ -1,5 +1,4 @@
 import Adafruit_ADS1x15
-import unittest
 import time
 
 """
@@ -17,10 +16,10 @@ class ADS1115Reader:
     
     adc = Adafruit_ADS1x15.ADS1115()
     volts_per_division_table = {0:6.144, 1:4.096, 2:2.048, 4:1.024, 8:0.512, 16:0.256}
-    
+    voltsPerDivision = 0
     status = 'close'
-    gain = 0
-    data_rate = 0
+    gain = 16
+    data_rate = 8
     sleep = 1
     channel = 0
     
@@ -28,9 +27,8 @@ class ADS1115Reader:
        #self.channel = channel
         dummy = 0
         
-        
-    def open(self, channel, gain, data_rate, sleep):
-        self.channel = channel
+    def open(self, differential, gain, data_rate, sleep:float) -> None:
+        self.differential = differential
         self.gain = gain
         self.data_rate = data_rate
         self.sleep = sleep
@@ -38,9 +36,8 @@ class ADS1115Reader:
     
     def read(self, differential, gain, data_rate, sleep):
         # dummy = self.adc.read_adc_difference(self.channel, self.gain, self.data_rate)
-        time.sleep(sleep)
-        value = self.adc.read_adc_difference(differential, gain, data_rate)
-        value *= self.voltsPerDivision
-        return value
+        time.sleep(self.sleep)
+        value = self.adc.read_adc_difference(differential, self.gain, self.data_rate)
+        return value * self.voltsPerDivision
     
 
