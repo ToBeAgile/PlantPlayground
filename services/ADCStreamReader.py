@@ -40,6 +40,7 @@ class ADCStreamReader:
     data_rate = 8
     sleep = 1
     channel = 0
+    differential = 0
     
     def __init__(self):
        #self.channel = channel
@@ -56,9 +57,9 @@ class ADCStreamReader:
     
     def read(self, differential):
         time.sleep(self.sleep)
-        differential_value = self.adc.read_adc_difference(self.differential, self.gain, self.data_rate)
+        self.differential_value = self.adc.read_adc_difference(self.differential, self.gain, self.data_rate)
 
-        return differential_value
+        return self.differential_value
 
 # channel 0 is the control (a potato) gets read a second every minute
 #reader.open(channel=CHANNEL0, gain=GAIN, data_rate=DATA_RATE, sleep=CH0SLEEPTIME) #open channel 0 stream

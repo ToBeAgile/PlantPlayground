@@ -9,21 +9,26 @@ ALWAYS_NEGATIVE = -1
 PASSTHRU = 0
 
 class ADCStreamWrapperTest(unittest.TestCase):
+    wrapper = 0
     
     def test_ADCWrapper_PassThru(self):
         wrapper = ADCStreamWrapper(PASSTHRU)
-        #open, read, assert < 0
-        dummy = 0
+        real_value = wrapper.read(self.wrapper)
+        assert real_value == 0
+
 
     def test_ADCWrapper_Positive(self):
         wrapper = ADCStreamWrapper(ALWAYS_POSITIVE)
-        #open, read, assert < 0
-        dummy = 0
+        real_value = wrapper.read(self.wrapper)
+        assert real_value > 0
 
     def test_ADCWrapper_Negative(self):
         wrapper = ADCStreamWrapper(ALWAYS_NEGATIVE)
-        #open, read, assert < 0
-        dummy = 0
+        real_value = wrapper.read(self.wrapper)
+        assert 0 > real_value
+
+if __name__ == '__main__':
+    unittest.main()
 
         
 
