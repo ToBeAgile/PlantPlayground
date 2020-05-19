@@ -2,6 +2,7 @@ import Adafruit_ADS1x15
 import time
 import sys
 import timeit
+from pythonosc.udp_client import SimpleUDPClient
 
 sys.path.insert(1, '../')
 #from services.ADS1115Reader import *
@@ -37,10 +38,16 @@ class ADCStreamReader:
     voltsPerDivision = 0
     status = 'close'
     gain = 16
-    data_rate = 8
+    data_rate = 860
     sleep = 1
     channel = 0
     differential = 0
+    
+    ip = "127.0.0.1"
+    port = 1337
+
+    client = SimpleUDPClient(ip, port)  # Create client
+
     
     def __init__(self):
        #self.channel = channel
@@ -58,8 +65,32 @@ class ADCStreamReader:
     def read(self, differential):
         time.sleep(self.sleep)
         self.differential_value = self.adc.read_adc_difference(self.differential, self.gain, self.data_rate)
-
         return self.differential_value
+
+    def broadcastOSC(self):
+            self.d0 = self.open(differential=0, gain=16, data_rate=8, sleep=0)
+            self.d3 = self.open(differential=3, gain=16, data_rate=8, sleep=0)
+
+            try:
+                for x in range(1, 100):
+                    # for each channel read(self, channel, gain, data_rate, sleep):
+                    c0_value = self.adc.read_adc_difference(self.d0, self.gain, self.data_rate)
+                    self.client.send_message("/PP01/ADC0/RAW/", c0_value)   # Send float message
+
+                    c3_value = self.adc.read_adc_difference(self.d3, self.gain, self.data_rate)
+                    self.client.send_message("/PP01/ADC1/RAW/", c3_value)   # Send float message
+                    """
+                    now = datetime.datetime.now()
+                    #print("Value = ", value)
+                    print((now.strftime("%H:%M:%S:%f"), (round((c0_value), 4)), (round((c1_value), 4))))
+                    dl.write(((now.strftime("%H:%M:%S:%f")), (round((c0_value), 4)), (round((c1_value), 4))))
+                    #csvwriter.write_voltage(name="Diff_V_1: ", value=value)
+                    """
+            except KeyboardInterrupt:
+                    GPIO.cleanup()
+            
+      
+
 
 # channel 0 is the control (a potato) gets read a second every minute
 #reader.open(channel=CHANNEL0, gain=GAIN, data_rate=DATA_RATE, sleep=CH0SLEEPTIME) #open channel 0 stream

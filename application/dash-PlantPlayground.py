@@ -46,9 +46,11 @@ Y2.append(1)
 app = dash.Dash(__name__)
 app.layout = html.Div(
     [
-        html.Button('Save Note', id='save-note', n_clicks=0),
+        html.Button('Set Time Marker', id='set-marker', n_clicks=0),
         dcc.Input(id="input-field", type="text", placeholder="", value="", debounce=True),
-        html.Div(id='text-output', children='Enter your value'),
+        html.Button('Save Note', id='save-note', n_clicks=0),        
+        html.Div(id='time-output', children='Time: '),
+        html.Div(id='text-output', children='Entry: '),
         dcc.Graph(id='live-graph0', animate=True),
         dcc.Interval(
             id='graph-update0',
@@ -65,21 +67,33 @@ app.layout = html.Div(
 )
 
 @app.callback(
+    Output('time-output', 'children'),
+    [Input('input-field', 'value'), Input('set-marker', 'button_clicks')])
+def set_marker(text_value, button_clicks):
+    print("here I am")
+    #read from the text input
+    #write that text output to a file
+    #now = datetime.datetime.now()
+    return ['Now is ', now.strftime("%Y-%m-%d %H:%M:%S:%f")]
+
+@app.callback(
     Output('text-output', 'children'),
     [Input('input-field', 'value'), Input('save-note', 'button_clicks')])
 def save_note(text_value, button_clicks):
     #read from the text input
     #write that text output to a file
-    now = datetime.datetime.now()
+    if (now == 0):
+        now = datetime.datetime.now()
     with open('../data/notes.csv', 'a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow([now.strftime("%Y-%m-%d %H:%M:%S:%f"), text_value])
+        self.now = 0
     return 'You entered: {}'.format(text_value)
 
-@app.callback(Output('live-graph0', 'figure'),
+@app.callback(Output('live-graph0', 'figure'), 
         [Input('graph-update0', 'n_intervals')]) #make your input when sensor value changes (post filtering). This will trigger a graph update
 
-#@app.callback(Output('live-graph1', 'figure'),
+#@app.callback(Output('live-graph1', 'figure'), 
 #        [Input('graph-update1', 'n_intervals')]) #make your input when sensor value changes (post filtering). This will trigger a graph update
 
 def update_graph_a(n):

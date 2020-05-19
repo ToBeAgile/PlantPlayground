@@ -16,7 +16,6 @@ class ADCStreamWrapperTest(unittest.TestCase):
         real_value = wrapper.read(self.wrapper)
         assert real_value == 0
 
-
     def test_ADCWrapper_Positive(self):
         wrapper = ADCStreamWrapper(ALWAYS_POSITIVE)
         real_value = wrapper.read(self.wrapper)

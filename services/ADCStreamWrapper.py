@@ -17,7 +17,7 @@ class ADCStreamWrapper:
         
     def open(self, differential, gain, data_rate, sleep):
         
-        return self.adcSR.open(self, differential, gain, data_rate, sleep)
+        return self.adcSR.open(differential, gain, data_rate, sleep)
     
     def read(self, differential):
         
