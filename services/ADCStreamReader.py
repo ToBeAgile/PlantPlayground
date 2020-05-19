@@ -1,4 +1,4 @@
-import Adafruit_ADS1x15
+#import Adafruit_ADS1x15
 import time
 import sys
 import timeit

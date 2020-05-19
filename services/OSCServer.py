@@ -14,8 +14,10 @@ dispatcher = Dispatcher()
 dispatcher.map("/PP01/ADC0/RAW/", raw_handler)
 dispatcher.set_default_handler(default_handler)
 
-ip = "127.0.0.1"
-port = 1337
+#ip = "127.0.0.1"
+ip = ""
+#ip = "192.168.0.36"
+port = 50000
 
 server = BlockingOSCUDPServer((ip, port), dispatcher)
 server.serve_forever()  # Blocks forever
