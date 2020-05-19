@@ -9,8 +9,8 @@ from ADCStreamReader import *
 
 class OSCWriter():
     
-    ip = "127.0.0.1"
-    port = 1337
+    ip = "192.168.0.18"
+    port = 50000
 
     client = SimpleUDPClient(ip, port)  # Create client
 
@@ -28,6 +28,7 @@ class OSCWriter():
                 c0_value = adcSR.read(adc0)
                 self.send_message("/PP01/ADC0/RAW/", c0_value)   # Send float message
                 time.sleep(0.05)
+                print("Hi")
                 c3_value = adcSR.read(adc3)
                 self.send_message("/PP01/ADC1/RAW/", c3_value)   # Send float message
             except KeyboardInterrupt:
