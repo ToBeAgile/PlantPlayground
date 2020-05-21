@@ -1,9 +1,9 @@
 import unittest
 import sys
 
-from ADCStreamReader import *
+from pi.ADCStreamReader import *
 sys.path.insert(1, '../')
-from services.ADS1115Reader import *
+from pi.ADS1115Reader import *
 
 
 class SignalPlaygrountTest(unittest.TestCase):

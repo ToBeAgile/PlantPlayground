@@ -1,7 +1,7 @@
 import unittest
 import ADS1115Reader
 from ADS1115Reader import ADS1115Reader
-
+#doesn't run
 
 class TestADS1115Reader(unittest.TestCase):
     

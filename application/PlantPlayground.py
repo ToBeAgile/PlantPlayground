@@ -5,7 +5,7 @@ import matplotlib
 #sys.path.insert(1, '../services')
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 
-from services.ADS1115Reader import *
+from pi.ADS1115Reader import *
 from services.DataLogger import *
 #from services.Plotter import *
 #from ../services/ADS1115Reader import *

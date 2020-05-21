@@ -4,12 +4,13 @@ import sys
 import time
 import timeit
 
-sys.path.insert(1, '../')
-from ADCStreamReader import *
+#sys.path.insert(1, '../')
+sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
+from pi.ADCStreamReader import *
 
-class OSCWriter():
+class OSCHandler():
     
-    ip = "192.168.0.18"
+    ip = "192.168.0.18" # internal ip address of MacBook Pro 
     port = 50000
 
     client = SimpleUDPClient(ip, port)  # Create client
@@ -75,6 +76,7 @@ class OSCWriter():
                 """
 
     
+
 
 
 

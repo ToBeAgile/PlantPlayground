@@ -1,19 +1,19 @@
 import unittest
 import sys
+sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground/')
+#sys.path.insert(1, '../')
+from pi.ADCStreamReader import *
+from pi.ADCStreamWrapper import *
+from pi.OSCHandler import *
 
-sys.path.insert(1, '../')
-from services.ADCStreamReader import *
-from services.ADCStreamWrapper import *
-from services.OSCWriter import *
-
-class OSCWriterTest(unittest.TestCase):
+class OSCHandlerTest(unittest.TestCase):
     
     def testOSCWriteRawData(self):
-        oscWriter = OSCWriter()
+        oscHandler = OSCHandler()
         adcSR = ADCStreamReader()
         adc = adcSR.open(differential=0, gain=16, data_rate=8, sleep=0)
         c0_value = adcSR.read(adc)
-        oscWriter.send_message("/PP01/ADC0/RAW/", c0_value)
+        oscHandler.send_message("/PP01/ADC0/RAW/", c0_value)
         print(c0_value)
 
     def testOSCWriteRawD0Negative(self):
@@ -29,12 +29,13 @@ class OSCWriterTest(unittest.TestCase):
         assert mock_c0_value == 1
         
     def testOSCWriteRawcontinuous(self):
-        oscWriter = OSCWriter()
-        oscWriter.OSCWriteRawContinuous()
+        oscHandler = OSCHandler()
+        oscHandler.OSCWriteRawContinuous()
         
 
 if __name__ == '__main__':
     unittest.main()
+
 
 
 

@@ -11,7 +11,7 @@ from collections import deque
 
 import sys
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
-from services.ADS1115Reader import *
+from pi.ADS1115Reader import *
 from services.DataLogger import *
 import datetime
 

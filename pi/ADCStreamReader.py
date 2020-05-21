@@ -1,11 +1,11 @@
-#import Adafruit_ADS1x15
+import Adafruit_ADS1x15
 import time
 import sys
 import timeit
 from pythonosc.udp_client import SimpleUDPClient
 
-sys.path.insert(1, '../')
-#from services.ADS1115Reader import *
+sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
+from pi.ADS1115Reader import *
 
 """
 class ChannelInfo:

@@ -1,8 +1,9 @@
 import sys
 import timeit
 
-sys.path.insert(1, '../')
-from ADCStreamReader import ADCStreamReader
+#sys.path.insert(1, '../')
+sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
+from pi.ADCStreamReader import ADCStreamReader
 
 WRAPPER_PASSTHRU = 0
 WRAPPER_POSITIVE = 1

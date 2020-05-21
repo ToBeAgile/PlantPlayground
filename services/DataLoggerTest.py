@@ -2,7 +2,10 @@ import unittest
 import os.path
 from os import path
 import datetime
-from DataLogger import *
+import sys
+sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground/')
+
+from services.DataLogger import *
 
 
 class TestDataLogger(unittest.TestCase):
@@ -59,7 +62,7 @@ class TestDataLogger(unittest.TestCase):
         
         #act
         #write to the file
-        dl.file.write("hello")
+        #dl.file.write("hello")
         #ensure that filesize is nonzero
         dl.file.close()
         

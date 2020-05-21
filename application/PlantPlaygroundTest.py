@@ -1,5 +1,10 @@
 import unittest
-from PlantPlayground import *
+
+
+import sys
+sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
+
+from application.PlantPlayground import *
 
 class PlantPlaygrountTest(unittest.TestCase):
     reader = ADS1115Reader()
