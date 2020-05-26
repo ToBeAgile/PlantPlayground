@@ -21,7 +21,7 @@ class ChannelInfo:
 class ADCStreamReader:
     
     GAIN = 16
-    DATA_RATE = 250 # 8, 16, 32, 64, 128, 250, 475, 860
+    DATA_RATE = 8 # 8, 16, 32, 64, 128, 250, 475, 860
 
     SLEEP = 2
     NUMBEROFCHANNELS = 2
@@ -30,15 +30,15 @@ class ADCStreamReader:
 
     CHANNEL0 = 0
     CHANNEL1 = 1
-    CH0SLEEPTIME = 60
-    CH1SLEEPTIME = 60
+    CH0SLEEPTIME = 1
+    CH1SLEEPTIME = 1
 
     adc = Adafruit_ADS1x15.ADS1115()
     volts_per_division_table = {0:6.144, 1:4.096, 2:2.048, 4:1.024, 8:0.512, 16:0.256}
     voltsPerDivision = 0
     status = 'close'
     gain = 16
-    data_rate = 860
+    data_rate = 8
     sleep = 1
     channel = 0
     differential = 0
@@ -66,10 +66,17 @@ class ADCStreamReader:
         time.sleep(self.sleep)
         self.differential_value = self.adc.read_adc_difference(self.differential, self.gain, self.data_rate)
         return self.differential_value
+    
+    def read_without_sleep(self, differential):
+        #time.sleep(self.sleep)
+        self.differential_value = self.adc.read_adc_difference(self.differential, self.gain, self.data_rate)
+        return self.differential_value
+
+
 
     def broadcastOSC(self):
-            self.d0 = self.open(differential=0, gain=16, data_rate=8, sleep=0)
-            self.d3 = self.open(differential=3, gain=16, data_rate=8, sleep=0)
+            self.d0 = self.open(differential=0, gain=16, data_rate=860, sleep=0)
+            self.d3 = self.open(differential=3, gain=16, data_rate=860, sleep=0)
 
             try:
                 for x in range(1, 100):

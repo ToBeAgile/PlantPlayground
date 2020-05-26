@@ -21,8 +21,8 @@ class TestADS1115Reader(unittest.TestCase):
         
     def test_read(self):
         adsReader = ADS1115Reader()
-        adsReader.open(1, 16, 8, 1)
-        value = adsReader.read(0)
+        adsReader.open(1, 16, 8, -1)
+        value = adsReader.read(0, 16, 860, -1)
         print(value)
 
 if __name__ == '__main__':

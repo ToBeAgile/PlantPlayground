@@ -1,8 +1,8 @@
 import unittest
 import sys
+sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 
 from pi.ADCStreamReader import *
-sys.path.insert(1, '../')
 from pi.ADS1115Reader import *
 
 
