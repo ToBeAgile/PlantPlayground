@@ -79,7 +79,7 @@ class TestDataLogger(unittest.TestCase):
         
         #act
         #write to the file
-        dl.write("hello")
+        #dl.write("hello")
         dl.file.close()
         modified_size = os.stat(dl.full_path).st_size
         

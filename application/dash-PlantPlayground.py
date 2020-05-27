@@ -92,10 +92,8 @@ def save_note(text_value, button_clicks):
 
 @app.callback(Output('live-graph0', 'figure'), 
         [Input('graph-update0', 'n_intervals')]) #make your input when sensor value changes (post filtering). This will trigger a graph update
-
 #@app.callback(Output('live-graph1', 'figure'), 
 #        [Input('graph-update1', 'n_intervals')]) #make your input when sensor value changes (post filtering). This will trigger a graph update
-
 def update_graph_a(n):
 
     X.append(X[-1]+1)

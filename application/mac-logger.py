@@ -1,10 +1,16 @@
+import sys
+sys.path.insert(1, "/Users/davidscottbernstein/Dropbox/Dev/Python/Projects/PlantPlayground")
+from services.DataLogger import DataLogger
 from pythonosc.dispatcher import Dispatcher
 from pythonosc.osc_server import BlockingOSCUDPServer
+
+dl = DataLogger()
 
 def raw_handler(address, *args):
     print(f"{address}: {args}")
 
 def sec_handler(address, *args):
+    dl.write(args)
     print(f"{address}: {args}")
 
 def min_handler(address, *args):
