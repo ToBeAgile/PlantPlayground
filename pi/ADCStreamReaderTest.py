@@ -1,9 +1,9 @@
 import unittest
 import sys
+sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 
-from ADCStreamReader import *
-sys.path.insert(1, '../')
-from services.ADS1115Reader import *
+from pi.ADCStreamReader import *
+from pi.ADS1115Reader import *
 
 
 class SignalPlaygrountTest(unittest.TestCase):

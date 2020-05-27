@@ -1,5 +1,5 @@
 #test writer
-from writer import *
+from CSVWriter import *
 import unittest
 
 class TestWriter(unittest.TestCase):

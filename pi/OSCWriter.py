@@ -4,8 +4,8 @@ import sys
 import time
 import timeit
 
-sys.path.insert(1, '../')
-from ADCStreamReader import *
+sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground/')
+from pi.ADCStreamReader import *
 
 class OSCWriter():
     

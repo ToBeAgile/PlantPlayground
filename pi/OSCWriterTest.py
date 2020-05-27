@@ -1,10 +1,10 @@
 import unittest
 import sys
 
-sys.path.insert(1, '../')
-from services.ADCStreamReader import *
-from services.ADCStreamWrapper import *
-from services.OSCWriter import *
+sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground/')
+from pi.ADCStreamReader import *
+from pi.ADCStreamWrapper import *
+from pi.OSCWriter import *
 
 class OSCWriterTest(unittest.TestCase):
     

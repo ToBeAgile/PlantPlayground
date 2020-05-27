@@ -36,8 +36,9 @@ class ADS1115Reader:
     
     def read(self, differential, gain, data_rate, sleep):
         # dummy = self.adc.read_adc_difference(self.channel, self.gain, self.data_rate)
-        time.sleep(self.sleep)
-        value = self.adc.read_adc_difference(differential, self.gain, self.data_rate)
+        if (sleep >= 0):
+            time.sleep(sleep)
+        value = self.adc.read_adc_difference(differential, gain, data_rate)
         return value * self.voltsPerDivision
     
 
