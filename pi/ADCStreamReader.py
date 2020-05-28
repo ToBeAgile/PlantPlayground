@@ -2,7 +2,7 @@ import Adafruit_ADS1x15
 import time
 import sys
 import timeit
-from pythonosc.udp_client import SimpleUDPClient
+#from pythonosc.udp_client import SimpleUDPClient
 
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 from pi.ADS1115Reader import *
@@ -46,7 +46,7 @@ class ADCStreamReader:
     ip = "127.0.0.1"
     port = 1337
 
-    client = SimpleUDPClient(ip, port)  # Create client
+    #client = SimpleUDPClient(ip, port)  # Create client
 
     
     def __init__(self):
