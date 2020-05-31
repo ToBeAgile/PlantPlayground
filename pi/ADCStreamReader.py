@@ -5,7 +5,7 @@ import timeit
 #from pythonosc.udp_client import SimpleUDPClient
 
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
-from pi.ADS1115Reader import *
+#from pi.ADS1115Reader import *
 
 """
 class ChannelInfo:
@@ -39,7 +39,7 @@ class ADCStreamReader:
     status = 'close'
     gain = 16
     data_rate = 8
-    sleep = 1
+    sleep = 0
     channel = 0
     differential = 0
     
@@ -59,42 +59,42 @@ class ADCStreamReader:
         self.gain = gain
         self.data_rate = data_rate
         self.sleep = sleep
-        #self.voltsPerDivision = ((2 * self.volts_per_division_table[self.gain])/65535)*1000
+        self.voltsPerDivision = ((2 * self.volts_per_division_table[self.gain])/65535)*1000
         return self.differential
     
     def read(self, differential):
         time.sleep(self.sleep)
-        self.differential_value = self.adc.read_adc_difference(self.differential, self.gain, self.data_rate)
-        return self.differential_value
+        self.differential_value = self.adc.read_adc_difference(differential, self.gain, self.data_rate)
+        return self.differential_value * self.voltsPerDivision
     
     def read_without_sleep(self, differential):
         #time.sleep(self.sleep)
-        self.differential_value = self.adc.read_adc_difference(self.differential, self.gain, self.data_rate)
-        return self.differential_value
+        self.differential_value = self.adc.read_adc_difference(differential, self.gain, self.data_rate)
+        return self.differential_value * self.voltsPerDivision
 
 
 
     def broadcastOSC(self):
-            self.d0 = self.open(differential=0, gain=16, data_rate=860, sleep=0)
-            self.d3 = self.open(differential=3, gain=16, data_rate=860, sleep=0)
+        self.d0 = self.open(differential=0, gain=16, data_rate=860, sleep=0)
+        self.d3 = self.open(differential=3, gain=16, data_rate=860, sleep=0)
 
-            try:
-                for x in range(1, 100):
-                    # for each channel read(self, channel, gain, data_rate, sleep):
-                    c0_value = self.adc.read_adc_difference(self.d0, self.gain, self.data_rate)
-                    self.client.send_message("/PP01/ADC0/RAW/", c0_value)   # Send float message
+        try:
+            for x in range(1, 100):
+                # for each channel read(self, channel, gain, data_rate, sleep):
+                c0_value = self.adc.read_adc_difference(self.d0, self.gain, self.data_rate)
+                self.client.send_message("/PP01/ADC0/RAW/", c0_value)   # Send float message
 
-                    c3_value = self.adc.read_adc_difference(self.d3, self.gain, self.data_rate)
-                    self.client.send_message("/PP01/ADC1/RAW/", c3_value)   # Send float message
-                    """
-                    now = datetime.datetime.now()
-                    #print("Value = ", value)
-                    print((now.strftime("%H:%M:%S:%f"), (round((c0_value), 4)), (round((c1_value), 4))))
-                    dl.write(((now.strftime("%H:%M:%S:%f")), (round((c0_value), 4)), (round((c1_value), 4))))
-                    #csvwriter.write_voltage(name="Diff_V_1: ", value=value)
-                    """
-            except KeyboardInterrupt:
-                    GPIO.cleanup()
+                c3_value = self.adc.read_adc_difference(self.d3, self.gain, self.data_rate)
+                self.client.send_message("/PP01/ADC1/RAW/", c3_value)   # Send float message
+                """
+                now = datetime.datetime.now()
+                #print("Value = ", value)
+                print((now.strftime("%H:%M:%S:%f"), (round((c0_value), 4)), (round((c1_value), 4))))
+                dl.write(((now.strftime("%H:%M:%S:%f")), (round((c0_value), 4)), (round((c1_value), 4))))
+                #csvwriter.write_voltage(name="Diff_V_1: ", value=value)
+                """
+        except KeyboardInterrupt:
+            GPIO.cleanup()
             
       
 

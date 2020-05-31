@@ -9,26 +9,7 @@ import threading
 #sys.path.insert(1, '../')
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 from pi.ADCStreamReader import *
-
-class TrackingData:
-    last_high = 0
-    up_count = 0
-    last_low = 0
-    down_count = 0
-    moving_average = 0
-    difference = 0
-    c0_value = 0
-    moving_average = 0
-    counter = 0
-    history = [60]
-    
-    def __init__(self):
-        dummy = 0
-    
-    def stringify(self):
-        return("val: "+str(self.c0_value)+" avg: "+str(self.moving_average)+
-               " hi: "+str(self.last_high)+" lo: "+str(self.last_low)+
-               " dif: "+str(self.difference))
+from pi.TrackingData import TrackingData
 
 
 class OSCHandler():
@@ -41,11 +22,12 @@ class OSCHandler():
     adc3 = 0
     td = 0
     now = 0
+    value = 0
     
     def __init__(self):
         self.client = SimpleUDPClient(self.ip, self.port)
         self.adcSR = ADCStreamReader()
-        self.adc0 = self.adcSR.open(differential=0, gain=16, data_rate=8, sleep=0)
+        self.adc0 = self.adcSR.open(differential=0, gain=16, data_rate=64, sleep=0)
         #self.adc3 = self.adcSR.open(differential=3, gain=16, data_rate=8, sleep=0)
         self.td = TrackingData()
         self.now = datetime.datetime.now()
@@ -57,8 +39,8 @@ class OSCHandler():
         while True:
             try:
                 time.sleep(0.05)
-                td.c0_value = self.adcSR.read(self.adc0)
-                self.send_message("/PP01/ADC0/RAW/", td.c0_value)
+                td.value = self.adcSR.read(self.adc0)
+                self.send_message("/PP01/ADC0/RAW/", td.value)
                 #time.sleep(0.05)
                 #c3_value = adcSR.read(adc3)
                 #self.send_message("/PP01/ADC1/RAW/", c3_value)
@@ -69,17 +51,22 @@ class OSCHandler():
 
     
     def main_loop(self):
+        #t = threading.Timer(1, self.broadcast_sec_format(self.td))
+        #t.start() # after 10 seconds, task will be executed
         try:
             while True:
                 #self.td.initialize()          
-                for x in range (1, 10):
-                    time.sleep(0.1)
-                    self.td.c0_value = self.adcSR.read(self.adc0)
-                    self.broadcast_raw_format()
+                for x in range (1, 60):
+                    time.sleep(1)
+                    self.td.value = self.adcSR.read(self.adc0)
+                    print(self.td.value)
+                    #self.broadcast_raw_format()
                     self.update_data(self.td)
                     #if (self.exceeds_tolerance(self.td)):
-                #self.send_bundled_data(self.td)
-                self.broadcast_sec_format(self.td)
+                    #self.send_bundled_data(self.td)
+                    self.broadcast_sec_format(self.td)
+                self.td.moving_average = self.update_moving_average(self.td)
+                self.broadcast_min_format(self.td)
             
         except KeyboardInterrupt:
                     GPIO.cleanup()
@@ -90,19 +77,21 @@ class OSCHandler():
     
     def update_data(self, td):
         td.counter = td.counter + 1
-        if (td.c0_value > td.last_high):
+        if (td.value > td.last_high):
             td.up_count = td.up_count + 1
-            td.last_high = td.c0_value
-        elif (td.last_low > td.c0_value):
+            td.last_high = td.value
+        elif (td.last_low > td.value):
             td.down_count = td.down_count + 1
-            td.last_low = td.c0_value
+            td.last_low = td.value
         td.difference = td.up_count - td.down_count
-        td.history.insert(td.c0_value, td.counter % 60)
-        td.moving_average = self.update_moving_average(td)
+        td.history.insert(td.counter % 60, td.value)
             
     def update_moving_average(self, td):
         sum = 0
-        mod60 = (td.counter % 60)+1
+        if (td.counter < 60):
+            mod60 = td.counter
+        else:
+            mod60 = 60
         for i in range (0, mod60):
             sum = sum + td.history[i % mod60]
         if (sum == 0):
@@ -112,14 +101,24 @@ class OSCHandler():
     
     def broadcast_raw_format(self):
         #time.sleep(0.1)
-        self.c0_value = self.adcSR.read_without_sleep(self.adc0)
-        self.send_message("/PP01/ADC0/RAW/", self.c0_value)
+        self.value = self.adcSR.read_without_sleep(self.adc0)
+        self.send_message("/PP01/ADC0/RAW/", self.value)
 
     def broadcast_sec_format(self, td):
-        now = datetime.datetime.now()
-        self.send_message("/PP01/ADC0/SEC/", now.strftime("%H:%M:%S:%f ")+self.td.stringify())   
+        self.value = self.adcSR.read_without_sleep(self.adc0)
+        #now = datetime.datetime.now()
+        self.send_message("/PP01/ADC0/SEC/", self.value)   
 
     
+    def broadcast_min_format(self, td):
+        now = datetime.datetime.now()
+        self.send_message("/PP01/ADC0/MIN/", self.td.stringify())   
+
+    
+
+if __name__ == '__main__':
+    self = OSCHandler()
+    OSCHandler.main_loop(self)
 
 
 
