@@ -22,5 +22,4 @@ class TrackingData:
     def stringify(self):
         self.now = datetime.datetime.now()
         return(str(self.now) + self.topic + self.sensor + " val: " + str(self.value)
-               + " avg: " + str(self.moving_average) + " hi: " + str(self.last_high)
-               + " lo: " + str(self.last_low) + " dif: " + str(self.difference))
+               + " avg: " + str(self.moving_average) + " dif: " + str(self.difference))
