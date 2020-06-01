@@ -60,10 +60,13 @@ app.layout = html.Div(
 def update_graph(n):
     serialized_data = client.recv(size)
     data_dict = pickle.loads(serialized_data)
+    time = data_dict["time"]
+    topic = data_dict["topic"]
     sensor = data_dict["sensor"]
     value = data_dict["value"]
-    time = data_dict["time"]
-    dl.write(str(time), str(value))
+
+    if topic == "SEC":
+        dl.write(str(time), str(sensor), str(value))
 
     X.append(X[-1]+1)
     Y.append(value)
