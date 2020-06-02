@@ -1,11 +1,51 @@
 """TODO.txt - Plant Project To Do List
+IPs:
+Heavens: 192.168.0.36
+Heavens2: 192.168.0.37
+MacBookPro: 192.168.0.18
 
-FRONT BURNER - NOW
+TASKS
+
+Pi Side
+Write OSCHandler as template method to call other OSC formats as decorators
+Write OSCRawHandler to write raw format as fast as possible
+Write OSCHmsHandler to compute hi, low, direction, etc. every 100 ms
+Write OSCSecHandler to write data every second with timestamp
+Write OSCMinHandler to write every minute (with timestamp: average, mean, hi, lo, ...)
+
+Implement raw handler then extract base behavior. Refactor to event driven
+Statistics: value, moving average, moving mean, hi, lo, ...
+
+Mac Side
+Add data logging from OSCServer
+
+FIX: dash-PlantPlayground - add 'Set Marker' button to set time instead of in save, if not given
+Add controls for dashboard
+
+Write handler to read ADC on a timer event, save data, track hi, low, avg, mean, ...
+Create new data format to broadcast every 100 ms
+
+KEY FEATURES
+Pi-side: broadcast raw format, second format with stats
+Mac-side: log, graph, notes, manage settings, 
+
+With Alex:
+Design signal dashboard
 Add support for a second channel
+Design data aquisition process to broadcast via OSC
+To recieve on my MacBook, what IP address should we use?
+
+
+
+
+
+To Do:
+
 Clean up code, add constants class and missing tests,
 Plot in realtime
 Compress redundant data
 
+FRONT BURNER - NOW
 
 BACK BURNER - LATER
 Add ability to implement up to 4 channels of input
@@ -22,29 +62,78 @@ Add filters to ADSReader as decorators
 
 
 
-FREEZER - DONE
+FREEZER -
+
+
+
+DONE
 Add date-time stamp to data file name, put in parent folder,
 Add metadata to header of csv file: channels, data_rate, delay,,,
 Added tests.py to application to run all test in project, must check in
+5/12/20: Added support for notes
+5/12/20: Wrote ADCStreamWrapper and tests
+5/12/20: Wrap ADCStreamReader in ADCStreamWrapper to be positive, negative, or pass thru
+5/17/20: Write OSCWriter to write ADC data to network from Pi
+5/19/20: Move PlantPlayground, Dash UI, graphing, logging, to Mac and PyCharm, Venv, packages...
+
+
+
+Commit Messages:
+Updated OSCHandler and test to broadcast formats raw and sec via OSC in a loop
+
+
+
+Added broadcastOSC() to ADCStreamReader and implemnted OSC RAW format
+
+
+to replace ADS1115ReaderTest and ADS1115ReaderTest
+
+
+
 
 
 """
 
 """
 Check-in Messages:
-Added rudimentary support for a second channel, giving each one the ability to sleep for a specified time
+
+Got OSC working across machines. Created pi folder for code that runs on the pi and moved pi services to it
+
+
+"""
+"""
+The Pi has 2 IO busses so we can have two threads, each managing two differenntial inputs
+Every 5 ms:
+    Read from one of two ADC channels into value
+    If new_peak or new_valley
+    If (value > last_value || direction == -1):
+        new_high = value
+        moving_up =+ 1
+        
+        
+        
+        
+        
+Every 50 ms:
+    
+
+
+
+
+
+
+
+OSC
+https://pypi.org/project/python-osc/ # Installed into PlantVenv 5/15/20
+https://pypi.org/project/osc4py3/
+
+
+https://www.programcreek.com/python/example/88074/pythonosc.osc_server.ThreadingOSCUDPServer
+
+https://github.com/neurotechuoft/Wall-EEG/blob/master/Code/Muse/Installation%20Instructions.txt
+
 
 
 
 """
-pi@heavens:~/Documents/Code/PlantPlayground $ git commit -a -m "Added rudimentary support for a second channel, giving each it's own sleep time."
-[master 2055aad] Added rudimentary support for a second channel, giving each it's own sleep time.
- 12 files changed, 61 insertions(+), 193 deletions(-)
- delete mode 100644 ADS1115Reader.py
- delete mode 100644 MyDifferential.py
- delete mode 100644 PlantPlayground.py
- delete mode 100644 services/PlantPlayground.py
- delete mode 100644 services/PlantPlaygroundTest.py
- delete mode 100644 test_ADS1115.py
-
 
