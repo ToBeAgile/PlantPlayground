@@ -36,7 +36,7 @@ class TestDataLogger(unittest.TestCase):
         print(dl.full_path)
         print(dl.partial_path)
         self.assertTrue(path.exists(dl.full_path))
-        dl.file.close()
+        #dl.file.close()
         
         
     def test_DataLogger_append_file(self):
@@ -64,7 +64,7 @@ class TestDataLogger(unittest.TestCase):
         #write to the file
         #dl.file.write("hello")
         #ensure that filesize is nonzero
-        dl.file.close()
+        file.close()
         
         #assert
         #file size is greater than 0
@@ -83,7 +83,7 @@ class TestDataLogger(unittest.TestCase):
         #act
         #write to the file
         #dl.write("hello")
-        dl.file.close()
+        #dl.close()
         modified_size = os.stat(dl.full_path).st_size
         
         #assert

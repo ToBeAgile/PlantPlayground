@@ -17,7 +17,16 @@ port = 50000
 backlog = 5
 size = 1024
 
+#instantiate the writer and write the header
 dl = DataLogger()
+dl.write("Plant bioelectric data log. Project: Setup")
+dl.write(dl.filename)
+dl.write("Channel0 is the control (a potato).")
+dl.write("Channel1 is the plant connected to tinned copper wire.")
+dl.write("Gain: " + str(GAIN))
+dl.write("Volts per division: " + str(reader.voltsPerDivision))
+dl.write("Data rate: " + str(DATA_RATE))
+dl.write("Time                 Value in mV")
 
 s = None
 try:
