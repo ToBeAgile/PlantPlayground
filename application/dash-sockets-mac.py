@@ -9,6 +9,7 @@ import plotly
 import random
 import plotly.graph_objs as go
 from collections import deque
+import threading
 #sys.path.insert(1, '/Users/davidscottbernstein/Dropbox/Dev/Python/Projects/PlantPlayground')
 #from services.DataLogger import DataLogger
 
@@ -58,17 +59,6 @@ app.layout = html.Div(
 @app.callback(Output('live-graph', 'figure'),
               [Input('graph-update', 'n_intervals')])
 def update_graph(n):
-    serialized_data = client.recv(size)
-    data_dict = pickle.loads(serialized_data)
-    sensor = data_dict["sensor"]
-    value = data_dict["value"]
-    time = data_dict["time"]
-    #dl.write(str(time), str(value))
-
-    X.append(X[-1]+1)
-    Y.append(value)
-    #Y.append(Y[-1]+Y[-1]*random.uniform(-0.1,0.1))
-
     data = plotly.graph_objs.Scatter(
             x=list(X),
             y=list(Y),
@@ -80,7 +70,18 @@ def update_graph(n):
                                                 yaxis=dict(range=[min(Y),max(Y)]),)}
 
 
+def update_data():
+    serialized_data = client.recv(size)
+    data_dict = pickle.loads(serialized_data)
+    #sensor = data_dict["sensor"]
+    value = data_dict["value"]
+    #time = data_dict["time"]
+    #dl.write(str(time), str(value))
+    X.append(X[-1]+1)
+    Y.append(value)
+
 if __name__ == '__main__':
+    threading.Thread(target=update_data).start()
     #isDashInitialized = True
     app.run_server() #debug enables reload by default. This means that every line is run again, resulting in reinitialization. This breaks sockets.
     #app.run_server(debug=True, use_reloader=False) #to debug and block reload
