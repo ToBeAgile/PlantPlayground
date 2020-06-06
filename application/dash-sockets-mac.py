@@ -9,15 +9,15 @@ import plotly
 import random
 import plotly.graph_objs as go
 from collections import deque
-sys.path.insert(1, '/Users/davidscottbernstein/Dropbox/Dev/Python/Projects/PlantPlayground')
-from services.DataLogger import DataLogger
+#sys.path.insert(1, '/Users/davidscottbernstein/Dropbox/Dev/Python/Projects/PlantPlayground')
+#from services.DataLogger import DataLogger
 
 host = ''
 port = 50000
 backlog = 5
 size = 1024
 
-dl = DataLogger()
+#dl = DataLogger()
 
 s = None
 try:
@@ -63,7 +63,7 @@ def update_graph(n):
     sensor = data_dict["sensor"]
     value = data_dict["value"]
     time = data_dict["time"]
-    dl.write(str(time), str(value))
+    #dl.write(str(time), str(value))
 
     X.append(X[-1]+1)
     Y.append(value)
@@ -82,6 +82,6 @@ def update_graph(n):
 
 if __name__ == '__main__':
     #isDashInitialized = True
-    #app.run_server() #debug enables reload by default. This means that every line is run again, resulting in reinitialization. This breaks sockets.
-    app.run_server(debug=True, use_reloader=False) #to debug and block reload
+    app.run_server() #debug enables reload by default. This means that every line is run again, resulting in reinitialization. This breaks sockets.
+    #app.run_server(debug=True, use_reloader=False) #to debug and block reload
     #see https://stackoverflow.com/questions/9449101/how-to-stop-flask-from-initialising-twice-in-debug-mode for another option to block only certain things from being reinitialized
