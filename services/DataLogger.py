@@ -19,10 +19,10 @@ class DataLogger:
             #writer.writerow(["Time"])
         file.close()
         
-    def write(self, time, value):
+    def write(self, value):
         #self.file.write(data)
         with open(self.full_path, 'a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow([time, value])
+            writer.writerow([value])
     
     

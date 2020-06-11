@@ -24,8 +24,8 @@ DIFFERENTIAL2 = 3
 
 CHANNEL0 = 0
 CHANNEL1 = 1
-CH0SLEEPTIME = 60
-CH1SLEEPTIME = 60
+CH0SLEEPTIME = 600
+CH1SLEEPTIME = 600
 
 #create an instance of ADS1115 Reader
 reader = ADS1115Reader()
@@ -38,8 +38,8 @@ reader.open(differential=3, gain=GAIN, data_rate=DATA_RATE, sleep=CH1SLEEPTIME) 
 dl= DataLogger()
 dl.write("Plant bioelectric data log. Project: Setup")
 dl.write(dl.filename)
-dl.write("Channel0 is the control (a potato).")
-dl.write("Channel1 is the plant connected to tinned copper wire.")
+dl.write("Channel0 is not connnnected.")
+dl.write("Channel1 is the plant connected to tinned copper wire in a Faraday cage that's grounded.")
 dl.write("Gain: " + str(GAIN))
 dl.write("Volts per division: " + str(reader.voltsPerDivision))
 dl.write("Data rate: " + str(DATA_RATE))

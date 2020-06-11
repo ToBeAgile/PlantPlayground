@@ -26,25 +26,28 @@ except socket.error as message:
 adcSR = ADCStreamReader()
 adc0 = adcSR.open(differential=0, gain=16, data_rate=8, sleep=0)
 
-sensor = "CH0"
-value = adcSR.read(adc0)
-now = datetime.datetime.now()
-sensor_time = now.strftime("%H:%M:%S:%f")
+topic = "/PP01/ADC0/RAW/"
 
-data_dict = {"sensor": sensor, "value": value, "time": sensor_time}
-serialized_data = pickle.dumps(data_dict)
+#data_dict = {"sensor": sensor, "value": value, "time": sensor_time}
+#serialized_data = pickle.dumps(data_dict)
 
 while True:
     #todo set the above sensor, dict, serialized_data, etc here
-    value = random.randrange(-20, 20)
-    now = datetime.datetime.now()
-    sensor_time = now.strftime("%H:%M:%S:%f")
+    #value = random.randrange(-20, 20)
+    #now = datetime.datetime.now()
+    #sensor_time = now.strftime("%H:%M:%S:%f")
     #value = adcSR.read(adc0)
     #print(value)
-    data_dict = {"sensor": sensor, "value": value, "time": sensor_time}
-    serialized_data = pickle.dumps(data_dict)
+    #data_dict = {"sensor": sensor, "value": str(value), "time": sensor_time}
+    #serialized_data = pickle.dumps(data_dict)
+    value = adcSR.read(adc0)
+    now = datetime.datetime.now()
+    sensor_time = now.strftime("%H:%M:%S:%f")
+    message = topic + ", " + sensor_time + ", " + str(value)
+
     print("Sending...")
-    s.send(serialized_data)
+    #s.send(serialized_data)
+    s.send(message.encode())
     time.sleep(1)
 
 s.close()

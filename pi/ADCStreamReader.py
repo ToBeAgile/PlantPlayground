@@ -21,7 +21,7 @@ class ChannelInfo:
 class ADCStreamReader:
     
     GAIN = 16
-    DATA_RATE = 8 # 8, 16, 32, 64, 128, 250, 475, 860
+    DATA_RATE = 64 # 8, 16, 32, 64, 128, 250, 475, 860
 
     SLEEP = 2
     NUMBEROFCHANNELS = 2
@@ -38,7 +38,7 @@ class ADCStreamReader:
     voltsPerDivision = 0
     status = 'close'
     gain = 16
-    data_rate = 8
+    data_rate = DATA_RATE
     sleep = 1
     channel = 0
     differential = 0

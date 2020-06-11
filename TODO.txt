@@ -32,7 +32,10 @@ Added tests.py to application to run all test in project, must check in
 
 """
 Check-in Messages:
-Added rudimentary support for a second channel, giving each one the ability to sleep for a specified time
+Changed Pi-side.py to send encoded string with sensor data instead of using Pickel
+
+
+
 
 
 
