@@ -74,25 +74,19 @@ def update_graph(n):
 def update_data():
     while True:
         serialized_data = client.recv(size)
-        data_dict = pickle.loads(serialized_data)
+        value = pickle.loads(serialized_data)
+        #data_dict = pickle.loads(serialized_data)
         #sensor = data_dict["sensor"]
-        value = data_dict["value"]
-        time = data_dict["time"]
-        print("Time: ", time, " Value: ", value)
+        #value = data_dict["value"]
+        #time = data_dict["time"]
+        #print("Time: ", time, " Value: ", value)
         #dl.write(str(time), str(value))
         X.append(X[-1]+1)
         Y.append(value)
 
-def test_fun():
-    while True:
-        print("hi")
-        time.sleep(0.4)
 
 if __name__ == '__main__':
     threading.Thread(target=update_data).start()
     threading.Thread(target=app.run_server).start()
-    #threading.Thread(target=test_fun).start()
-    #isDashInitialized = True
-    #app.run_server() #debug enables reload by default. This means that every line is run again, resulting in reinitialization. This breaks sockets.
     #app.run_server(debug=True, use_reloader=False) #to debug and block reload
     #see https://stackoverflow.com/questions/9449101/how-to-stop-flask-from-initialising-twice-in-debug-mode for another option to block only certain things from being reinitialized
