@@ -10,6 +10,16 @@ import csv
 #sys.path.insert(1, '.')
 #from services.DataLogger import DataLogger
 
+#Set the rates. Implement these into a GUI
+sensor_read_frequency = 25.0 #Hz
+network_write_frequency = 20.0 #Hz    How many data points will be graphed each second
+data_log_frequency = 2.0 #Hz  How many data points are logged each second locally, on the pi
+
+#Calculated from above
+sensor_read_time = float(1/sensor_read_frequency)
+network_write_time = float(1/network_write_frequency)
+data_log_time = float(1/data_log_frequency)
+
 # Create an ADS1115 ADC (16-bit) instance.
 adc = Adafruit_ADS1x15.ADS1115()
 GAIN = 16
@@ -50,7 +60,7 @@ def read_sensor():
         sensor_time = now.strftime("%H:%M:%S:%f")
         #log the data
         #dl.write(str(time), str(value)) #this may be way too slow. Check implementation, might be reopening file every write. Even with a stream, might be too slow
-        read_event.wait(0.4) #todo depend on a user modified variable
+        read_event.wait(sensor_read_time) #todo depend on a user modified variable
 
 def write_network():
     global sensor
@@ -58,9 +68,10 @@ def write_network():
     global sensor_time
 
     while True:
-        write_event.wait(1)
-        data_dict = {"sensor": sensor, "value": value, "time": sensor_time}
-        serialized_data = pickle.dumps(data_dict)
+        write_event.wait(network_write_time)
+        #data_dict = {"sensor": sensor, "value": value, "time": sensor_time}
+        #serialized_data = pickle.dumps(data_dict)
+        serialized_data = pickle.dumps(value)
         s.send(serialized_data)
 
 def log_data():
@@ -79,7 +90,7 @@ def log_data():
     writer.writerow(["Time", "Value"])
     #for k in range(10):
     while True:
-        log_event.wait(0.5)
+        log_event.wait(data_log_time)
         writer.writerow([sensor_time, value])
     file.close()
 
