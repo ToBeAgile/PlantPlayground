@@ -49,10 +49,13 @@ b_time_q.append(1)
 b_value_q = deque(maxlen=300)
 b_value_q.append(1)
 
+time_mark = datetime.datetime.now()
+time_mark_set = False
 
 app = dash.Dash(__name__)
 app.layout = html.Div(
     [
+        html.Button('Set Time Marker', id='set-marker', n_clicks=0),
         html.Button('Save Note', id='save-note', n_clicks=0),
         dcc.Input(id="input-field", type="text", placeholder="", value="", debounce=True),
         html.Div(id='text-output', children='Enter your value'),
@@ -71,16 +74,35 @@ app.layout = html.Div(
     ]
 )
 
+"""
+@app.callback(
+    Output('text-output', 'children'),
+    [Input('set-marker', 'n_clicks')])
+def set_marker(button_clicks):
+    global time_mark
+    global time_mark_set
+    time_mark = datetime.datetime.now()
+    ms = "Test"
+    time_mark_set = True
+    return 'You entered: {}'.format(ms)
+"""
+
+
+#read from the text input
+#write that text output to a file
 @app.callback(
     Output('text-output', 'children'),
     [Input('input-field', 'value'), Input('save-note', 'n_clicks')])
 def save_note(text_value, button_clicks):
-    #read from the text input
-    #write that text output to a file
-    now = datetime.datetime.now()
+    global time_mark
+    global time_mark_set
+    
+    if not time_mark_set:
+        time_mark = datetime.datetime.now()
     with open('notes.csv', 'a', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow([now.strftime("%Y-%m-%d %H:%M:%S:%f"), text_value])
+        writer.writerow([time_mark.strftime("%Y-%m-%d %H:%M:%S:%f"), text_value])
+    time_mark_set = False
     return 'You entered: {}'.format(text_value)
 
 @app.callback(Output('a-graph', 'figure'),
