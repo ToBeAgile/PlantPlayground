@@ -53,6 +53,8 @@ b_value_q.append(1)
 app = dash.Dash(__name__)
 app.layout = html.Div(
     [
+        dcc.Input(id="input-field", type="text", placeholder="", value="", debounce=True),
+        html.Button('Save Note', id='save-note', n_clicks=0),
         dcc.Graph(id='a-graph', animate=True),
         dcc.Graph(id='b-graph', animate=True),
         dcc.Interval(
