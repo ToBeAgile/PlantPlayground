@@ -10,9 +10,9 @@ import random
 import plotly.graph_objs as go
 from collections import deque
 import threading
-#sys.path.insert(1, '/Users/davidscottbernstein/Dropbox/Dev/Python/Projects/PlantPlayground')
-#from services.DataLogger import DataLogger
+import datetime
 import time
+import csv
 
 host = ''
 port = 50000
@@ -53,8 +53,9 @@ b_value_q.append(1)
 app = dash.Dash(__name__)
 app.layout = html.Div(
     [
-        dcc.Input(id="input-field", type="text", placeholder="", value="", debounce=True),
         html.Button('Save Note', id='save-note', n_clicks=0),
+        dcc.Input(id="input-field", type="text", placeholder="", value="", debounce=True),
+        html.Div(id='text-output', children='Enter your value'),
         dcc.Graph(id='a-graph', animate=True),
         dcc.Graph(id='b-graph', animate=True),
         dcc.Interval(
@@ -69,6 +70,18 @@ app.layout = html.Div(
         ),
     ]
 )
+
+@app.callback(
+    Output('text-output', 'children'),
+    [Input('input-field', 'value'), Input('save-note', 'n_clicks')])
+def save_note(text_value, button_clicks):
+    #read from the text input
+    #write that text output to a file
+    now = datetime.datetime.now()
+    with open('notes.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([now.strftime("%Y-%m-%d %H:%M:%S:%f"), text_value])
+    return 'You entered: {}'.format(text_value)
 
 @app.callback(Output('a-graph', 'figure'),
               [Input('a-update', 'n_intervals')])
