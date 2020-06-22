@@ -59,6 +59,7 @@ app.layout = html.Div(
         html.Button('Save Note', id='save-note', n_clicks=0),
         dcc.Input(id="input-field", type="text", placeholder="", value="", debounce=True),
         html.Div(id='text-output', children='Enter your value'),
+        html.Div(id='time-mark-output', children=''),
         dcc.Graph(id='a-graph', animate=True),
         dcc.Graph(id='b-graph', animate=True),
         dcc.Interval(
@@ -74,18 +75,18 @@ app.layout = html.Div(
     ]
 )
 
-"""
+
 @app.callback(
-    Output('text-output', 'children'),
+    Output('time-mark-output', 'children'),
     [Input('set-marker', 'n_clicks')])
 def set_marker(button_clicks):
     global time_mark
     global time_mark_set
     time_mark = datetime.datetime.now()
-    ms = "Test"
     time_mark_set = True
-    return 'You entered: {}'.format(ms)
-"""
+    return 'Time mark set: {}'.format(time_mark.strftime("%Y-%m-%d %H:%M:%S:%f"))
+
+
 
 
 #read from the text input
@@ -94,6 +95,7 @@ def set_marker(button_clicks):
     Output('text-output', 'children'),
     [Input('input-field', 'value'), Input('save-note', 'n_clicks')])
 def save_note(text_value, button_clicks):
+    print("save clicked")
     global time_mark
     global time_mark_set
     
@@ -161,6 +163,7 @@ def update_data():
 
 if __name__ == '__main__':
     threading.Thread(target=update_data).start()
-    threading.Thread(target=app.run_server).start()
+    #threading.Thread(target=app.run_server).start()
+    threading.Thread(target=app.run_server, kwargs={'debug': True, 'use_reloader': False}).start()
     #app.run_server(debug=True, use_reloader=False) #to debug and block reload
     #see https://stackoverflow.com/questions/9449101/how-to-stop-flask-from-initialising-twice-in-debug-mode for another option to block only certain things from being reinitialized
