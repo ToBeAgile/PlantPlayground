@@ -53,27 +53,46 @@ b_value_q.append(1)
 app = dash.Dash(__name__)
 app.layout = html.Div(
     [
-        dcc.Graph(id='live-graph', animate=True),
+        dcc.Graph(id='a-graph', animate=True),
+        dcc.Graph(id='b-graph', animate=True),
         dcc.Interval(
-            id='graph-update',
+            id='a-update',
+            interval=1000,
+            n_intervals=0
+        ),
+        dcc.Interval(
+            id='b-update',
             interval=1000,
             n_intervals=0
         ),
     ]
 )
 
-@app.callback(Output('live-graph', 'figure'),
-              [Input('graph-update', 'n_intervals')])
-def update_graph(n):
+@app.callback(Output('a-graph', 'figure'),
+              [Input('a-update', 'n_intervals')])
+def update_a_graph(n):
     data = plotly.graph_objs.Scatter(
             x=list(a_time_q),
             y=list(a_value_q),
-            name='Scatter',
+            name='a-graph',
             mode= 'lines+markers'
             )
 
     return {'data': [data],'layout' : go.Layout(xaxis=dict(range=[(max(a_time_q)-50),max(a_time_q)]),
                                                 yaxis=dict(range=[(min(a_value_q)-5),max(a_value_q)+5]),)}
+
+@app.callback(Output('b-graph', 'figure'),
+              [Input('b-update', 'n_intervals')])
+def update_b_graph(n):
+    data = plotly.graph_objs.Scatter(
+            x=list(b_time_q),
+            y=list(b_value_q),
+            name='b-graph',
+            mode= 'lines+markers'
+            )
+
+    return {'data': [data],'layout' : go.Layout(xaxis=dict(range=[(max(b_time_q)-50),max(b_time_q)]),
+                                                yaxis=dict(range=[(min(b_value_q)-5),max(b_value_q)+5]),)}
 
 
 def update_data():
@@ -91,6 +110,13 @@ def update_data():
             a_value = data_dict["value"]
             a_time_q.append(a_time_q[-1]+1)
             a_value_q.append(a_value)
+        elif sensor == "b_sensor":
+            b_time = data_dict["time"]
+            b_value = data_dict["value"]
+            b_time_q.append(b_time_q[-1]+1)
+            b_value_q.append(b_value)
+        else:
+            print("Bad network data!")
         #value = data_dict["value"]
         #time = data_dict["time"]
         #print("Time: ", time, " Value: ", value)
