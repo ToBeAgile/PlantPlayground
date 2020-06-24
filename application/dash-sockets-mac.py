@@ -2,7 +2,7 @@ import socket
 import sys
 import pickle
 import dash
-from dash.dependencies import Output, Input
+from dash.dependencies import Output, Input, State
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly
@@ -42,12 +42,10 @@ except socket.error as message:
 a_time_q = deque(maxlen=300)
 a_time_q.append(1)
 a_value_q = deque(maxlen=300)
-a_value_q.append(1)
 
 b_time_q = deque(maxlen=300)
 b_time_q.append(1)
 b_value_q = deque(maxlen=300)
-b_value_q.append(1)
 
 time_mark = datetime.datetime.now()
 time_mark_set = False
@@ -91,11 +89,13 @@ def set_marker(button_clicks):
 
 #read from the text input
 #write that text output to a file
+#n_submit correct behavior, but incorrect value
+#value correct value, but incorrect behavior
 @app.callback(
     Output('text-output', 'children'),
-    [Input('input-field', 'value'), Input('save-note', 'n_clicks')])
-def save_note(text_value, button_clicks):
-    print("save clicked")
+    [Input('input-field', 'n_submit'), Input('save-note', 'n_clicks')],
+    [State('input-field', 'value')])
+def save_note(text_submit, button_clicks, text_value):
     global time_mark
     global time_mark_set
     
