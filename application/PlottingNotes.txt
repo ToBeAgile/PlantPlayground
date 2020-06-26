@@ -1,7 +1,0 @@
-Plotting notes:
-    Time based X
-    Graph all inputs
-    Save a graph periodically
-    Have a larger timescale
-    Separate thread
-    Database (mongoDB?)

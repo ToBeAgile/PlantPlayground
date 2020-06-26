@@ -11,9 +11,9 @@ import csv
 #from services.DataLogger import DataLogger
 
 #Set the rates. Implement these into a GUI
-sensor_read_frequency = 20.0 #Hz
+sensor_read_frequency = 25.0 #Hz
 network_write_frequency = 10.0 #Hz    How many data points will be graphed each second
-data_log_frequency = 0.01 #Hz  How many data points are logged each second locally, on the pi
+data_log_frequency = 1.00 #Hz  How many data points are logged each second locally, on the pi
 
 #Calculated from above
 sensor_read_time = float(1/sensor_read_frequency)
@@ -23,7 +23,7 @@ data_log_time = float(1/data_log_frequency)
 # Create an ADS1115 ADC (16-bit) instance.
 adc = Adafruit_ADS1x15.ADS1115()
 a_gain = 16
-b_gain = 2/3
+b_gain = 16
 a_data_rate = 128
 b_data_rate = 128
 volts_per_division_table = {2/3:6.144, 1:4.096, 2:2.048, 4:1.024, 8:0.512, 16:0.256}
