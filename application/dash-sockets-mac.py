@@ -2,7 +2,7 @@ import socket
 import sys
 import pickle
 import dash
-from dash.dependencies import Output, Input
+from dash.dependencies import Output, Input, State
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly
@@ -10,9 +10,9 @@ import random
 import plotly.graph_objs as go
 from collections import deque
 import threading
-#sys.path.insert(1, '/Users/davidscottbernstein/Dropbox/Dev/Python/Projects/PlantPlayground')
-#from services.DataLogger import DataLogger
+import datetime
 import time
+import csv
 
 host = ''
 port = 50000
@@ -42,17 +42,22 @@ except socket.error as message:
 a_time_q = deque(maxlen=300)
 a_time_q.append(1)
 a_value_q = deque(maxlen=300)
-a_value_q.append(1)
 
 b_time_q = deque(maxlen=300)
 b_time_q.append(1)
 b_value_q = deque(maxlen=300)
-b_value_q.append(1)
 
+time_mark = datetime.datetime.now()
+time_mark_set = False
 
 app = dash.Dash(__name__)
 app.layout = html.Div(
     [
+        html.Button('Set Time Marker', id='set-marker', n_clicks=0),
+        html.Button('Save Note', id='save-note', n_clicks=0),
+        dcc.Input(id="input-field", type="text", placeholder="", value="", debounce=True),
+        html.Div(id='text-output', children='Enter your value'),
+        html.Div(id='time-mark-output', children=''),
         dcc.Graph(id='a-graph', animate=True),
         dcc.Graph(id='b-graph', animate=True),
         dcc.Interval(
@@ -67,6 +72,40 @@ app.layout = html.Div(
         ),
     ]
 )
+
+
+@app.callback(
+    Output('time-mark-output', 'children'),
+    [Input('set-marker', 'n_clicks')])
+def set_marker(button_clicks):
+    global time_mark
+    global time_mark_set
+    time_mark = datetime.datetime.now()
+    time_mark_set = True
+    return 'Time mark set: {}'.format(time_mark.strftime("%Y-%m-%d %H:%M:%S:%f"))
+
+
+
+
+#read from the text input
+#write that text output to a file
+#n_submit correct behavior, but incorrect value
+#value correct value, but incorrect behavior
+@app.callback(
+    Output('text-output', 'children'),
+    [Input('input-field', 'n_submit'), Input('save-note', 'n_clicks')],
+    [State('input-field', 'value')])
+def save_note(text_submit, button_clicks, text_value):
+    global time_mark
+    global time_mark_set
+    
+    if not time_mark_set:
+        time_mark = datetime.datetime.now()
+    with open('notes.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([time_mark.strftime("%Y-%m-%d %H:%M:%S:%f"), text_value])
+    time_mark_set = False
+    return 'You entered: {}'.format(text_value)
 
 @app.callback(Output('a-graph', 'figure'),
               [Input('a-update', 'n_intervals')])
@@ -124,6 +163,7 @@ def update_data():
 
 if __name__ == '__main__':
     threading.Thread(target=update_data).start()
-    threading.Thread(target=app.run_server).start()
+    #threading.Thread(target=app.run_server).start()
+    threading.Thread(target=app.run_server, kwargs={'debug': True, 'use_reloader': False}).start()
     #app.run_server(debug=True, use_reloader=False) #to debug and block reload
     #see https://stackoverflow.com/questions/9449101/how-to-stop-flask-from-initialising-twice-in-debug-mode for another option to block only certain things from being reinitialized
