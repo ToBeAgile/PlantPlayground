@@ -39,13 +39,13 @@ except socket.error as message:
     sys.exit(1)
 
 
-a_time_q = deque(maxlen=300)
+a_time_q = deque(maxlen=50)
 a_time_q.append(1)
-a_value_q = deque(maxlen=300)
+a_value_q = deque(maxlen=50)
 
-b_time_q = deque(maxlen=300)
+b_time_q = deque(maxlen=50)
 b_time_q.append(1)
-b_value_q = deque(maxlen=300)
+b_value_q = deque(maxlen=50)
 
 time_mark = datetime.datetime.now()
 time_mark_set = False
