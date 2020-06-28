@@ -6,7 +6,7 @@ import matplotlib
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 
 from pi.ADS1115Reader import *
-from services.DataLogger import *
+from pi.LocalDataLogger import *
 #from services.Plotter import *
 #from ../services/ADS1115Reader import *
 #from StreamInfo import *
@@ -14,7 +14,7 @@ from services.DataLogger import *
 import datetime
 
 GAIN = 16
-DATA_RATE = 8
+DATA_RATE = 128 # 8, 16, 32, 64, 128, 250, 475, 860
 SLEEP = 2
 NUMBEROFCHANNELS = 2
 DIFFERENTIAL1 = 0
@@ -40,6 +40,7 @@ dl.write("Plant bioelectric data log. Project: Setup")
 dl.write(dl.filename)
 dl.write("Channel0 is the control (a potato).")
 dl.write("Channel1 is the plant connected to tinned copper wire.")
+dl.write("Plant now in Faraday cage.")
 dl.write("Gain: " + str(GAIN))
 dl.write("Volts per division: " + str(reader.voltsPerDivision))
 dl.write("Data rate: " + str(DATA_RATE))
