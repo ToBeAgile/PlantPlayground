@@ -19,7 +19,7 @@ port = 50000
 backlog = 5
 size = 5096
 
-#dl = DataLogger()
+# dl = DataLogger()
 
 s = None
 try:
@@ -38,7 +38,6 @@ except socket.error as message:
     print("Could not open socket: " + str(message))
     sys.exit(1)
 
-
 a_time_q = deque(maxlen=50)
 a_time_q.append(1)
 a_value_q = deque(maxlen=50)
@@ -50,27 +49,76 @@ b_value_q = deque(maxlen=50)
 time_mark = datetime.datetime.now()
 time_mark_set = False
 
+''' 
+    Add to dashboard
+            Project: <Name>
+            File: <Path>
+            Start: <Date/Time>
+            End: <Date/Time>
+            Description: 
+                <Text>
+            [New] [Open] [Save]
+            
+    Controls
+            Network Write Frequency (Hz): <int>
+            Sensor Read Frequency (Hz): <int>            
+            Sensor Channel A: [Off] [On]
+                Gain: <int>
+                Data Rate: <int>
+            Sensor Channel B: [Off] [On]
+                Gain: <int>
+                Data Rate: <int>
+            Logging: [Off] [Local] [Remote]
+            Download Remote Log: [Off] [Nightly]
+            Logging Interval: [Sec] [Min] [Hr] [Dif1] [Dif2]
+            Sound [Off] [On]
+            Graph A: [Off] [On]
+            Graph B: [Off] [On] 
+            
+    Displays
+            Notes: 
+                <Text>
+            Log:
+                [Text]    
+
+            Graph A:
+                [Graph A]
+            Graph B:
+                [Graph B]         
+                                 
+    '''
 app = dash.Dash(__name__)
-app.layout = html.Div(
-    [
-        html.Button('Set Time Marker', id='set-marker', n_clicks=0),
-        html.Button('Save Note', id='save-note', n_clicks=0),
-        dcc.Input(id="input-field", type="text", placeholder="", value="", debounce=True),
-        html.Div(id='text-output', children='Enter your value'),
-        html.Div(id='time-mark-output', children=''),
-        dcc.Graph(id='a-graph', animate=True),
-        dcc.Graph(id='b-graph', animate=True),
-        dcc.Interval(
-            id='a-update',
-            interval=1000,
-            n_intervals=0
-        ),
-        dcc.Interval(
-            id='b-update',
-            interval=1000,
-            n_intervals=0
-        ),
-    ]
+app.layout = html.Div(children=[
+    html.H2(children='Plant Playground Dashboard',
+    style = {
+    'textAlign': 'center'
+    }
+            ),
+    html.Div(children=''''
+            Automation Research Lab - Version 0.1
+            ''',
+    style = {
+    'textAlign': 'center'
+}
+             ),
+    html.Button('Set Time Marker', id='set-marker', n_clicks=0),
+    html.Button('Save Note', id='save-note', n_clicks=0),
+    dcc.Input(id="input-field", type="text", placeholder="", value="", debounce=True),
+    html.Div(id='text-output', children='Enter your value'),
+    html.Div(id='time-mark-output', children=''),
+    dcc.Graph(id='a-graph', animate=True),
+    dcc.Graph(id='b-graph', animate=True),
+    dcc.Interval(
+        id='a-update',
+        interval=1000,
+        n_intervals=0
+    ),
+    dcc.Interval(
+        id='b-update',
+        interval=1000,
+        n_intervals=0
+    ),
+]
 )
 
 
@@ -85,12 +133,10 @@ def set_marker(button_clicks):
     return 'Time mark set: {}'.format(time_mark.strftime("%Y-%m-%d %H:%M:%S:%f"))
 
 
-
-
-#read from the text input
-#write that text output to a file
-#n_submit correct behavior, but incorrect value
-#value correct value, but incorrect behavior
+# read from the text input
+# write that text output to a file
+# n_submit correct behavior, but incorrect value
+# value correct value, but incorrect behavior
 @app.callback(
     Output('text-output', 'children'),
     [Input('input-field', 'n_submit'), Input('save-note', 'n_clicks')],
@@ -98,7 +144,7 @@ def set_marker(button_clicks):
 def save_note(text_submit, button_clicks, text_value):
     global time_mark
     global time_mark_set
-    
+
     if not time_mark_set:
         time_mark = datetime.datetime.now()
     with open('notes.csv', 'a', newline='') as file:
@@ -107,38 +153,40 @@ def save_note(text_submit, button_clicks, text_value):
     time_mark_set = False
     return 'You entered: {}'.format(text_value)
 
+
 @app.callback(Output('a-graph', 'figure'),
               [Input('a-update', 'n_intervals')])
 def update_a_graph(n):
     data = plotly.graph_objs.Scatter(
-            x=list(a_time_q),
-            y=list(a_value_q),
-            name='a-graph',
-            mode= 'lines+markers'
-            )
+        x=list(a_time_q),
+        y=list(a_value_q),
+        name='a-graph',
+        mode='lines+markers'
+    )
 
-    return {'data': [data],'layout' : go.Layout(xaxis=dict(range=[(max(a_time_q)-50),max(a_time_q)]),
-                                                yaxis=dict(range=[(min(a_value_q)-5),max(a_value_q)+5]),)}
+    return {'data': [data], 'layout': go.Layout(xaxis=dict(range=[(max(a_time_q) - 50), max(a_time_q)]),
+                                                yaxis=dict(range=[(min(a_value_q) - 5), max(a_value_q) + 5]), )}
+
 
 @app.callback(Output('b-graph', 'figure'),
               [Input('b-update', 'n_intervals')])
 def update_b_graph(n):
     data = plotly.graph_objs.Scatter(
-            x=list(b_time_q),
-            y=list(b_value_q),
-            name='b-graph',
-            mode= 'lines+markers'
-            )
+        x=list(b_time_q),
+        y=list(b_value_q),
+        name='b-graph',
+        mode='lines+markers'
+    )
 
-    return {'data': [data],'layout' : go.Layout(xaxis=dict(range=[(max(b_time_q)-50),max(b_time_q)]),
-                                                yaxis=dict(range=[(min(b_value_q)-5),max(b_value_q)+5]),)}
+    return {'data': [data], 'layout': go.Layout(xaxis=dict(range=[(max(b_time_q) - 50), max(b_time_q)]),
+                                                yaxis=dict(range=[(min(b_value_q) - 5), max(b_value_q) + 5]), )}
 
 
 def update_data():
     while True:
         serialized_data = client.recv(size)
-        #value = pickle.loads(serialized_data)
-        try: #deal with occasional broken network data
+        # value = pickle.loads(serialized_data)
+        try:  # deal with occasional broken network data
             data_dict = pickle.loads(serialized_data)
             sensor = data_dict["sensor"]
         except:
@@ -147,23 +195,25 @@ def update_data():
         if sensor == "a_sensor":
             a_time = data_dict["time"]
             a_value = data_dict["value"]
-            a_time_q.append(a_time_q[-1]+1)
+            a_time_q.append(a_time_q[-1] + 1)
             a_value_q.append(a_value)
         elif sensor == "b_sensor":
             b_time = data_dict["time"]
             b_value = data_dict["value"]
-            b_time_q.append(b_time_q[-1]+1)
+            b_time_q.append(b_time_q[-1] + 1)
             b_value_q.append(b_value)
         else:
             print("Bad network data!")
-        #value = data_dict["value"]
-        #time = data_dict["time"]
-        #print("Time: ", time, " Value: ", value)
-        #dl.write(str(time), str(value))
+        # value = data_dict["value"]
+        # time = data_dict["time"]
+        # print("Time: ", time, " Value: ", value)
+        # dl.write(str(time), str(value))
+
 
 if __name__ == '__main__':
     threading.Thread(target=update_data).start()
-    #threading.Thread(target=app.run_server).start()
+    # threading.Thread(target=app.run_server).start()
     threading.Thread(target=app.run_server, kwargs={'debug': True, 'use_reloader': False}).start()
-    #app.run_server(debug=True, use_reloader=False) #to debug and block reload
-    #see https://stackoverflow.com/questions/9449101/how-to-stop-flask-from-initialising-twice-in-debug-mode for another option to block only certain things from being reinitialized
+    # app.run_server(debug=True, use_reloader=False) #to debug and block reload
+    # see https://stackoverflow.com/questions/9449101/how-to-stop-flask-from-initialising-twice-in-debug-mode for another option to block only certain things from being reinitialized
+    # Copyright (c) 2020 Picocosm, Inc.
