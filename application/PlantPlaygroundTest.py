@@ -4,7 +4,7 @@ import unittest
 import sys
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 
-from application.PlantPlayground import *
+from application.PlantPlayground2 import *
 
 class PlantPlaygrountTest(unittest.TestCase):
     reader = ADS1115Reader()
