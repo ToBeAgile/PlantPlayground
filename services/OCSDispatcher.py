@@ -10,8 +10,8 @@ def set_filter(address: str, *args: List[Any]) -> None:
         return
 
     # Check that address starts with filter
-    if not address[:-1] == "/PP01/ADC0/RAW/":  # Cut off the last character
-        return
+    #if not address[:-1] == "/PP01/ADC0/RAW/":  # Cut off the last character
+        #return
 
     value1 = args[0]
     value2 = args[1]
@@ -25,8 +25,8 @@ dispatcher.map("/filter*", set_filter)  # Map wildcard address to set_filter fun
 from pythonosc.osc_server import BlockingOSCUDPServer
 from pythonosc.udp_client import SimpleUDPClient
 
-server = BlockingOSCUDPServer(("127.0.0.1", 1337), dispatcher)
-client = SimpleUDPClient("127.0.0.1", 1337)
+server = BlockingOSCUDPServer(("127.0.0.1", 50000), dispatcher) #port was 1337
+client = SimpleUDPClient("127.0.0.1", 50000)
 
 # Send message and receive exactly one message (blocking)
 client.send_message("/PP01/ADC0/RAW/", [1., 2.])
