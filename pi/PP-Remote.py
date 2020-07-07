@@ -62,29 +62,17 @@ def read_sensor():
     global b_value
     global b_time
     global sensor_state
-
+    
     while True:
-        #a_value = (adc.read_adc_difference(0, gain=a_gain, data_rate=a_data_rate)) * mv_per_division
-        #a_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
-        
-        if sensor_state == 0:
-            a_value = adc.read_adc_difference(0, gain=a_gain, data_rate=860)
-            a_value = (adc.read_adc_difference(0, gain=a_gain, data_rate=a_data_rate)) * a_mv_per_division
-            a_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
-            sensor_state = sensor_state + 1
-            print("A time, value: ", a_time, a_value)
-        elif sensor_state == 1:
-            b_value = adc.read_adc_difference(3, gain=b_gain, data_rate=860)
-            b_value = (adc.read_adc_difference(3, gain=b_gain, data_rate=b_data_rate)) * b_mv_per_division
-            b_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
-            sensor_state = 0
-            print("B time, value: ", b_time, b_value)
-        else:
-            print("Sensor state machine error!")
-            sensor_state = 0
-        
+        #a_value = adc.read_adc_difference(0, gain=a_gain, data_rate=860)
+        a_value = (adc.read_adc_difference(0, gain=a_gain, data_rate=a_data_rate)) * a_mv_per_division
+        a_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
+        #b_value = adc.read_adc_difference(3, gain=b_gain, data_rate=860)
+        b_value = (adc.read_adc_difference(3, gain=b_gain, data_rate=b_data_rate)) * b_mv_per_division
+        b_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
+        print("Channel A: ", a_time, a_value, " Channel B: ", b_time, b_value)        
         read_event.wait(sensor_read_time) #todo depend on a user modified variable
-
+ 
 def write_network():
     global a_value
     global a_time
@@ -132,9 +120,9 @@ def log_data():
         writer.writerow(["Software: PlantPlayground, File: PP-Remote.py, Version 0.1"])
         writer.writerow(["Reading 2 differential channels in milivolts with a sensor read frequency of " + str(sensor_read_time) + "."])
         writer.writerow(["The plant is in a Faraday cage and the Pi 4 is in a Faraday cage inside the Faraday cage with a common ground."])
-        writer.writerow(["Channel A is connected to the plant using a tinned coppper wire."])
+        writer.writerow(["Channel A is connected to a potato in a Faraday cage. Channel B is connected to a plant in a Faraday cage."])
         writer.writerow(["Gain: " + str(a_gain) + ", Data Rate: " + str(a_data_rate) + ", Volts per Division: " + str(a_mv_per_division) + "."])
-        writer.writerow(["Channel B is connected to the plant using a silver-silver chloride wire."])
+        writer.writerow(["Channels A and B are connected using a silver-silver chloride wire that I made myself."])
         writer.writerow(["Gain: " + str(b_gain) + ", Data Rate: " + str(b_data_rate) + ", Volts per Division: " + str(b_mv_per_division) + "."])
 
     while True:
@@ -149,3 +137,7 @@ log_event = threading.Event()
 threading.Thread(target=read_sensor).start()
 threading.Thread(target=write_network).start()
 threading.Thread(target=log_data).start()
+
+def a():
+    return True
+
