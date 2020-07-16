@@ -1,3 +1,4 @@
+# PlantPlayground Version 0.1 Copyright(c) 2020 Picocosm, Inc.
 import socket
 import sys
 import pickle
@@ -51,8 +52,62 @@ time_mark = datetime.datetime.now()
 time_mark_set = False
 
 app = dash.Dash(__name__)
-app.layout = html.Div(
-    [
+''' 
+    Add to dashboard
+            Project: <Name>
+            File: <Path>
+            Start: <Date/Time>
+            End: <Date/Time>
+            Description: 
+                <Text>
+            [New] [Open] [Save]
+
+    Controls
+            Sensor Read Frequency (Hz): <int>            
+            Network Write Frequency (Hz): <int>
+            Sensor Channel A: [Off] [On] Gain: <int> Data Rate: <int>
+            Sensor Channel B: [Off] [On] Gain: <int> Data Rate: <int>
+            Sensor Channel C: [Off] [On] Gain: <int> Data Rate: <int>
+            Sensor Channel D: [Off] [On] Gain: <int> Data Rate: <int>
+            Logging: [Off] [Local] [Remote]
+            Download Remote Log: [Off] [Nightly]
+            Logging Interval: [Sec] [Min] [Hr] [Dif1] [Dif2]
+            Sound [Off] [On]
+            Graph A: [Off] [On]
+            Graph B: [Off] [On] 
+            Graph C: [Off] [On] 
+            Graph D: [Off] [On] 
+
+    Displays
+            Notes: 
+                <Text>
+            Log:
+                [Text]    
+
+            Graph A:
+                [Graph A]
+            Graph B:
+                [Graph B]         
+           Graph C:
+                [Graph C]
+            Graph D:
+                [Graph D]         
+
+    '''
+
+app.layout = html.Div(children=[
+    html.H2(children='Plant Playground Dashboard',
+    style = {
+    'textAlign': 'center'
+    }
+            ),
+    html.Div(children=''''
+            Automation Research Lab - Version 0.1
+            ''',
+    style = {
+    'textAlign': 'center'
+            }
+        ),
         html.Button('Set Time Marker', id='set-marker', n_clicks=0),
         html.Button('Save Note', id='save-note', n_clicks=0),
         dcc.Input(id="input-field", type="text", placeholder="", value="", debounce=True),
