@@ -2,11 +2,13 @@ import Adafruit_ADS1x15
 import time
 import sys
 import timeit
+import cmd, logging, smbus, RPi.GPIO as GPIO
+
 #from pythonosc.udp_client import SimpleUDPClient
 
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
-#from pi.ADS1115Reader import *
-
+from pi.ADS1115Runner import *
+ 
 """
 class ChannelInfo:
     channel_number
@@ -33,6 +35,7 @@ class ADCStreamReader:
     CH0SLEEPTIME = 1
     CH1SLEEPTIME = 1
 
+    ads1115Runner = ADS1115Runner()
     adc = Adafruit_ADS1x15.ADS1115()
     volts_per_division_table = {0:6.144, 1:4.096, 2:2.048, 4:1.024, 8:0.512, 16:0.256}
     voltsPerDivision = 0
@@ -42,6 +45,8 @@ class ADCStreamReader:
     sleep = 0
     channel = 0
     differential = 0
+    value = 0
+    value_raw = 0
     
     ip = "127.0.0.1"
     port = 1337
@@ -51,34 +56,55 @@ class ADCStreamReader:
     
     def __init__(self):
        #self.channel = channel
-        dummy = 0
+        pass
 
     # Store channels separately on object 
-    def open(self, differential, gain, data_rate, sleep):
-        self.differential = differential
+    def open(self, reader_type, channel, gain, data_rate, sleep):
+        self.reader_type = reader_type
+        self.channel = channel
         self.gain = gain
         self.data_rate = data_rate
         self.sleep = sleep
         self.voltsPerDivision = ((2 * self.volts_per_division_table[self.gain])/65535)*1000
-        return self.differential
+        if (self.reader_type == 'differential_i2c'):
+            config_string = '1-000-111-1-000-0-0-0-11'
+            self.ads1115Runner.i2c_reader_init(config_string)
+            #adc = ADCStreamReader()
+            #resetChip()
+            # compare with configuration settings from ADS115 datasheet
+            # start single conversion - AIN2/GND - 4.096V - single shot - 8SPS - X
+            # - X - X - disable comparator
+            #conf = prepareLEconf('1-000-111-1-100-1-0-0-11')
+            #conf = prepareLEconf('0-000-111-1-100-1-0-0-11')
+        return self.channel
     
-    def read(self, differential):
-        time.sleep(self.sleep)
-        self.differential_value = self.adc.read_adc_difference(differential, self.gain, self.data_rate)
-        return self.differential_value * self.voltsPerDivision
-    
+    def read(self, channel):
+        if (self.reader_type == 'differential' ):
+            time.sleep(self.sleep)
+            self.differential_value = self.adc.read_adc_difference(self.differential, self.gain, self.data_rate)
+            return self.differential_value * self.voltsPerDivision
+        elif (self.reader_type == 'single_ended'):
+            time.sleep(self.sleep)            
+            self.differential_value = self.adc.read_adc(self.differential, self.gain, self.data_rate)
+            return self.differential_value * self.voltsPerDivision
+        elif (self.reader_type == 'differential_i2c'):
+            self.value_raw = self.ads1115Runner.i2c_read(channel)
+            return self.value_raw
+
+
     def read_without_sleep(self, differential):
         #time.sleep(self.sleep)
         self.differential_value = self.adc.read_adc_difference(differential, self.gain, self.data_rate)
         return self.differential_value * self.voltsPerDivision
 
 
-
+    """     
     def broadcastOSC(self):
         self.d0 = self.open(differential=0, gain=16, data_rate=860, sleep=0)
         self.d3 = self.open(differential=3, gain=16, data_rate=860, sleep=0)
 
         try:
+       
             for x in range(1, 100):
                 # for each channel read(self, channel, gain, data_rate, sleep):
                 c0_value = self.adc.read_adc_difference(self.d0, self.gain, self.data_rate)
@@ -86,17 +112,17 @@ class ADCStreamReader:
 
                 c3_value = self.adc.read_adc_difference(self.d3, self.gain, self.data_rate)
                 self.client.send_message("/PP01/ADC1/RAW/", c3_value)   # Send float message
-                """
+
                 now = datetime.datetime.now()
                 #print("Value = ", value)
                 print((now.strftime("%H:%M:%S:%f"), (round((c0_value), 4)), (round((c1_value), 4))))
                 dl.write(((now.strftime("%H:%M:%S:%f")), (round((c0_value), 4)), (round((c1_value), 4))))
                 #csvwriter.write_voltage(name="Diff_V_1: ", value=value)
-                """
+
         except KeyboardInterrupt:
             GPIO.cleanup()
             
-      
+    """      
 
 
 # channel 0 is the control (a potato) gets read a second every minute

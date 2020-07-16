@@ -9,26 +9,26 @@ from pi.ADS1115Reader import *
 class SignalPlaygrountTest(unittest.TestCase):
     reader = ADCStreamReader()
 
-    def test_ADCStreamReader_open(self):
-        self.return_differential = self.reader.open(differential=0, gain=16, data_rate=8, sleep=0)
-        assert self.reader.differential == self.return_differential
-        assert self.reader.differential == 0
+    def test_differential_stream(self):
+        self.reader.open(reader_type='differential', channel=0, gain=16, data_rate=8, sleep=0)
+        assert self.reader.reader_type == 'differential'
+        assert self.reader.channel == 0
         assert self.reader.gain == 16
         assert self.reader.data_rate == 8
         assert self.reader.sleep == 0
-        #value = self.reader.read(0, 16, 8, 0)
-        
-    def test_ADCStreamReader_read(self):
-        self.return_differential = self.reader.open(differential=0, gain=16, data_rate=8, sleep=0)
-        self.value = self.reader.read(self.reader.differential)
-        #assert self.value != 0
-        print (self.value)
+        value = self.reader.read(0)
+        print('Differential: ', value)
+    
+    def test_single_ended_stream(self):
+        self.reader.open(reader_type='single_ended', channel=0, gain=16, data_rate=8, sleep=0)
+        assert self.reader.reader_type == 'single_ended'
+        value = self.reader.read(0)
+        print('Single_ended: ', value)
 
-    def test_ADCStreamReader_broadcastOSC(self):
-        self.reader.broadcastOSC()
-        #assert self.value != 0
-        #print (self.value)
-        
+    def test_differential_i2c(self):
+        self.reader.open(reader_type='differential_i2c', channel=0, gain=16, data_rate=8, sleep=0)
+        value = self.reader.read(0)
+        print('i2c_diff: ', value)  
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,0 +1,8 @@
+"Plant bioelectric data log by David Scott Bernstein. Project: Setup, File name: "
+"Software: PlantPlayground, File: PP-Remote.py, Version 0.1"
+Reading 2 differential channels in milivolts with a sensor read frequency of 1.
+The plant is in a Faraday cage and the Pi 4 is in a Faraday cage inside the Faraday cage with a common ground.
+Channel A is connected to a potato in a Faraday cage. Channel B is connected to a plant in a Faraday cage.
+"Gain: 1, Data Rate: 1, Volts per Division: 1."
+Channels A and B are connected using a silver-silver chloride wire that I made myself.
+"Gain: 1, Data Rate: 1, Volts per Division: 1."
