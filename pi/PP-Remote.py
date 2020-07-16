@@ -11,6 +11,7 @@ import os.path
 #sys.path.insert(1, '.')
 #from services.DataLogger import DataLogger
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
+from pi.ADCStreamReader import ADCStreamReader
 
 #Set the rates. Implement these into a GUI
 data_log_frequency = 0.01 #Hz  How many data points are logged each second locally, on the pi
@@ -23,7 +24,11 @@ network_write_time = float(1/network_write_frequency)
 data_log_time = float(1/data_log_frequency)
 
 # Create an ADS1115 ADC (16-bit) instance.
-adc = Adafruit_ADS1x15.ADS1115()
+#adc = Adafruit_ADS1x15.ADS1115()
+adc = ADCStreamReader()
+channel0 = adc.open(reader_type='differential_i2c', channel=0, gain=16, data_rate=8, sleep=0)
+channel1 = adc.open(reader_type='differential_i2c', channel=0, gain=16, data_rate=8, sleep=0)
+
 a_gain = 16
 b_gain = 16
 a_data_rate = 128
@@ -34,10 +39,12 @@ b_mv_per_division = ((2 * volts_per_division_table[b_gain])/65535)*1000
 sensor_state = 0
 
 #Initialize the shared variables across threads
-a_value = (adc.read_adc_difference(0, gain=a_gain, data_rate=a_data_rate)) * a_mv_per_division
+a_raw_value = 1 #adc.read_adc_difference(0, gain=a_gain, data_rate=a_data_rate) 
+a_value = a_raw_value * a_mv_per_division
 a_time = datetime.datetime.now()
 time.sleep(0.01)
-b_value = (adc.read_adc_difference(3, gain=b_gain, data_rate=b_data_rate)) * b_mv_per_division
+b_raw_value = 1 #adc.read_adc_difference(3, gain=b_gain, data_rate=b_data_rate)
+b_value = b_raw_value * b_mv_per_division
 b_time = datetime.datetime.now()
 
 #set up the network connection
@@ -57,27 +64,36 @@ except socket.error as message:
     
 
 def read_sensor():
+    global a_raw_value
     global a_value
     global a_time
+    global b_raw_value
     global b_value
     global b_time
     global sensor_state
     
     while True:
         #a_value = adc.read_adc_difference(0, gain=a_gain, data_rate=860)
-        a_value = (adc.read_adc_difference(0, gain=a_gain, data_rate=a_data_rate)) * a_mv_per_division
+        #a_value = (adc.read_adc_difference(0, gain=a_gain, data_rate=a_data_rate)) * a_mv_per_division
+        a_raw_value = adc.read(0)
+        a_value = a_raw_value * a_mv_per_division
         a_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
         #b_value = adc.read_adc_difference(3, gain=b_gain, data_rate=860)
-        b_value = (adc.read_adc_difference(3, gain=b_gain, data_rate=b_data_rate)) * b_mv_per_division
+        #b_value = (adc.read_adc_difference(3, gain=b_gain, data_rate=b_data_rate)) * b_mv_per_division
+        b_raw_value = adc.read(1)
+        b_value = b_raw_value * b_mv_per_division
         b_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
-        print("Channel A: ", a_time, a_value, " Channel B: ", b_time, b_value)        
+        print("Channel A: ", a_time, a_raw_value, a_value, " Channel B: ", b_time, b_raw_value, b_value)        
         read_event.wait(sensor_read_time) #todo depend on a user modified variable
  
 def write_network():
+    global a_raw_value
     global a_value
     global a_time
+    global b_raw_value
     global b_value
     global b_time
+    global sensor_state
 
     while True:
         write_event.wait(network_write_time)
@@ -94,10 +110,13 @@ def write_network():
         s.send(serialized_data)
 
 def log_data():
+    global a_raw_value
     global a_value
     global a_time
+    global b_raw_value
     global b_value
     global b_time
+    global sensor_state
 
     now = datetime.datetime.now()
     folder_name = "..//data//"
@@ -118,7 +137,9 @@ def log_data():
         #writer and write the header
         writer.writerow(["Plant bioelectric data log by David Scott Bernstein. Project: Setup, File name: " + file_name])
         writer.writerow(["Software: PlantPlayground, File: PP-Remote.py, Version 0.1"])
-        writer.writerow(["Reading 2 differential channels in milivolts with a sensor read frequency of " + str(sensor_read_time) + "."])
+        #writer.writerow(["Reading 2 differential channels in milivolts with a sensor read frequency of " + str(sensor_read_time) + "."])
+        writer.writerow(["Reading 2 single-ended channels in milivolts with a sensor read frequency of " + str(sensor_read_time) + "."])
+        writer.writerow(["Channel A is connected to a potato and ground, Channel B is connected to a plant and ground."])
         writer.writerow(["The plant is in a Faraday cage and the Pi 4 is in a Faraday cage inside the Faraday cage with a common ground."])
         writer.writerow(["Channel A is connected to a potato in a Faraday cage. Channel B is connected to a plant in a Faraday cage."])
         writer.writerow(["Gain: " + str(a_gain) + ", Data Rate: " + str(a_data_rate) + ", Volts per Division: " + str(a_mv_per_division) + "."])
@@ -127,7 +148,8 @@ def log_data():
 
     while True:
         log_event.wait(data_log_time)
-        writer.writerow(["Channel A: " + str(a_time) + ", " + str(a_value) + '; Channel B: ' + str(b_time) + ", " + str(b_value)])
+        writer.writerow(["Channel A: " + str(a_time) + ", " + str(a_raw_value) + ", " + str(a_value)
+                         + '; Channel B: ' + str(b_time) + ", " + str(b_raw_value) + ", " + str(b_value)])
     file.close()
 
 read_event = threading.Event()
