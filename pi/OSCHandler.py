@@ -27,7 +27,7 @@ class OSCHandler():
     def __init__(self):
         self.client = SimpleUDPClient(self.ip, self.port)
         self.adcSR = ADCStreamReader()
-        self.adc0 = self.adcSR.open(differential=0, gain=16, data_rate=64, sleep=0)
+        self.adc0 = self.adcSR.open('differential', channel=0, gain=16, data_rate=64, sleep=0)
         #self.adc3 = self.adcSR.open(differential=3, gain=16, data_rate=8, sleep=0)
         self.td = TrackingData()
         self.now = datetime.datetime.now()

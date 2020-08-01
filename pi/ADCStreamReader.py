@@ -67,6 +67,7 @@ class ADCStreamReader:
         self.sleep = sleep
         self.voltsPerDivision = ((2 * self.volts_per_division_table[self.gain])/65535)*1000
         if (self.reader_type == 'differential_i2c'):
+            #config_string = '1-000-111-1-000-0-0-0-11'
             config_string = '1-000-111-1-000-0-0-0-11'
             self.ads1115Runner.i2c_reader_init(config_string)
             #adc = ADCStreamReader()
@@ -81,20 +82,20 @@ class ADCStreamReader:
     def read(self, channel):
         if (self.reader_type == 'differential' ):
             time.sleep(self.sleep)
-            self.differential_value = self.adc.read_adc_difference(self.differential, self.gain, self.data_rate)
-            return self.differential_value * self.voltsPerDivision
+            self.differential_value = self.adc.read_adc_difference(self.channel, self.gain, self.data_rate)
+            return self.differential_value #* self.voltsPerDivision
         elif (self.reader_type == 'single_ended'):
             time.sleep(self.sleep)            
-            self.differential_value = self.adc.read_adc(self.differential, self.gain, self.data_rate)
-            return self.differential_value * self.voltsPerDivision
+            self.differential_value = self.adc.read_adc(self.channel, self.gain, self.data_rate)
+            return self.differential_value #* self.voltsPerDivision
         elif (self.reader_type == 'differential_i2c'):
             self.value_raw = self.ads1115Runner.i2c_read(channel)
-            return self.value_raw
+            return self.value_raw #* self.voltsPerDivision
 
 
     def read_without_sleep(self, differential):
         #time.sleep(self.sleep)
-        self.differential_value = self.adc.read_adc_difference(differential, self.gain, self.data_rate)
+        self.differential_value = self.adc.read_adc_difference(channel, self.gain, self.data_rate)
         return self.differential_value * self.voltsPerDivision
 
 
