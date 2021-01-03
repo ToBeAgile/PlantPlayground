@@ -29,7 +29,7 @@ server = BlockingOSCUDPServer(("127.0.0.1", 50000), dispatcher) #port was 1337
 client = SimpleUDPClient("127.0.0.1", 50000)
 
 # Send message and receive exactly one message (blocking)
-client.send_message("/PP01/ADC0/RAW/", [1., 2.])
+client.send_message("/*", [1., 2.])
 server.handle_request()
 
 # client.send_message("/filter8", [6., -2.])
