@@ -17,7 +17,6 @@ Prototypes are provided for each supported model, so it's a
 simple matter of commenting the ones that don't apply, and 
 uncommenting the one that does. In its as-delivered state
 the program assumes that model DI-2108 is connected.
-DB: Updated for DI-4108
 Instruments used with this program MUST be placed in their
 CDC communication mode. 
 Follow this link for guidance:
@@ -57,7 +56,7 @@ slist for model DI-4108
 #slist = [0x0000,0x0101,0x0709,0x000A]
 Therefore, to set Channels 0-3 to +-200mV...
 """
-slist = [0x1100,0x1101,0x1110,0x1111,0x0809,0x000A]
+#slist = [0x1100,0x1101,0x1110,0x1111,0x0809,0x000A]
 
 
 
@@ -68,7 +67,7 @@ slist for model DI-2108
 0x0709 = Rate input, 0-500 Hz range
 0x000A = Counter input
 """
-#slist = [0x0000,0x0001,0x0709,0x000A]
+slist = [0x0000,0x0001,0x0709,0x000A]
 
 """ 
 slist for model DI-4718B (untested, but should work)
@@ -88,10 +87,10 @@ their tuples contain only one value (e.g. model DI-2108.)
 #analog_ranges = tuple((100,50,20,10,5,2))
 
 # Analog ranges for model DI-4108
-analog_ranges = tuple((10,5,2,1,0.5,0.2))
+#analog_ranges = tuple((10,5,2,1,0.5,0.2))
 
 # Analog ranges for model DI-2108 (fixed ±10 V measurement range)
-#analog_ranges = [10]
+analog_ranges = [10]
 
 # Analog ranges for model DI-4718B (fixed ±5 V measurement range)
 #analog_ranges = [5]

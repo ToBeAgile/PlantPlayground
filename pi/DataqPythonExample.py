@@ -15,7 +15,7 @@ import sys
 #Press key 'x' to EXIT
 #since serDataq.readline waits until a line is received, low sample rate makes the program slow in response to key stroke
 
-CONST_SER_PORT = 'COM23'   #get the com port from device manger and enter it here
+CONST_SER_PORT = 'COM1'   #get the com port from device manger and enter it here
 
 serDataq = serial.Serial(CONST_SER_PORT)
 

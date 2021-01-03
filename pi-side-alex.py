@@ -39,7 +39,7 @@ b_value = (adc.read_adc_difference(3, gain=b_gain, data_rate=b_data_rate)) * b_m
 b_time = datetime.datetime.now()
 
 #set up the network connection
-host = '192.168.1.5'
+host = '192.168.0.18'
 port = 50000
 
 s = None
@@ -121,7 +121,7 @@ def log_data():
     #for k in range(10):
     while True:
         log_event.wait(data_log_time)
-        writer.writerow([a_time, a_value])
+        writer.writerow(['Channel A: ', a_time, a_value, 'Channel B: ', b_time, b_value])
     file.close()
 
 read_event = threading.Event()
