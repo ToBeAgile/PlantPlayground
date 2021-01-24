@@ -9,7 +9,8 @@ from pi.ADCStreamReader import *
 
 class OSCWriter():
     
-    ip = "192.168.0.18"
+    #ip = "192.168.0.18"
+    ip = "192.168.4.22"
     port = 50000
 
     client = SimpleUDPClient(ip, port)  # Create client

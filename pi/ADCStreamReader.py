@@ -4,6 +4,9 @@ import sys
 import timeit
 import cmd, logging, smbus, RPi.GPIO as GPIO
 
+sys.path.insert(1, '/home/pi/grove.py/')
+from grove.adc import ADC
+
 #from pythonosc.udp_client import SimpleUDPClient
 
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
@@ -18,10 +21,20 @@ class ChannelInfo:
     channel_sleep
     channel_volts_per_division
     
-"""    
+"""
+
+class GroveGSRSensor:
+    def __init__(self, channel):
+        self.channel = channel
+        self.adc = ADC()
+ 
+    @property
+    def GSR(self):
+        value = self.adc.read(self.channel)
+        return value
     
 class ADCStreamReader:
-    
+    Grove = GroveGSRSensor    
     GAIN = 16
     DATA_RATE = 8 # 8, 16, 32, 64, 128, 250, 475, 860
 
@@ -65,6 +78,7 @@ class ADCStreamReader:
         self.gain = gain
         self.data_rate = data_rate
         self.sleep = sleep
+        self.sensor = 0
         self.voltsPerDivision = ((2 * self.volts_per_division_table[self.gain])/65535)*1000
         if (self.reader_type == 'differential_i2c'):
             #config_string = '1-000-111-1-000-0-0-0-11'
@@ -77,6 +91,9 @@ class ADCStreamReader:
             # - X - X - disable comparator
             #conf = prepareLEconf('1-000-111-1-100-1-0-0-11')
             #conf = prepareLEconf('0-000-111-1-100-1-0-0-11')
+        elif (self.reader_type == 'grove_gsr'):
+            self.sensor = GroveGSRSensor(int(0))
+
         return self.channel
     
     def read(self, channel):
@@ -91,6 +108,12 @@ class ADCStreamReader:
         elif (self.reader_type == 'differential_i2c'):
             self.value_raw = self.ads1115Runner.i2c_read(channel)
             return self.value_raw #* self.voltsPerDivision
+        elif (self.reader_type == 'dummy_read'):
+            time.sleep(self.sleep)            
+            return 99
+        elif (self.reader_type == 'grove_gsr'):
+            time.sleep(self.sleep)            
+            return self.sensor.GSR
 
 
     def read_without_sleep(self, differential):

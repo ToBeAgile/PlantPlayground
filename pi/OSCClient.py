@@ -4,8 +4,11 @@ import sys
 #sys.path.insert(1, '../')
 #from services.ADCStreamReader import *
 
-ip = "127.0.0.1"
-port = 1337
+#ip = "127.0.0.1"
+#port = 1337
+ip = "192.168.4.22"
+port = 50000
+
 
 client = SimpleUDPClient(ip, port)  # Create client
 

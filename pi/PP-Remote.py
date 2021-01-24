@@ -1,3 +1,4 @@
+#Added Grove GSR sensor, flags to log and write, 
 import socket
 import sys
 import time
@@ -13,18 +14,21 @@ import os.path
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 from pi.ADCStreamReader import ADCStreamReader
 
+
 #Set the rates. Implement these into a GUI
-data_log_frequency = 0.05 #Hz  How many data points are logged each second locally, on the pi
-sensor_read_frequency = 0.1 #0.1 #25 #Hz
-network_write_frequency = 10 #10.0 #Hz    How many data points will be graphed each second
+number_of_channels = 1
+to_log = False
+data_log_frequency = 1 #Hz  How many data points are logged each second locally, on the pi
+sensor_read_frequency = 1 #0.1 #25 #Hz
+network_write_frequency = 1 #10.0 #Hz    How many data points will be graphed each second
 
 #Calculated from above
 sensor_read_time = float(1/sensor_read_frequency)
 network_write_time = float(1/network_write_frequency)
 data_log_time = float(1/data_log_frequency)
 
-reader_type_a='single_ended' #'differential_i2c' #'single_ended' #'differential'
-reader_type_b='single_ended' #'differential_i2c' #'single_ended' #'differential'
+reader_type_a = 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
+reader_type_b = 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
 
 # Create an ADS1115 ADC (16-bit) instance.
 #adc = Adafruit_ADS1x15.ADS1115()
@@ -51,14 +55,15 @@ b_value = b_raw_value * b_mv_per_division
 b_time = datetime.datetime.now()
 
 #set up the network connection
-host = '192.168.0.18'
+host = '192.168.4.22' # was '192.168.0.18' '127.0.1.1' #
 port = 50000
 
 s = None
 try:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((host,port))
+    s.connect((host, port))
 
+  
 except socket.error as message:
     if s:
         s.close()
@@ -78,15 +83,21 @@ def read_sensor():
     while True:
         #a_raw_value = adc.read_adc_difference(0, gain=a_gain, data_rate=860)
         #a_value = (adc.read_adc_difference(0, gain=a_gain, data_rate=a_data_rate)) * a_mv_per_division
-        a_raw_value = adc.read(channel0)
-        a_value = a_raw_value * a_mv_per_division
-        a_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
+        if (number_of_channels > 0):           
+            a_raw_value = adc.read(channel0)
+            a_value = a_raw_value * a_mv_per_division
+            a_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
+        if (number_of_channels > 1):
+            b_raw_value = adc.read(channel1)
+            b_value = b_raw_value * b_mv_per_division
+            b_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
+
         #b_raw_value = adc.read_adc_difference(3, gain=b_gain, data_rate=860)
         #b_value = (adc.read_adc_difference(3, gain=b_gain, data_rate=b_data_rate)) * b_mv_per_division
         #b_raw_value = adc.read(channel1)
         #b_value = b_raw_value * b_mv_per_division
-        b_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
-        print("Channel A: ", a_time, a_raw_value, a_value, " Channel B: ", b_time, b_raw_value, b_value)        
+        #b_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
+        #print("Channel A: ", a_time, a_raw_value, a_value, " Channel B: ", b_time, b_raw_value, b_value)        
         read_event.wait(sensor_read_time) #todo depend on a user modified variable
  
 def write_network():
@@ -102,13 +113,13 @@ def write_network():
         write_event.wait(network_write_time)
 
         #write channel a
-        data_dict = {"sensor": "a_sensor", "value": a_value, "time": a_time}
+        data_dict = {"sensor": "a_sensor", "raw_value": a_raw_value, "value": a_value, "time": a_time}
         #print(data_dict)
         serialized_data = pickle.dumps(data_dict)
         s.send(serialized_data)
 
         #write channel b
-        data_dict = {"sensor": "b_sensor", "value": b_value, "time": b_time}
+        data_dict = {"sensor": "b_sensor", "raw_value": b_raw_value, "value": b_value, "time": b_time}
         serialized_data = pickle.dumps(data_dict)
         s.send(serialized_data)
 
@@ -127,6 +138,9 @@ def log_data():
     file_name = project_code + "-" + now.strftime("%Y-%m-%d") + ".csv"
     full_path = folder_name + file_name
     #file = open(full_path, 'a', newline='', buffering=1)
+    
+    if (to_log == False):
+        return
     
     if os.path.isfile(full_path):
         #with open(full_path, 'a', newline='', buffering=1) as file:
