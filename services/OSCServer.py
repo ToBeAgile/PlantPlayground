@@ -30,7 +30,8 @@ dispatcher.set_default_handler(default_handler)
 #ip = "127.0.0.1"
 #ip = ""
 #ip = "192.168.0.36"
-ip = "192.168.0.18"
+#ip = "192.168.0.18"
+ip = "192.168.4.22"
 port = 50000
 
 server = BlockingOSCUDPServer((ip, port), dispatcher)

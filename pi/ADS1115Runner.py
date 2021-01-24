@@ -17,7 +17,7 @@ For testing 3) + 4) use potentiometer 2
 Enjoy!
 '''
  
-import cmd, time, logging, smbus, RPi.GPIO as GPIO
+#import cmd, time, logging, smbus, RPi.GPIO as GPIO
  
 # ADS1115 + hardware constants
 I2C_BUS = 1

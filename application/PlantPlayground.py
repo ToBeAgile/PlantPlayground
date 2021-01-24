@@ -15,7 +15,7 @@ import datetime
 import time
 import csv
 
-host = ''
+host = '192.168.4.22' #host = ''
 port = 50000
 backlog = 5
 size = 5096
@@ -117,12 +117,12 @@ app.layout = html.Div(children=[
         dcc.Graph(id='b-graph', animate=True),
         dcc.Interval(
             id='a-update',
-            interval=1000,
+            interval=1000, #was 1000
             n_intervals=0
         ),
         dcc.Interval(
             id='b-update',
-            interval=1000,
+            interval=1000, #was 1000
             n_intervals=0
         ),
     ]
@@ -197,18 +197,18 @@ def update_data():
             data_dict = pickle.loads(serialized_data)
             sensor = data_dict["sensor"]
         except:
-            data_dict = {"sensor": "junk", "value": 0, "time": 0}
+            data_dict = {"sensor": "a_or_b", "raw_value": 0, "value": 0, "time": 0}
             print("Bad Network Data")
         if sensor == "a_sensor":
             a_time = data_dict["time"]
-            a_value = data_dict["value"]
+            a_raw_value = data_dict["raw_value"]
             a_time_q.append(a_time_q[-1]+1)
-            a_value_q.append(a_value)
+            a_value_q.append(a_raw_value)
         elif sensor == "b_sensor":
             b_time = data_dict["time"]
-            b_value = data_dict["value"]
+            b_raw_value = data_dict["raw_value"]
             b_time_q.append(b_time_q[-1]+1)
-            b_value_q.append(b_value)
+            b_value_q.append(b_raw_value)
         else:
             print("Bad network data!")
         #value = data_dict["value"]
