@@ -1,4 +1,3 @@
-#Added Grove GSR sensor, flags to log and write, 
 import socket
 import sys
 import time
@@ -9,6 +8,9 @@ import Adafruit_ADS1x15
 import threading
 import csv
 import os.path
+import unittest
+from approvaltests.approvals import verify
+
 #sys.path.insert(1, '.')
 #from services.DataLogger import DataLogger
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
@@ -19,8 +21,8 @@ from pi.ADCStreamReader import ADCStreamReader
 number_of_channels = 1
 to_log = False
 data_log_frequency = 1 #Hz  How many data points are logged each second locally, on the pi
-sensor_read_frequency = 1 #0.1 #25 #Hz
-network_write_frequency = 1 #10.0 #Hz    How many data points will be graphed each second
+sensor_read_frequency = 4 #0.1 #25 #Hz
+network_write_frequency = 4 #10.0 #Hz    How many data points will be graphed each second
 
 #Calculated from above
 sensor_read_time = float(1/sensor_read_frequency)
@@ -181,3 +183,9 @@ threading.Thread(target=log_data).start()
 def a():
     return True
 
+#class GettingStartedTest(unittest.TestCase):
+#    def test_simple(self):
+#        verify("Hello ApprovalTests")
+
+#if __name__ == "__main__":
+#    unittest.main()

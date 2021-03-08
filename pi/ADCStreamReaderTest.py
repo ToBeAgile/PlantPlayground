@@ -6,7 +6,7 @@ from pi.ADCStreamReader import *
 from pi.ADS1115Reader import *
 
 
-class SignalPlaygrountTest(unittest.TestCase):
+class SignalPlaygroundTest(unittest.TestCase):
     reader = ADCStreamReader()
 
     def test_differential_stream(self):

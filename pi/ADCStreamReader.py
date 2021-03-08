@@ -2,7 +2,7 @@ import Adafruit_ADS1x15
 import time
 import sys
 import timeit
-import cmd, logging, smbus, RPi.GPIO as GPIO
+import cmd, logging, smbus2, RPi.GPIO as GPIO
 
 sys.path.insert(1, '/home/pi/grove.py/')
 from grove.adc import ADC
