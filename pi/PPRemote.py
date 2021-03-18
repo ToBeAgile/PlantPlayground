@@ -16,6 +16,10 @@ from approvaltests.approvals import verify
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 from pi.ADCStreamReader import ADCStreamReader
 
+#The new design:
+#In read_sensor() read time and 4 sensors into a tuple: (time, r0, r1, r2, r3)
+#if channel not used put NaN, all values raw. File header had date, gain, etc.
+
 
 #Set the rates. Implement these into a GUI
 number_of_channels = 1
@@ -81,6 +85,7 @@ def read_sensor():
     global b_value
     global b_time
     global sensor_state
+    #sensor_read = (time, r0, r1, r2, r3)
     
     while True:
         #a_raw_value = adc.read_adc_difference(0, gain=a_gain, data_rate=860)

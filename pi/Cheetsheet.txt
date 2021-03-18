@@ -1,0 +1,75 @@
+Cheatsheet.txt
+
+Raspberry Pi Virtual Environment 
+From a terminal window:
+cd Documents/Code/PlantPlayground
+source PlantVenv/bin/activate
+
+To check into GIT from PlantPlayground on Pi
+git add pi/
+git commit -m "<message>"
+git push
+
+Then, on Mac:
+git pull
+git add application/ services/
+git commit -m "<message>"
+git push
+
+
+
+git add application/ services/
+git commit -m "<Message>"
+git push
+
+To clone a git respository:
+Cd to the folder I want the repository
+Git clone
+Git fetch
+Git pull
+
+
+Use pip freeze to take a snapshot of an install and later batch install another system:
+Pip freeze | requirements.txt
+Then on the VM to install the packages:
+Pip freeze -r requirement.txt
+
+ 
+Creating a python venv:
+
+    1. Enter the directory you wish to work in. This is where the venv folder will be installed.
+    2. Create the venv: “python3 -m venv <name-of-venv-folder>”
+    3. Activate the venv: “source <name-of-venv-folder>/bin/activate”
+        a) Note: you can run this script from anywhere, just change the path to point to activate
+    4. Done! At this point, you should see the name of your venv in parenthesis in bash
+
+——
+If imports aren’t getting picked up try:
+export PYTHONPATH=. 
+---------
+i2c
+ 
+Download i2c-tools
+sudo apt-get install i2c-tools
+
+Scan the devices on port 1
+I2cdetect -r -y 1
+
+I2c devices have registers: control registers, data registers, and configure registers.
+
+I2cset -y 1 0x20 
+
+For Python support:
+Sudo apt - get install python-smbfs
+In python code:
+Import smbus
+Import time
+
+
+Bus.write_byte_data(0x20, 0x00, 0x00)
+
+
+
+
+
+

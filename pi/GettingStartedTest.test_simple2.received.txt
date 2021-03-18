@@ -1,0 +1,1 @@
+<__main__.User object at 0xb597b730>
