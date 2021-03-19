@@ -164,7 +164,7 @@ class ADCStreamReader:
             return self.sensor.GSR
         elif (self.reader_type == 'mcc_single_value_read'):
             time.sleep(self.sleep)
-            value = hat.a_in_read(chan, options)
+            value = hat.a_in_read(0, options)
             print('\nMCC: ' + str(value))
             return value
 

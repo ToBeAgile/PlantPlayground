@@ -49,6 +49,9 @@ volts_per_division_table = {2/3:6.144, 1:4.096, 2:2.048, 4:1.024, 8:0.512, 16:0.
 a_mv_per_division = ((2 * volts_per_division_table[a_gain])/65535)*1000
 b_mv_per_division = ((2 * volts_per_division_table[b_gain])/65535)*1000
 sensor_state = 0
+channel0 = 0
+channel1 = 1
+chan = 0
 
 #Initialize the shared variables across threads
 a_raw_value = 1 #adc.read_adc_difference(0, gain=a_gain, data_rate=a_data_rate) 
