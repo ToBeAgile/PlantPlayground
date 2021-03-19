@@ -11,7 +11,10 @@ git commit -m "<message>"
 git push
 
 Then, on Mac:
+cd /Users/davidscottbernstein/Dropbox/Dev/Python/Projects/PlantPlayground
+source venv/bin/activate
 git pull
+
 git add application/ services/
 git commit -m "<message>"
 git push

@@ -20,6 +20,7 @@ from pi.ADCStreamReader import ADCStreamReader
 #In read_sensor() read time and 4 sensors into a tuple: (time, r0, r1, r2, r3)
 #if channel not used put NaN, all values raw. File header had date, gain, etc.
 
+
 #Set the rates. Implement these into a GUI
 number_of_channels = 1
 to_log = False
@@ -32,8 +33,8 @@ sensor_read_time = float(1/sensor_read_frequency)
 network_write_time = float(1/network_write_frequency)
 data_log_time = float(1/data_log_frequency)
 
-reader_type_a = 'mcc_single_value_read' # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
-reader_type_b = 'mcc_single_value_read' # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
+reader_type_a = 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
+reader_type_b = 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
 
 # Create an ADS1115 ADC (16-bit) instance.
 #adc = Adafruit_ADS1x15.ADS1115()
@@ -68,11 +69,13 @@ try:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
 
+  
 except socket.error as message:
     if s:
         s.close()
     print ("Unable to open the socket: " + str(message))
     sys.exit(1)
+    
 
 def read_sensor():
     global a_raw_value

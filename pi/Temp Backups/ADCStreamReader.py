@@ -1,11 +1,3 @@
-from __future__ import print_function
-from time import sleep
-from sys import stdout
-from daqhats import mcc128, OptionFlags, HatIDs, HatError, AnalogInputMode, \
-    AnalogInputRange
-from daqhats_utils import select_hat_device, enum_mask_to_string, \
-    input_mode_to_string, input_range_to_string
-
 import Adafruit_ADS1x15
 import time
 import sys
@@ -19,11 +11,7 @@ from grove.adc import ADC
 
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 from pi.ADS1115Runner import *
-
-# Constants
-CURSOR_BACK_2 = '\x1b[2D'
-ERASE_TO_END_OF_LINE = '\x1b[0K'
-
+ 
 """
 class ChannelInfo:
     channel_number
@@ -34,41 +22,7 @@ class ChannelInfo:
     channel_volts_per_division
     
 """
-#MCC DAQ START
-options = OptionFlags.DEFAULT
-low_chan = 0
-high_chan = 3
-input_mode = AnalogInputMode.SE
-input_range = AnalogInputRange.BIP_10V
 
-mcc_128_num_channels = mcc128.info().NUM_AI_CHANNELS[input_mode]
-sample_interval = 0.1 #0.5  # Seconds
-
-try:
-    # Ensure low_chan and high_chan are valid.
-    if low_chan < 0 or low_chan >= mcc_128_num_channels:
-        error_message = ('Error: Invalid low_chan selection - must be '
-                         '0 - {0:d}'.format(mcc_128_num_channels - 1))
-        raise Exception(error_message)
-    if high_chan < 0 or high_chan >= mcc_128_num_channels:
-        error_message = ('Error: Invalid high_chan selection - must be '
-                         '0 - {0:d}'.format(mcc_128_num_channels - 1))
-        raise Exception(error_message)
-    if low_chan > high_chan:
-        error_message = ('Error: Invalid channels - high_chan must be '
-                         'greater than or equal to low_chan')
-        raise Exception(error_message)
-
-    # Get an instance of the selected hat device object.
-    address = select_hat_device(HatIDs.MCC_128)
-    hat = mcc128(address)
-
-    hat.a_in_mode_write(input_mode)
-    hat.a_in_range_write(input_range)
-except (HatError, ValueError) as error:
-    print('\n', error)
-#MCC128 END
-    
 class GroveGSRSensor:
     def __init__(self, channel):
         self.channel = channel
@@ -139,8 +93,6 @@ class ADCStreamReader:
             #conf = prepareLEconf('0-000-111-1-100-1-0-0-11')
         elif (self.reader_type == 'grove_gsr'):
             self.sensor = GroveGSRSensor(int(0))
-        elif (self.reader_type == 'mcc_single_value_read'):
-            self.sensor = hat
 
         return self.channel
     
@@ -162,11 +114,6 @@ class ADCStreamReader:
         elif (self.reader_type == 'grove_gsr'):
             time.sleep(self.sleep)            
             return self.sensor.GSR
-        elif (self.reader_type == 'mcc_single_value_read'):
-            time.sleep(self.sleep)
-            value = hat.a_in_read(chan, options)
-            print('\nMCC: ' + str(value))
-            return value
 
 
     def read_without_sleep(self, differential):
