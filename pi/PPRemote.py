@@ -170,7 +170,6 @@ def log_data():
         writer.writerow(["Gain: " + str(b_gain) + ", Data Rate: " + str(b_data_rate) + ", Volts per Division: " + str(b_mv_per_division) + "."])
         writer.writerow(["Channel A Open Type: " + reader_type_a + "Channel B Open Type: " + reader_type_b + "."])
 
-
     while True:
         log_event.wait(data_log_time)
         writer.writerow(["Channel A: " + str(a_time) + ", " + str(a_raw_value) + ", " + str(a_value)
@@ -184,9 +183,6 @@ log_event = threading.Event()
 threading.Thread(target=read_sensor).start()
 threading.Thread(target=write_network).start()
 threading.Thread(target=log_data).start()
-
-def a():
-    return True
 
 #class GettingStartedTest(unittest.TestCase):
 #    def test_simple(self):

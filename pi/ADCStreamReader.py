@@ -112,7 +112,6 @@ class ADCStreamReader:
 
     #client = SimpleUDPClient(ip, port)  # Create client
 
-    
     def __init__(self):
        #self.channel = channel
         pass
@@ -167,7 +166,6 @@ class ADCStreamReader:
             value = hat.a_in_read(0, options)
             print('\nMCC: ' + str(value))
             return value
-
 
     def read_without_sleep(self, differential):
         #time.sleep(self.sleep)
