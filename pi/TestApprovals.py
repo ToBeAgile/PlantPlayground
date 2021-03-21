@@ -11,11 +11,11 @@ class GettingStartedTest(unittest.TestCase):
 
     def test_simple(self):
         result = "Hello ApprovalTests"
-        verify(result)
+        verify(str(result))
         
-    def test_simple2(self):
-        user = User()
-        verify(str(user))
+    #def test_simple2(self):
+        #user = User()
+        #verify(str(user))
     
 
 if __name__ == "__main__":

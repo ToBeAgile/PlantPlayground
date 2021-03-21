@@ -21,8 +21,8 @@ sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 from pi.ADS1115Runner import *
 
 # Constants
-CURSOR_BACK_2 = '\x1b[2D'
-ERASE_TO_END_OF_LINE = '\x1b[0K'
+#CURSOR_BACK_2 = '\x1b[2D'
+#ERASE_TO_END_OF_LINE = '\x1b[0K'
 
 """
 class ChannelInfo:
@@ -163,8 +163,8 @@ class ADCStreamReader:
             return self.sensor.GSR
         elif (self.reader_type == 'mcc_single_value_read'):
             time.sleep(self.sleep)
-            value = hat.a_in_read(0, options)
-            print('\nMCC: ' + str(value))
+            value = hat.a_in_read(channel, options)
+            #print('\nMCC: ' + str(value))
             return value
 
     def read_without_sleep(self, differential):
@@ -173,77 +173,3 @@ class ADCStreamReader:
         return self.differential_value * self.voltsPerDivision
 
 
-    """     
-    def broadcastOSC(self):
-        self.d0 = self.open(differential=0, gain=16, data_rate=860, sleep=0)
-        self.d3 = self.open(differential=3, gain=16, data_rate=860, sleep=0)
-
-        try:
-       
-            for x in range(1, 100):
-                # for each channel read(self, channel, gain, data_rate, sleep):
-                c0_value = self.adc.read_adc_difference(self.d0, self.gain, self.data_rate)
-                self.client.send_message("/PP01/ADC0/RAW/", c0_value)   # Send float message
-
-                c3_value = self.adc.read_adc_difference(self.d3, self.gain, self.data_rate)
-                self.client.send_message("/PP01/ADC1/RAW/", c3_value)   # Send float message
-
-                now = datetime.datetime.now()
-                #print("Value = ", value)
-                print((now.strftime("%H:%M:%S:%f"), (round((c0_value), 4)), (round((c1_value), 4))))
-                dl.write(((now.strftime("%H:%M:%S:%f")), (round((c0_value), 4)), (round((c1_value), 4))))
-                #csvwriter.write_voltage(name="Diff_V_1: ", value=value)
-
-        except KeyboardInterrupt:
-            GPIO.cleanup()
-            
-    """      
-
-
-# channel 0 is the control (a potato) gets read a second every minute
-#reader.open(channel=CHANNEL0, gain=GAIN, data_rate=DATA_RATE, sleep=CH0SLEEPTIME) #open channel 0 stream
-#reader.open(channel=CHANNEL1, gain=GAIN, data_rate=DATA_RATE, sleep=CH1SLEEPTIME) #open channel 1 stream
-
-#print(timeit.timeit(lambda: reader.read(DIFFERENTIAL1, GAIN, DATA_RATE, 0), number=1))
-
-
-
-
-
-"""import os
-import errno
-import time
-import random
-
-class DataEndpoint:
-    def __init__(self, pipe_path):
-        self.pipe_path = pipe_path
-        print("creating pipe {}".format(pipe_path))
-        # os.mkfifo(self.pipe_path)
-        
-
-    def __del__(self):
-        print("deleting pipe {}".format(self.pipe_path))
-        
-
-    def send_data(self, data):
-        self.pipe = open(self.pipe_path, "w")
-        self.pipe.write(data)
-        self.pipe.close();
-
-consumers = []
-"""
-
-# set up all of the pipes that will consume data
-# for entry in os.scandir("/tmp/plants"):
-#     # consumers.append(lambda data_val: expression)
-#     consumers.append(DataEndpoint(entry.path))
-
-# while True:
-#     data = random.randrange(100)
-#     print("Sending data: {}".format(data))
-#     for consumer in consumers:
-        
-#         consumer.send_data(str(data))
-
-#     time.sleep(5)
