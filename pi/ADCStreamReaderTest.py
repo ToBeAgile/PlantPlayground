@@ -6,6 +6,14 @@ from pi.ADCStreamReader import *
 from pi.ADS1115Reader import *
 
 
+class ADCStreamReaderTest:
+    reader = ADCStreamReader()
+    
+    def test_open(self, ADCStreamInfo):
+        #create an ADCStreamInfo object, pass it to the factory method, and verify to object returned
+        
+        
+
 class SignalPlaygroundTest(unittest.TestCase):
     reader = ADCStreamReader()
 

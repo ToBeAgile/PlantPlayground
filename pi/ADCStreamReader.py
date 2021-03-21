@@ -24,21 +24,12 @@ from pi.ADS1115Runner import *
 #CURSOR_BACK_2 = '\x1b[2D'
 #ERASE_TO_END_OF_LINE = '\x1b[0K'
 
-"""
-class ChannelInfo:
-    channel_number
-    channel_status = 'closed'
-    channel_gain
-    channel_data_rate
-    channel_sleep
-    channel_volts_per_division
-    
-"""
+
 #MCC DAQ START
 options = OptionFlags.DEFAULT
 low_chan = 0
 high_chan = 3
-input_mode = AnalogInputMode.SE
+input_mode = AnalogInputMode.DIFF #or SE
 input_range = AnalogInputRange.BIP_10V
 
 mcc_128_num_channels = mcc128.info().NUM_AI_CHANNELS[input_mode]
@@ -119,7 +110,7 @@ class ADCStreamReader:
     # Store channels separately on object 
     def open(self, reader_type, channel, gain, data_rate, sleep):
         self.reader_type = reader_type
-        self.channel = channel
+        self.channel = channel # change to tuple of 4 bools for each active channel
         self.gain = gain
         self.data_rate = data_rate
         self.sleep = sleep

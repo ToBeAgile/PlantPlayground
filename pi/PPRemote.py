@@ -1,3 +1,13 @@
+'''
+PPRemote.py - todo
+    1. Refactor global data to global tuple:
+            (RefID, DateTime, ch0, ch1, ch2, ch3)
+                - RefID is a GUID that maps to another table containing the project details, etc.
+                - DateTime contains to date and time down to the milliseconds
+                - ch0-3 are shorts containing raw data values for each channel
+
+
+'''
 import socket
 import sys
 import time
