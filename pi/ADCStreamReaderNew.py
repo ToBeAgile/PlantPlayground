@@ -33,12 +33,12 @@ class ADCStreamInfo:
     #General settings
     sensor_type = 'mcc_single_value_read'
     sleep_between_reads = -1 # -1 = don't give away the time slice
-    reader_type = 'differential' # or 'single-ended'
     number_of_channels = 4
     channels = (True, True, True, True)
     #MCC128-specific settings
     analog_input_range = AnalogInputRange.BIP_10V
-    
+    reader_type = 'differential' # or 'single-ended'
+
     #other DAQ
     gain = 16
     data_rate = 8
@@ -69,7 +69,7 @@ class ADCStream(ABC):
     def read(self):
         pass
     
-class MCC_Single_Value_Read(ADCStream):
+class MCC128Daq(ADCStream):
     def __init__(self, value):
         self.value = value
         super().__init__()
@@ -82,8 +82,7 @@ class MCC_Single_Value_Read(ADCStream):
     def read(self):
         pass
 
-    
-mcc_single_value_read
+
 
 """
 

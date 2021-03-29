@@ -1,5 +1,3 @@
-#TODO: Create ADCStreamInfo value object, open strategy, read strategy
-
 from __future__ import print_function
 from daqhats import mcc128, OptionFlags, HatIDs, HatError, AnalogInputMode, \
     AnalogInputRange
@@ -8,7 +6,6 @@ from daqhats_utils import select_hat_device, enum_mask_to_string, \
 from time import sleep
 import sys, timeit, cmd, logging, smbus2, RPi.GPIO as GPIO
 import Adafruit_ADS1x15
-from abc import ABC, abstractmethod
 
 sys.path.insert(1, '/home/pi/grove.py/')
 from grove.adc import ADC
@@ -18,125 +15,58 @@ from grove.adc import ADC
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 from pi.ADS1115Runner import *
 
-# ADCStreamInfo contains everything needed to configure, open, read, and close an ADCStream
-
-class ADCStreamInfo:
-    #General settings
-    sleep_between_reads = -1 # -1 = don't give away the time slice
-    number_of_channels = 4
-    channels = (True, True, True, True)
-    sensor_type = 'mcc_single_value_read'
-    
-    #MCC128-specific settings
-    analog_input_range = AnalogInputRange.BIP_10V
-    reader_type = 'differential' # or 'single-ended'
-
-
-    # ADS1115 specific
-    volts_per_division_table = {0:6.144, 1:4.096, 2:2.048, 4:1.024, 8:0.512, 16:0.256}
-    voltsPerDivision = 0
-    status = 'close'
-    gain = 16
-    data_rate = 8
-    sleep = 0
-    channel = 0
-    differential = 0
-    value = 0
-    value_raw = 0
-    
-'''    
-class ADCStreamReaderFactory:
-    def __init__(self):
-        pass
-        
-    def getADCStream(self, ADCStreamInfo):
-        self.ADCStreamInfo = ADCStreamInfo()
-        
-        return ADCStream
-'''    
-
-class ADCStream(ABC):
-    
-    @abstractmethod
-    def openADC(self, adcStreamInfo):
-        pass
-    
-    @abstractmethod
-    def read(self):
-        if self.adcStreamInfo.sleep_between_reads >= 0:
-            time.sleep(self.adcStreamInfo.sleep_between_reads)
-    
-class MCC128Daq(ADCStream):
-            
-    def openADC(self, adcStreamInfo):
-        self.adcStreamInfo = adcStreamInfo
-        self.options = OptionFlags.DEFAULT
-        self.low_chan = 0
-        self.high_chan = 3
-        self.input_mode = AnalogInputMode.DIFF #or SE
-        self.input_range = AnalogInputRange.BIP_10V #BIP_1V
-
-        self.mcc_128_num_channels = mcc128.info().NUM_AI_CHANNELS[self.input_mode]
-        self.sample_interval = 0.1 #0.5  # Seconds
-        
-
-        try:
-            # Ensure low_chan and high_chan are valid.
-            if self.low_chan < 0 or self.low_chan >= self.mcc_128_num_channels:
-                error_message = ('Error: Invalid low_chan selection - must be '
-                                 '0 - {0:d}'.format(mcc_128_num_channels - 1))
-                raise Exception(error_message)
-            if self.high_chan < 0 or self.high_chan >= self.mcc_128_num_channels:
-                error_message = ('Error: Invalid high_chan selection - must be '
-                                 '0 - {0:d}'.format(mcc_128_num_channels - 1))
-                raise Exception(error_message)
-            if self.low_chan > self.high_chan:
-                error_message = ('Error: Invalid channels - high_chan must be '
-                                 'greater than or equal to low_chan')
-                raise Exception(error_message)
-            # Get an instance of the selected hat device object.
-            address = select_hat_device(HatIDs.MCC_128)
-            self.hat = mcc128(address)
-
-            self.hat.a_in_mode_write(self.input_mode)
-            self.hat.a_in_range_write(self.input_range)
-            self.sensor = self.hat
-
-        except (HatError, ValueError) as error:
-            print('\n', error)
-
-        
-    
-    def read(self):
-        value = self.hat.a_in_read(0)
-        #print('\nMCC: ' + str(value))
-        return value
-
-
-
-
 # Constants
 #CURSOR_BACK_2 = '\x1b[2D'
 #ERASE_TO_END_OF_LINE = '\x1b[0K'
 
 
-    
+#MCC DAQ START
+options = OptionFlags.DEFAULT
+low_chan = 0
+high_chan = 3
+input_mode = AnalogInputMode.DIFF #or SE
+input_range = AnalogInputRange.BIP_10V #BIP_1V
 
+mcc_128_num_channels = mcc128.info().NUM_AI_CHANNELS[input_mode]
+sample_interval = 0.1 #0.5  # Seconds
+
+try:
+    # Ensure low_chan and high_chan are valid.
+    if low_chan < 0 or low_chan >= mcc_128_num_channels:
+        error_message = ('Error: Invalid low_chan selection - must be '
+                         '0 - {0:d}'.format(mcc_128_num_channels - 1))
+        raise Exception(error_message)
+    if high_chan < 0 or high_chan >= mcc_128_num_channels:
+        error_message = ('Error: Invalid high_chan selection - must be '
+                         '0 - {0:d}'.format(mcc_128_num_channels - 1))
+        raise Exception(error_message)
+    if low_chan > high_chan:
+        error_message = ('Error: Invalid channels - high_chan must be '
+                         'greater than or equal to low_chan')
+        raise Exception(error_message)
+
+    # Get an instance of the selected hat device object.
+    address = select_hat_device(HatIDs.MCC_128)
+    hat = mcc128(address)
+
+    hat.a_in_mode_write(input_mode)
+    hat.a_in_range_write(input_range)
+except (HatError, ValueError) as error:
+    print('\n', error)
+#MCC128 END
     
 class GroveGSRSensor:
     def __init__(self, channel):
         self.channel = channel
         self.adc = ADC()
-
+ 
     @property
     def GSR(self):
         value = self.adc.read(self.channel)
         return value
     
-    
 class ADCStreamReader:
     Grove = GroveGSRSensor    
-
     GAIN = 16
     DATA_RATE = 8 # 8, 16, 32, 64, 128, 250, 475, 860
 
@@ -152,12 +82,20 @@ class ADCStreamReader:
 
     ads1115Runner = ADS1115Runner()
     adc = Adafruit_ADS1x15.ADS1115()
-    adcInfo = ADCStreamInfo()
-    daq = MCC128Daq()
+    volts_per_division_table = {0:6.144, 1:4.096, 2:2.048, 4:1.024, 8:0.512, 16:0.256}
+    voltsPerDivision = 0
+    status = 'close'
+    gain = 16
+    data_rate = 8
+    sleep = 0
+    channel = 0
+    differential = 0
+    value = 0
+    value_raw = 0
     
-    #ip = "127.0.0.1"
-    #port = 1337
-    #daq = MCC128Daq()
+    ip = "127.0.0.1"
+    port = 1337
+
     #client = SimpleUDPClient(ip, port)  # Create client
 
     def __init__(self):
@@ -172,7 +110,7 @@ class ADCStreamReader:
         self.data_rate = data_rate
         self.sleep = sleep
         self.sensor = 0
-        self.voltsPerDivision = ((2 * self.adcInfo.volts_per_division_table[self.gain])/65535)*1000
+        self.voltsPerDivision = ((2 * self.volts_per_division_table[self.gain])/65535)*1000
         if (self.reader_type == 'differential_i2c'):
             #config_string = '1-000-111-1-000-0-0-0-11'
             config_string = '1-000-111-1-000-0-0-0-11'
@@ -186,6 +124,8 @@ class ADCStreamReader:
             #conf = prepareLEconf('0-000-111-1-100-1-0-0-11')
         elif (self.reader_type == 'grove_gsr'):
             self.sensor = GroveGSRSensor(int(0))
+        elif (self.reader_type == 'mcc_single_value_read'):
+            self.sensor = hat
 
         return self.channel
     
@@ -207,6 +147,11 @@ class ADCStreamReader:
         elif (self.reader_type == 'grove_gsr'):
             time.sleep(self.sleep)            
             return self.sensor.GSR
+        elif (self.reader_type == 'mcc_single_value_read'):
+            time.sleep(self.sleep)
+            value = hat.a_in_read(channel, options)
+            #print('\nMCC: ' + str(value))
+            return value
 
     def read_without_sleep(self, differential):
         #time.sleep(self.sleep)

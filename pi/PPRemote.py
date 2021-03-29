@@ -24,7 +24,7 @@ from approvaltests.approvals import verify
 #sys.path.insert(1, '.')
 #from services.DataLogger import DataLogger
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
-from pi.ADCStreamReader import ADCStreamReader
+from pi.ADCStreamReader import *
 
 #The new design:
 #In read_sensor() read time and 4 sensors into a tuple: (time, r0, r1, r2, r3)
@@ -47,9 +47,10 @@ reader_type_b = 'mcc_single_value_read' # 'grove_gsr' # 'dummy_read' #'single_en
 
 # Create an ADS1115 ADC (16-bit) instance.
 #adc = Adafruit_ADS1x15.ADS1115()
-adc = ADCStreamReader()
-channel0 = adc.open(reader_type_a, channel=0, gain=1, data_rate=8, sleep=0)
-channel1 = adc.open(reader_type_b, channel=1, gain=1, data_rate=8, sleep=0)
+adcInfo = ADCStreamInfo()
+adc = MCC128Daq() #adc = ADCStreamReader()
+channel0 = adc.openADC(adcInfo)
+channel1 = adc.openADC(adcInfo)
 
 a_gain = 1 #16
 b_gain = 1 #16
@@ -100,22 +101,26 @@ def read_sensor():
     while True:
         #a_raw_value = adc.read_adc_difference(0, gain=a_gain, data_rate=860)
         #a_value = (adc.read_adc_difference(0, gain=a_gain, data_rate=a_data_rate)) * a_mv_per_division
+        
         if (number_of_channels > 0):           
-            a_raw_value = adc.read(channel0)
+            a_raw_value = adc.read()
             a_value = a_raw_value * a_mv_per_division
             a_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
+            
+'''            
         if (number_of_channels > 1):
             b_raw_value = adc.read(channel1)
             b_value = b_raw_value * b_mv_per_division
             b_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
+ '''
 
         #b_raw_value = adc.read_adc_difference(3, gain=b_gain, data_rate=860)
         #b_value = (adc.read_adc_difference(3, gain=b_gain, data_rate=b_data_rate)) * b_mv_per_division
         #b_raw_value = adc.read(channel1)
         #b_value = b_raw_value * b_mv_per_division
-        #b_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
+        #b_time = datetime.datetime.now().strftime("%H:%M:%S:%f")  
         #print("Channel A: ", a_time, a_raw_value, a_value, " Channel B: ", b_time, b_raw_value, b_value)        
-        read_event.wait(sensor_read_time) #todo depend on a user modified variable
+        #read_event.wait(sensor_read_time) #todo depend on a user modified variable
  
 def write_network():
     global a_raw_value
