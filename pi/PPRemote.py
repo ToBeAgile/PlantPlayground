@@ -1,4 +1,6 @@
 '''
+DONE: PPRemote.py: Moved socket open to network thread so data can be logged without a network connection (for testing), cleaning up ADCStreamReader.
+
 PPRemote.py - todo
     1. Refactor global data to global tuple:
             (RefID, DateTime, ch0, ch1, ch2, ch3)
@@ -47,10 +49,10 @@ reader_type_b = 'mcc_single_value_read' # 'grove_gsr' # 'dummy_read' #'single_en
 
 # Create an ADS1115 ADC (16-bit) instance.
 #adc = Adafruit_ADS1x15.ADS1115()
-adcInfo = ADCStreamInfo()
+ADCInfo = ADCStreamInfo()
 adc = MCC128Daq() #adc = ADCStreamReader()
-channel0 = adc.openADC(adcInfo)
-channel1 = adc.openADC(adcInfo)
+channel0 = adc.openDaq(ADCInfo)
+channel1 = adc.openDaq(ADCInfo)
 
 a_gain = 1 #16
 b_gain = 1 #16
@@ -73,21 +75,6 @@ b_raw_value = 1 #adc.read_adc_difference(3, gain=b_gain, data_rate=b_data_rate)
 b_value = b_raw_value * b_mv_per_division
 b_time = datetime.datetime.now()
 
-#set up the network connection
-host = '192.168.4.22' # was '192.168.0.18' '127.0.1.1' #
-port = 50000
-
-s = None
-try:
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((host, port))
-
-except socket.error as message:
-    if s:
-        s.close()
-    print ("Unable to open the socket: " + str(message))
-    sys.exit(1)
-
 def read_sensor():
     global a_raw_value
     global a_value
@@ -96,17 +83,17 @@ def read_sensor():
     global b_value
     global b_time
     global sensor_state
-    #sensor_read = (time, r0, r1, r2, r3)
+    #sensor_read = (GUID, datetime, ch0, ch1, ch2, ch3)
     
     while True:
         #a_raw_value = adc.read_adc_difference(0, gain=a_gain, data_rate=860)
         #a_value = (adc.read_adc_difference(0, gain=a_gain, data_rate=a_data_rate)) * a_mv_per_division
         
         if (number_of_channels > 0):           
-            a_raw_value = adc.read()
+            a_raw_value = adc.readDaq()
             a_value = a_raw_value * a_mv_per_division
             a_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
-            
+            print("Channel A: ", a_time, a_raw_value, a_value)
 '''            
         if (number_of_channels > 1):
             b_raw_value = adc.read(channel1)
@@ -130,6 +117,22 @@ def write_network():
     global b_value
     global b_time
     global sensor_state
+
+    #set up the network connection
+    host = '192.168.4.22' # was '192.168.0.18' '127.0.1.1' #
+    port = 50000
+
+    s = None
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((host, port))
+
+    except socket.error as message:
+        if s:
+            s.close()
+        print ("Unable to open the socket: " + str(message))
+        sys.exit(1)
+
 
     while True:
         write_event.wait(network_write_time)

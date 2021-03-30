@@ -1,4 +1,4 @@
-#TODO: Create ADCStreamInfo value object, open strategy, read strategy
+#TODO: create ADCStreamReader open and read strategies for all DAQ types
 
 from __future__ import print_function
 from daqhats import mcc128, OptionFlags, HatIDs, HatError, AnalogInputMode, \
@@ -18,7 +18,7 @@ from grove.adc import ADC
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 from pi.ADS1115Runner import *
 
-# ADCStreamInfo contains everything needed to configure, open, read, and close an ADCStream
+# DaqStreamInfo contains everything needed to configure, open, read, and close an DaqStream
 
 class ADCStreamInfo:
     #General settings
@@ -52,24 +52,24 @@ class ADCStreamReaderFactory:
     def getADCStream(self, ADCStreamInfo):
         self.ADCStreamInfo = ADCStreamInfo()
         
-        return ADCStream
+        return DaqStream
 '''    
 
-class ADCStream(ABC):
+class DaqStream(ABC):
     
     @abstractmethod
-    def openADC(self, adcStreamInfo):
+    def openDaq(self, DaqStreamInfo):
         pass
     
     @abstractmethod
-    def read(self):
-        if self.adcStreamInfo.sleep_between_reads >= 0:
-            time.sleep(self.adcStreamInfo.sleep_between_reads)
+    def readDaq(self):
+        if self.DaqStreamInfo.sleep_between_reads >= 0:
+            time.sleep(self.DaqStreamInfo.sleep_between_reads)
     
-class MCC128Daq(ADCStream):
+class MCC128Daq(DaqStream):
             
-    def openADC(self, adcStreamInfo):
-        self.adcStreamInfo = adcStreamInfo
+    def openDaq(self, DaqStreamInfo):
+        self.DaqStreamInfo = DaqStreamInfo
         self.options = OptionFlags.DEFAULT
         self.low_chan = 0
         self.high_chan = 3
@@ -104,16 +104,11 @@ class MCC128Daq(ADCStream):
 
         except (HatError, ValueError) as error:
             print('\n', error)
-
-        
     
-    def read(self):
+    def readDaq(self):
         value = self.hat.a_in_read(0)
         #print('\nMCC: ' + str(value))
         return value
-
-
-
 
 # Constants
 #CURSOR_BACK_2 = '\x1b[2D'
@@ -126,7 +121,7 @@ class MCC128Daq(ADCStream):
 class GroveGSRSensor:
     def __init__(self, channel):
         self.channel = channel
-        self.adc = ADC()
+        self.Daq = ADC()
 
     @property
     def GSR(self):
@@ -152,7 +147,7 @@ class ADCStreamReader:
 
     ads1115Runner = ADS1115Runner()
     adc = Adafruit_ADS1x15.ADS1115()
-    adcInfo = ADCStreamInfo()
+    ADCInfo = ADCStreamInfo()
     daq = MCC128Daq()
     
     #ip = "127.0.0.1"
