@@ -1,13 +1,7 @@
 '''
-DONE: PPRemote.py: Moved socket open to network thread so data can be logged without a network connection (for testing), cleaning up ADCStreamReader.
-
+DONE:
 PPRemote.py - todo
-    1. Refactor global data to global tuple:
-            (RefID, DateTime, ch0, ch1, ch2, ch3)
-                - RefID is a GUID that maps to another table containing the project details, etc.
-                - DateTime contains to date and time down to the milliseconds
-                - ch0-3 are shorts containing raw data values for each channel
-
+    1.
 
 '''
 import socket
@@ -26,7 +20,7 @@ from approvaltests.approvals import verify
 #sys.path.insert(1, '.')
 #from services.DataLogger import DataLogger
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
-from pi.ADCStreamReader import *
+from pi.ADCStreamReader import *\
 
 #The new design:
 #In read_sensor() read time and 4 sensors into a tuple: (time, r0, r1, r2, r3)
@@ -36,23 +30,22 @@ from pi.ADCStreamReader import *
 number_of_channels = 1
 to_log = False
 data_log_frequency = 1 #Hz  How many data points are logged each second locally, on the pi
-sensor_read_frequency = 4 #0.1 #25 #Hz
-network_write_frequency = 4 #10.0 #Hz    How many data points will be graphed each second
+sensor_read_frequency = 0.1 #0.1 #25 #Hz
+network_write_frequency = 0.1 #10.0 #Hz    How many data points will be graphed each second
 
 #Calculated from above
 sensor_read_time = float(1/sensor_read_frequency)
 network_write_time = float(1/network_write_frequency)
 data_log_time = float(1/data_log_frequency)
 
-reader_type_a = 'mcc_single_value_read' # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
-reader_type_b = 'mcc_single_value_read' # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
 
 # Create an ADS1115 ADC (16-bit) instance.
 #adc = Adafruit_ADS1x15.ADS1115()
-ADCInfo = ADCStreamInfo()
+daqStreamSettings = DaqStreamSettings()
+DaqInfo = DaqStreamInfo()
 adc = MCC128Daq() #adc = ADCStreamReader()
-channel0 = adc.openDaq(ADCInfo)
-channel1 = adc.openDaq(ADCInfo)
+channel0 = adc.openDaq(DaqInfo)
+#channel1 = adc.openDaq(DaqInfo)
 
 a_gain = 1 #16
 b_gain = 1 #16
@@ -67,7 +60,7 @@ channel1 = 1
 chan = 0
 
 #Initialize the shared variables across threads
-a_raw_value = 1 #adc.read_adc_difference(0, gain=a_gain, data_rate=a_data_rate) 
+a_raw_value = 1 #adc.read_adc_difference(0, gain=a_gain, data_rate=a_data_rate)
 a_value = a_raw_value * a_mv_per_division
 a_time = datetime.datetime.now()
 time.sleep(0.01)
@@ -83,17 +76,24 @@ def read_sensor():
     global b_value
     global b_time
     global sensor_state
-    #sensor_read = (GUID, datetime, ch0, ch1, ch2, ch3)
+    global daq_data
     
     while True:
+        #call readDaq() to return tuple and assign to global data
+        #wait
+        #data_from_sensor = adc.readDaq
+
         #a_raw_value = adc.read_adc_difference(0, gain=a_gain, data_rate=860)
         #a_value = (adc.read_adc_difference(0, gain=a_gain, data_rate=a_data_rate)) * a_mv_per_division
-        
-        if (number_of_channels > 0):           
-            a_raw_value = adc.readDaq()
-            a_value = a_raw_value * a_mv_per_division
-            a_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
-            print("Channel A: ", a_time, a_raw_value, a_value)
+
+        #a_raw_value = adc.readDaq
+        #a_value = a_raw_value * a_mv_per_division
+        #a_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
+        #print("Channel A: ", a_time, a_raw_value, a_value)
+        daq_data = adc.readDaq
+        print(daq_data)
+        if DaqInfo.sleep_between_reads != -1:
+            sleep(DaqInfo.sleep_between_reads)
 '''            
         if (number_of_channels > 1):
             b_raw_value = adc.read(channel1)
@@ -117,6 +117,7 @@ def write_network():
     global b_value
     global b_time
     global sensor_state
+    global daq_data
 
     #set up the network connection
     host = '192.168.4.22' # was '192.168.0.18' '127.0.1.1' #
@@ -136,17 +137,19 @@ def write_network():
 
     while True:
         write_event.wait(network_write_time)
-
+        #Replace global data with tuple and handle on the other end
         #write channel a
+        #print(daq_data)
         data_dict = {"sensor": "a_sensor", "raw_value": a_raw_value, "value": a_value, "time": a_time}
+        #data_dict = daq_data
         #print(data_dict)
         serialized_data = pickle.dumps(data_dict)
         s.send(serialized_data)
 
         #write channel b
-        data_dict = {"sensor": "b_sensor", "raw_value": b_raw_value, "value": b_value, "time": b_time}
-        serialized_data = pickle.dumps(data_dict)
-        s.send(serialized_data)
+        #data_dict = {"sensor": "b_sensor", "raw_value": b_raw_value, "value": b_value, "time": b_time}
+        #serialized_data = pickle.dumps(data_dict)
+        #s.send(serialized_data)
 
 def log_data():
     global a_raw_value
@@ -156,6 +159,7 @@ def log_data():
     global b_value
     global b_time
     global sensor_state
+    global daq_data
 
     now = datetime.datetime.now()
     folder_name = "..//data//"
@@ -178,20 +182,23 @@ def log_data():
         writer = csv.writer(file)
         #writer and write the header
         writer.writerow(["Plant bioelectric data log by David Scott Bernstein. Project: Setup, File name: " + file_name])
-        writer.writerow(["Software: PlantPlayground, File: PP-Remote.py, Version 0.1"])
+        writer.writerow(["Software: PlantPlayground, File: PP-Remote.py, Version 0.2"])
         #writer.writerow(["Reading 2 differential channels in milivolts with a sensor read frequency of " + str(sensor_read_time) + "."])
-        writer.writerow(["Reading 1 channel(s) in milivolts with a sensor read frequency of " + str(sensor_read_time) + "."])
-        writer.writerow(["Channel B is connected to nothing, Channel A is connected my old Op Amp from 35 years ago and then to a plant."])
-        writer.writerow(["The plant is in a Faraday cage and the Pi 4 is in a Faraday cage inside the Faraday cage with a common ground."])
-        writer.writerow(["Gain: " + str(a_gain) + ", Data Rate: " + str(a_data_rate) + ", Volts per Division: " + str(a_mv_per_division) + "."])
-        writer.writerow(["Channels A and B are connected using a silver-silver chloride wire that I made myself."])
-        writer.writerow(["Gain: " + str(b_gain) + ", Data Rate: " + str(b_data_rate) + ", Volts per Division: " + str(b_mv_per_division) + "."])
-        writer.writerow(["Channel A Open Type: " + reader_type_a + "Channel B Open Type: " + reader_type_b + "."])
+        #writer.writerow(["Reading 4 channel(s) in milivolts with a sensor read frequency of " + str(sensor_read_time) + "."])
+        #writer.writerow(["Channel B is connected to nothing, Channel A is connected my old Op Amp from 35 years ago and then to a plant."])
+        #writer.writerow(["The plant is in a Faraday cage and the Pi 4 is in a Faraday cage inside the Faraday cage with a common ground."])
+        #writer.writerow(["Gain: " + str(a_gain) + ", Data Rate: " + str(a_data_rate) + ", Volts per Division: " + str(a_mv_per_division) + "."])
+        #writer.writerow(["Channels A and B are connected using a silver-silver chloride wire that I made myself."])
+        #writer.writerow(["Gain: " + str(b_gain) + ", Data Rate: " + str(b_data_rate) + ", Volts per Division: " + str(b_mv_per_division) + "."])
+        #writer.writerow(["Channel A Open Type: " + reader_type_a + "Channel B Open Type: " + reader_type_b + "."])
 
     while True:
         log_event.wait(data_log_time)
-        writer.writerow(["Channel A: " + str(a_time) + ", " + str(a_raw_value) + ", " + str(a_value)
-                         + '; Channel B: ' + str(b_time) + ", " + str(b_raw_value) + ", " + str(b_value)])
+        print(daq_data)
+        #writer.writerow(daq_data)
+
+        #writer.writerow(["Channel A: " + str(a_time) + ", " + str(a_raw_value) + ", " + str(a_value)
+                         #+ '; Channel B: ' + str(b_time) + ", " + str(b_raw_value) + ", " + str(b_value)])
     file.close()
 
 read_event = threading.Event()

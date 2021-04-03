@@ -39,7 +39,8 @@ b_value = (adc.read_adc_difference(3, gain=b_gain, data_rate=b_data_rate)) * b_m
 b_time = datetime.datetime.now()
 
 #set up the network connection
-host = '192.168.0.18'
+#host = '192.168.0.18'
+host = '192.168.4.22'
 port = 50000
 
 s = None
