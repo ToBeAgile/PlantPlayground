@@ -20,7 +20,7 @@ from approvaltests.approvals import verify
 #sys.path.insert(1, '.')
 #from services.DataLogger import DataLogger
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
-from pi.ADCStreamReader import *\
+from pi.ADCStreamReader import *
 
 #The new design:
 #In read_sensor() read time and 4 sensors into a tuple: (time, r0, r1, r2, r3)
@@ -31,7 +31,7 @@ number_of_channels = 1
 to_log = False
 data_log_frequency = 1 #Hz  How many data points are logged each second locally, on the pi
 sensor_read_frequency = 0.1 #0.1 #25 #Hz
-network_write_frequency = 0.1 #10.0 #Hz    How many data points will be graphed each second
+network_write_frequency = 10 #10.0 #Hz    How many data points will be graphed each second
 
 #Calculated from above
 sensor_read_time = float(1/sensor_read_frequency)
@@ -67,6 +67,7 @@ time.sleep(0.01)
 b_raw_value = 1 #adc.read_adc_difference(3, gain=b_gain, data_rate=b_data_rate)
 b_value = b_raw_value * b_mv_per_division
 b_time = datetime.datetime.now()
+daq_data = 1
 
 def read_sensor():
     global a_raw_value
@@ -91,7 +92,7 @@ def read_sensor():
         #a_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
         #print("Channel A: ", a_time, a_raw_value, a_value)
         daq_data = adc.readDaq
-        print(daq_data)
+        #print(daq_data)
         if DaqInfo.sleep_between_reads != -1:
             sleep(DaqInfo.sleep_between_reads)
 '''            
@@ -140,9 +141,9 @@ def write_network():
         #Replace global data with tuple and handle on the other end
         #write channel a
         #print(daq_data)
-        data_dict = {"sensor": "a_sensor", "raw_value": a_raw_value, "value": a_value, "time": a_time}
-        #data_dict = daq_data
-        #print(data_dict)
+        #data_dict = {"sensor": "a_sensor", "raw_value": a_raw_value, "value": a_value, "time": a_time}
+        data_dict = daq_data
+        print(data_dict)
         serialized_data = pickle.dumps(data_dict)
         s.send(serialized_data)
 
@@ -194,7 +195,7 @@ def log_data():
 
     while True:
         log_event.wait(data_log_time)
-        print(daq_data)
+        #print(daq_data)
         #writer.writerow(daq_data)
 
         #writer.writerow(["Channel A: " + str(a_time) + ", " + str(a_raw_value) + ", " + str(a_value)

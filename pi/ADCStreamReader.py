@@ -121,6 +121,7 @@ def getDateTime():
 
 class MCC128Daq(DaqStream):
     daqChannels = [0.0, 0.0, 0.0, 0.0]
+    this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
 
     def openDaq(self, DaqStreamInfo):
         self.DaqStreamInfo = DaqStreamInfo
@@ -133,7 +134,7 @@ class MCC128Daq(DaqStream):
         self.mcc_128_num_channels = DaqStreamInfo.mcc_128_num_channels
         self.sample_interval = DaqStreamInfo.sample_interval
         self.guid = getGUID()
-        print(self.guid)
+        #print(self.guid)
 
         try:
             # Ensure low_chan and high_chan are valid.
@@ -162,15 +163,18 @@ class MCC128Daq(DaqStream):
     
     @property
     def readDaq(self):
-        this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
-        for ch in range(self.low_chan, self.high_chan):
+        self.this_moment = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
+        for ch in range(self.low_chan, self.high_chan + 1):
             if self.DaqStreamInfo.channels[ch] is True:
                 self.daqChannels[ch] = self.hat.a_in_read(ch)
                 if self.DaqStreamInfo.sleep_between_channels != -1:
                     sleep(DaqStreamInfo.sleep_between_channels)
-        return_tuple = (self.guid, this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
-        #print (return_tuple)
-        return return_tuple #self.hat.a_in_read(0)
+        sensor_data = list()
+        sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[2])
+        #print(myDict + self.this_moment)
+        #return_items = {'GUID:': daq.guid, 'Time: ': self.this_moment, 'Ch0: ': self.daqChannels[0], 'Ch1: ':self.daqChannels[1], 'Ch2: ':, self.daqChannels[2], 'Ch3: ': self.daqChannels[3]}
+        print (sensor_data)
+        return sensor_data #self.hat.a_in_read(0)
 
     @property
     def closeDaq(self):
