@@ -121,7 +121,7 @@ def write_network():
     global daq_data
 
     #set up the network connection
-    host = '192.168.4.22' # was '192.168.0.18' '127.0.1.1' #
+    host = '192.168.4.39' #'192.168.4.22' # was '192.168.0.18' '127.0.1.1' #
     port = 50000
 
     s = None
