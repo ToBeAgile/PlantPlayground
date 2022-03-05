@@ -16,19 +16,19 @@ from pi.ADCStreamReader import ADCStreamReader
 
 
 #Set the rates. Implement these into a GUI
-number_of_channels = 1
+number_of_channels = 2
 to_log = False
-data_log_frequency = 1 #Hz  How many data points are logged each second locally, on the pi
-sensor_read_frequency = 1 #0.1 #25 #Hz
-network_write_frequency = 1 #10.0 #Hz    How many data points will be graphed each second
+data_log_frequency = 10 #Hz  How many data points are logged each second locally, on the pi
+sensor_read_frequency = 10 #0.1 #25 #Hz
+network_write_frequency = 10 #10.0 #Hz    How many data points will be graphed each second
 
 #Calculated from above
 sensor_read_time = float(1/sensor_read_frequency)
 network_write_time = float(1/network_write_frequency)
 data_log_time = float(1/data_log_frequency)
 
-reader_type_a = 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
-reader_type_b = 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
+reader_type_a = 'differential' #'single_ended' #'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'differential'
+reader_type_b = 'differential' #'single_ended' #'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
 
 # Create an ADS1115 ADC (16-bit) instance.
 #adc = Adafruit_ADS1x15.ADS1115()
@@ -55,7 +55,7 @@ b_value = b_raw_value * b_mv_per_division
 b_time = datetime.datetime.now()
 
 #set up the network connection
-host = '192.168.4.22' # was '192.168.0.18' '127.0.1.1' #
+host = '192.168.4.39' #192.168.4.22' # was '192.168.0.18' '127.0.1.1' #
 port = 50000
 
 s = None
@@ -97,7 +97,7 @@ def read_sensor():
         #b_raw_value = adc.read(channel1)
         #b_value = b_raw_value * b_mv_per_division
         #b_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
-        #print("Channel A: ", a_time, a_raw_value, a_value, " Channel B: ", b_time, b_raw_value, b_value)        
+        print("Channel A: ", a_time, a_raw_value, a_value, " Channel B: ", b_time, b_raw_value, b_value)        
         read_event.wait(sensor_read_time) #todo depend on a user modified variable
  
 def write_network():
