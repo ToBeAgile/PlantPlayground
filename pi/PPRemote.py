@@ -27,7 +27,7 @@ from pi.ADCStreamReader import *
 #if channel not used put NaN, all values raw. File header had date, gain, etc.
 
 #Set the rates. Implement these into a GUI
-number_of_channels = 2
+number_of_channels = 1
 to_log = False
 data_log_frequency = 1 #Hz  How many data points are logged each second locally, on the pi
 sensor_read_frequency = 0.1 #0.1 #25 #Hz
@@ -38,8 +38,6 @@ sensor_read_time = float(1/sensor_read_frequency)
 network_write_time = float(1/network_write_frequency)
 data_log_time = float(1/data_log_frequency)
 
-reader_type_a = 'differential' #'single_ended' #'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'differential'
-reader_type_b = 'differential' #'single_ended' #'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
 
 # Create an ADS1115 ADC (16-bit) instance.
 #adc = Adafruit_ADS1x15.ADS1115()
@@ -69,23 +67,6 @@ time.sleep(0.01)
 b_raw_value = 1 #adc.read_adc_difference(3, gain=b_gain, data_rate=b_data_rate)
 b_value = b_raw_value * b_mv_per_division
 b_time = datetime.datetime.now()
-
-#set up the network connection
-host = '192.168.4.39' #192.168.4.22' # was '192.168.0.18' '127.0.1.1' #
-port = 50000
-
-s = None
-try:
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((host, port))
-
-  
-except socket.error as message:
-    if s:
-        s.close()
-    print ("Unable to open the socket: " + str(message))
-    sys.exit(1)
-    
 daq_data = 1
 
 def read_sensor():
@@ -125,15 +106,9 @@ def read_sensor():
         #b_value = (adc.read_adc_difference(3, gain=b_gain, data_rate=b_data_rate)) * b_mv_per_division
         #b_raw_value = adc.read(channel1)
         #b_value = b_raw_value * b_mv_per_division
-<<<<<<< HEAD:pi/PP-Remote.py
-        #b_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
-        print("Channel A: ", a_time, a_raw_value, a_value, " Channel B: ", b_time, b_raw_value, b_value)        
-        read_event.wait(sensor_read_time) #todo depend on a user modified variable
-=======
         #b_time = datetime.datetime.now().strftime("%H:%M:%S:%f")  
         #print("Channel A: ", a_time, a_raw_value, a_value, " Channel B: ", b_time, b_raw_value, b_value)        
         #read_event.wait(sensor_read_time) #todo depend on a user modified variable
->>>>>>> bc737c52825d918083f82b0562a1e2a172f0b123:pi/PPRemote.py
  
 def write_network():
     global a_raw_value
