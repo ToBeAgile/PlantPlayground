@@ -3,7 +3,6 @@
 #DONE:
 # #
 from __future__ import print_function
-
 from daqhats import mcc128, OptionFlags, HatIDs, HatError, AnalogInputMode, \
     AnalogInputRange
 from daqhats_utils import select_hat_device, enum_mask_to_string, \

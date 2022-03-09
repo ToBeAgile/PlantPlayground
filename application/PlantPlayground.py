@@ -1,4 +1,5 @@
 # PlantPlayground Version 0.1 Copyright(c) 2020 Picocosm, Inc.
+#Update: using raw data values instead of millivolts
 import socket
 import sys
 import pickle
@@ -202,13 +203,17 @@ def update_data():
         if sensor == "a_sensor":
             a_time = data_dict["time"]
             a_raw_value = data_dict["raw_value"]
+            a_value = data_dict["value"]
             a_time_q.append(a_time_q[-1]+1)
             a_value_q.append(a_raw_value)
+            #a_value_q.append(a_value)
         elif sensor == "b_sensor":
             b_time = data_dict["time"]
             b_raw_value = data_dict["raw_value"]
+            b_value = data_dict["value"]
             b_time_q.append(b_time_q[-1]+1)
             b_value_q.append(b_raw_value)
+            #b_value_q.append(b_value)
         else:
             print("Bad network data!")
         #value = data_dict["value"]
