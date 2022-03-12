@@ -1,7 +1,9 @@
 '''
 DONE:
+
 PPRemote.py - todo
-    1.
+    1. Extract hardware specific calls into objects and conditional imports
+    1. Implement ADS1115
 
 '''
 import socket
@@ -15,7 +17,19 @@ import threading
 import csv
 import os.path
 import unittest
-from approvaltests.approvals import verify
+import configparser
+
+# Read config file to determine what DAQ we are using and only refernce those symbols
+config = configparser.ConfigParser()
+config.read('PPRemote_Config.ini')
+daq = config['Default']['DAQ']
+device = config['Default']['Device']
+num_channels = config['Default']['NumChannels']
+#print(daq, device, num_channels)
+
+#Read config and get DAQ
+#Set a field to represent the DAQ we are using
+#Conditionally import modules for the DAQ
 
 #sys.path.insert(1, '.')
 #from services.DataLogger import DataLogger
