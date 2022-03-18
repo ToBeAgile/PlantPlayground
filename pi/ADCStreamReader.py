@@ -25,8 +25,6 @@ sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 from pi.ADS1115Runner import *
 #from pi.PPRemote import daqStreamSetting
 
-
-
 class DaqStreamSettings:
     # General settings
     guid = uuid.uuid4()
@@ -39,6 +37,7 @@ class DaqStreamSettings:
     sensor_type = 'mcc_single_value_read'
     reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
     reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
+
 
     # DaqStreamSettings are the most important settings for DaqStreamInfo
 
@@ -110,6 +109,10 @@ class DaqStream(ABC):
     @abstractmethod
     def closeDaq(self, DaqStreamInfo):
         pass
+
+    @staticmethod
+    def getInstance():
+        return MCC128Daq()
 
 def getGUID():
     id = uuid.uuid4()
