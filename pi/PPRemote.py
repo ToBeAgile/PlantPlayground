@@ -2,8 +2,6 @@
 DONE:
 
 PPRemote.py - todo
-    1. Extract hardware specific calls into objects and conditional imports
-    1. Implement ADS1115
 
 '''
 import socket
@@ -18,7 +16,7 @@ import os.path
 import unittest
 import configparser
 
-# Read config file to determine what DAQ we are using and only refernce those symbols
+# TO DO: Read config file to determine what DAQ we are using and only refernce those symbols
 config = configparser.ConfigParser()
 config.read('PPRemote_Config.ini')
 daq = config['Default']['DAQ']
@@ -30,8 +28,6 @@ num_channels = config['Default']['NumChannels']
 #Set a field to represent the DAQ we are using
 #Conditionally import modules for the DAQ
 
-#sys.path.insert(1, '.')
-#from services.DataLogger import DataLogger
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 from pi.ADCStreamReader import *
 
@@ -41,7 +37,7 @@ from pi.ADCStreamReader import *
 
 #Set the rates. Implement these into a GUI
 number_of_channels = 1
-to_log = False
+to_log = True
 data_log_frequency = 1 #Hz  How many data points are logged each second locally, on the pi
 sensor_read_frequency = 0.1 #0.1 #25 #Hz
 network_write_frequency = 10 #10.0 #Hz    How many data points will be graphed each second
@@ -73,9 +69,7 @@ b_value = b_raw_value * b_mv_per_division
 b_time = datetime.datetime.now()
 daq_data = 1
 
-# Create an ADS1115 ADC (16-bit) instance.
-#adc = Adafruit_ADS1x15.ADS1115()
-#daqStreamSettings = DaqStreamSettings()
+
 DaqInfo = DaqStreamInfo()
 #adcStreamReader = ADCStreamReader()
 adc = DaqStream.getInstance()
@@ -97,13 +91,6 @@ def read_sensor():
         #wait
         #data_from_sensor = adc.readDaq
 
-        #a_raw_value = adc.read_adc_difference(0, gain=a_gain, data_rate=860)
-        #a_value = (adc.read_adc_difference(0, gain=a_gain, data_rate=a_data_rate)) * a_mv_per_division
-
-        #a_raw_value = adc.readDaq
-        #a_value = a_raw_value * a_mv_per_division
-        #a_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
-        #print("Channel A: ", a_time, a_raw_value, a_value)
         daq_data = adc.readDaq
         #print(daq_data)
         if DaqInfo.sleep_between_reads != -1:

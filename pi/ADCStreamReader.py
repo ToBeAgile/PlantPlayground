@@ -97,7 +97,11 @@ class ADCStreamReaderFactory:
 '''    
 
 class DaqStream(ABC):
-    
+
+    @staticmethod
+    def getInstance():
+        return MCC128Daq()
+
     @abstractmethod
     def openDaq(self, DaqStreamInfo):
         pass
@@ -110,14 +114,9 @@ class DaqStream(ABC):
     def closeDaq(self, DaqStreamInfo):
         pass
 
-    @staticmethod
-    def getInstance():
-        return MCC128Daq()
-
 def getGUID():
     id = uuid.uuid4()
     return id.hex
-
 
 def getDateTime():
     return datetime.datetime.now()
@@ -175,65 +174,18 @@ class MCC128Daq(DaqStream):
                     sleep(DaqStreamInfo.sleep_between_channels)
         sensor_data = list()
         sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[2])
-        #print(myDict + self.this_moment)
-        #return_items = {'GUID:': daq.guid, 'Time: ': self.this_moment, 'Ch0: ': self.daqChannels[0], 'Ch1: ':self.daqChannels[1], 'Ch2: ':, self.daqChannels[2], 'Ch3: ': self.daqChannels[3]}
         print (sensor_data)
-        return sensor_data #self.hat.a_in_read(0)
+        return sensor_data
 
     @property
     def closeDaq(self):
         pass
-'''    
-        if self.DaqStreamInfo.channels[0] is True:
-            ch0 = self.hat.a_in_read(0)
-        if self.DaqStreamInfo.sleep_between_channels != -1:
-            sleep(DaqStreamInfo.sleep_between_channels)
-        if self.DaqStreamInfo.channels[1] is True:
-            ch1 = self.hat.a_in_read(1)
-        if self.DaqStreamInfo.sleep_between_channels != -1:
-            sleep(DaqStreamInfo.sleep_between_channels)
-        if self.DaqStreamInfo.channels[2] is True:
-            ch2 = self.hat.a_in_read(2)
-        if self.DaqStreamInfo.sleep_between_channels != -1:
-            sleep(DaqStreamInfo.sleep_between_channels)
-        if self.DaqStreamInfo.channels[3] is True:
-            ch3 = self.hat.a_in_read(3)
-        if self.DaqStreamInfo.sleep_between_channels != -1:
-            sleep(DaqStreamInfo.sleep_between_channels)
-'''
-                #for channel in range(DaqStreamInfo.low_chan, DaqStreamInfo.high_chan):
-            #if self.DaqStreamInfo.channels[channel] is True:
-                #channel_readings[channel] = self.hat.a_in_read(channel)
-            #if self.DaqStreamInfo.sleep_between_channels != -1:
-                #sleep(DaqStreamInfo.sleep_between_channels)
-        #@@@
-        #for each chan in channels:
-            #read(), wait()
-        #return tuple (guid, now, channels[ch0, ch1, ch2, ch3])
-            #print(self.guid, now, ch0, ch1, ch2, ch3)
-'''
-        #receive GUID, set date-time
-        GUID = getGUID()
-        date_time = getDateTime()
-        ch[]
-        #foreach channel, read channel, delay between channels
-        for channel in range(0, 3):
-            if DaqStreamInfo.channels[channel] == True:
-                ch[channel] = self.hat.a_in_read(channel)
-            else
-                ch[channel] = None
-            if DaqStreamInfo.sleep_between_reads >  -1:
-                time.sleep(DaqStreamInfo.sleep_between_reads)
-        return (GUID, date_time, ch[0], ch[1], ch[2], ch[3])
-'''
+
 # Constants
 #CURSOR_BACK_2 = '\x1b[2D'
 #ERASE_TO_END_OF_LINE = '\x1b[0K'
 
 
-    
-
-    
 class GroveGSRSensor:
     def __init__(self, channel):
         self.channel = channel
