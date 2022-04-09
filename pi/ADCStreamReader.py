@@ -1,7 +1,12 @@
-#TODO: create ADCStreamReader open and read strategies for all DAQ types
-#TODO: Read all 4 channels, time and GUID in read()
-#DONE:
-# #
+# PPRemote.py - Remote Data Aquisition, Logger, and network broadcaster
+'''
+NEXT:
+    Seperate out DAQ specific fields and imports into their own moduals that are conditionally included 
+    Set up PPRemote_Config.ini file to expose settings
+DONE:
+General clean up
+'''
+
 from __future__ import print_function
 from daqhats import mcc128, OptionFlags, HatIDs, HatError, AnalogInputMode, \
     AnalogInputRange

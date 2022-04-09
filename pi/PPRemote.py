@@ -1,7 +1,10 @@
 '''
-DONE:
+PPRemote.py
+NEXT:
+    Seperate out DAQ specific fields into 
 
-PPRemote.py - todo
+DONE:
+General clean up
 
 '''
 import socket
