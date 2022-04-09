@@ -85,6 +85,14 @@ class DaqStreamInfo:
     value = 0
     value_raw = 0
     
+def getGUID():
+    id = uuid.uuid4()
+    return id.hex
+
+def getDateTime():
+    return datetime.datetime.now()
+
+
 '''    
 class ADCStreamReaderFactory:
     def __init__(self):
@@ -113,13 +121,6 @@ class DaqStream(ABC):
     @abstractmethod
     def closeDaq(self, DaqStreamInfo):
         pass
-
-def getGUID():
-    id = uuid.uuid4()
-    return id.hex
-
-def getDateTime():
-    return datetime.datetime.now()
 
 
 class MCC128Daq(DaqStream):
@@ -227,7 +228,14 @@ class ADS1115Stream(DaqStream):
     
     @property
     def readDaq(self):
-        pass
+        if (self.reader_type == 'differential' ):
+            time.sleep(self.sleep)
+            self.differential_value = self.adc.read_adc_difference(self.channel, self.gain, self.data_rate)
+            return self.differential_value #* self.voltsPerDivision
+        elif (self.reader_type == 'single_ended'):
+            time.sleep(self.sleep)            
+            self.differential_value = self.adc.read_adc(self.channel, self.gain, self.data_rate)
+            return self.differential_value #* self.voltsPerDivision
 
     @property
     def closeDaq(self, DaqStreamInfo):
@@ -292,7 +300,10 @@ class ADS1115i2cStream(DaqStream):
 
     @property
     def readDaq(self):
-        pass
+        #if (self.reader_type == 'differential_i2c'):
+        self.value_raw = self.ads1115Runner.i2c_read(channel)
+        return self.value_raw #* self.voltsPerDivision
+
 
     @property
     def closeDaq(self, DaqStreamInfo):
@@ -338,7 +349,8 @@ class GroveGSRStream(DaqStream):
     
     @property
     def readDaq(self):
-        pass
+        time.sleep(self.sleep)            
+        return self.sensor.GSR
 
     @property
     def closeDaq(self, DaqStreamInfo):
