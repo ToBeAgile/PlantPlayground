@@ -36,17 +36,17 @@ from pi.ADCStreamReader import *
 #if channel not used put NaN, all values raw. File header had date, gain, etc.
 
 #Set the rates. Implement these into a GUI
-number_of_channels = 1
-to_log = True
+#number_of_channels = 1
+to_log = False
 data_log_frequency = 1 #Hz  How many data points are logged each second locally, on the pi
 sensor_read_frequency = 0.1 #0.1 #25 #Hz
 network_write_frequency = 10 #10.0 #Hz    How many data points will be graphed each second
 
 #Calculated from above
-sensor_read_time = float(1/sensor_read_frequency)
-network_write_time = float(1/network_write_frequency)
-data_log_time = float(1/data_log_frequency)
-
+#sensor_read_time = float(1/sensor_read_frequency)
+#network_write_time = float(1/network_write_frequency)
+#data_log_time = float(1/data_log_frequency)
+'''
 a_gain = 1 #16
 b_gain = 1 #16
 a_data_rate = 128
@@ -58,8 +58,9 @@ sensor_state = 0
 channel0 = 0
 channel1 = 1
 chan = 0
-
+'''
 #Initialize the shared variables across threads
+"""
 a_raw_value = 1 #adc.read_adc_difference(0, gain=a_gain, data_rate=a_data_rate)
 a_value = a_raw_value * a_mv_per_division
 a_time = datetime.datetime.now()
@@ -68,10 +69,11 @@ b_raw_value = 1 #adc.read_adc_difference(3, gain=b_gain, data_rate=b_data_rate)
 b_value = b_raw_value * b_mv_per_division
 b_time = datetime.datetime.now()
 daq_data = 1
-
+"""
 
 
 def read_sensor():
+    '''
     global a_raw_value
     global a_value
     global a_time
@@ -79,12 +81,13 @@ def read_sensor():
     global b_value
     global b_time
     global sensor_state
+    '''
     global daq_data
     
     DaqInfo = DaqStreamInfo()
     #adcStreamReader = ADCStreamReader()
     adc = DaqStream.getInstance()
-    channel0 = adc.openDaq(DaqInfo)
+    x = adc.openDaq(DaqInfo)
     #channel1 = adc.openDaq(DaqInfo)
 
     
@@ -113,6 +116,7 @@ def read_sensor():
         #read_event.wait(sensor_read_time) #todo depend on a user modified variable
  
 def write_network():
+    '''
     global a_raw_value
     global a_value
     global a_time
@@ -120,6 +124,7 @@ def write_network():
     global b_value
     global b_time
     global sensor_state
+    '''
     global daq_data
 
     #set up the network connection
@@ -155,6 +160,7 @@ def write_network():
         #s.send(serialized_data)
 
 def log_data():
+    '''
     global a_raw_value
     global a_value
     global a_time
@@ -162,6 +168,7 @@ def log_data():
     global b_value
     global b_time
     global sensor_state
+'''
     global daq_data
 
     now = datetime.datetime.now()
