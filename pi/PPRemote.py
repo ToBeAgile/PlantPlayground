@@ -35,17 +35,17 @@ from pi.ADCStreamReader import *
 #In read_sensor() read time and 4 sensors into a tuple: (time, r0, r1, r2, r3)
 #if channel not used put NaN, all values raw. File header had date, gain, etc.
 
-#Set the rates. Implement these into a GUI
-#number_of_channels = 1
-to_log = False
+#Set the rates. Implement these in config file or GUI
+number_of_channels = 1
 data_log_frequency = 1 #Hz  How many data points are logged each second locally, on the pi
 sensor_read_frequency = 0.1 #0.1 #25 #Hz
 network_write_frequency = 10 #10.0 #Hz    How many data points will be graphed each second
+to_log = False
 
 #Calculated from above
-#sensor_read_time = float(1/sensor_read_frequency)
-#network_write_time = float(1/network_write_frequency)
-#data_log_time = float(1/data_log_frequency)
+sensor_read_time = float(1/sensor_read_frequency)
+network_write_time = float(1/network_write_frequency)
+data_log_time = float(1/data_log_frequency)
 '''
 a_gain = 1 #16
 b_gain = 1 #16
