@@ -70,11 +70,6 @@ b_time = datetime.datetime.now()
 daq_data = 1
 
 
-DaqInfo = DaqStreamInfo()
-#adcStreamReader = ADCStreamReader()
-adc = DaqStream.getInstance()
-channel0 = adc.openDaq(DaqInfo)
-#channel1 = adc.openDaq(DaqInfo)
 
 def read_sensor():
     global a_raw_value
@@ -85,6 +80,13 @@ def read_sensor():
     global b_time
     global sensor_state
     global daq_data
+    
+    DaqInfo = DaqStreamInfo()
+    #adcStreamReader = ADCStreamReader()
+    adc = DaqStream.getInstance()
+    channel0 = adc.openDaq(DaqInfo)
+    #channel1 = adc.openDaq(DaqInfo)
+
     
     while True:
         #call readDaq() to return tuple and assign to global data
