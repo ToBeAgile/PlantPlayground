@@ -22,11 +22,13 @@ import configparser
 # TO DO: Read config file to determine what DAQ we are using and only refernce those symbols
 config = configparser.ConfigParser()
 config.read('PPRemote_Config.ini')
+# General settings
 number_of_channels = config['Default']['number_of_channels']
 data_log_frequency = int(config['Default']['data_log_frequency'])
 sensor_read_frequency = config['Default']['sensor_read_frequency']
 network_write_frequency = config['Default']['network_write_frequency']
 to_log = config['Default']['to_log']
+sleep_between_reads = config['Default']['sleep_between_reads']
 
 ''' put in DaqStreamInfo and pass to ADCStreamReader
 sleep_between_reads = -1  # -1 = don't give away the time slice
@@ -108,8 +110,8 @@ def read_sensor():
 
         daq_data = adc.readDaq
         #print(daq_data)
-        if DaqInfo.sleep_between_reads != -1:
-            sleep(DaqInfo.sleep_between_reads)
+        #if DaqInfo.sleep_between_reads != -1:
+        #    sleep(DaqInfo.sleep_between_reads)
 '''            
         if (number_of_channels > 1):
             b_raw_value = adc.read(channel1)

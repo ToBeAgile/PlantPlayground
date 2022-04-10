@@ -34,9 +34,10 @@ from pi.ADS1115Runner import *
 #from pi.PPRemote import daqStreamSetting
 
 class DaqStreamSettings:
+    '''
     # General settings
     guid = uuid.uuid4()
-    '''
+    
     sleep_between_reads = -1  # -1 = don't give away the time slice
     sleep_between_channels = 0.25
     number_of_channels = 4
@@ -48,18 +49,19 @@ class DaqStreamSettings:
     reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
     '''
 
-    # DaqStreamSettings are the most important settings for DaqStreamInfo
-    sleep_between_reads = -1  # -1 = don't give away the time slice
-    sleep_between_channels = 0.25
-    number_of_channels = 4
-    low_chan = 0
-    high_chan = 3
-    channels = [True, True, True, True]
-    sensor_type = 'mcc_single_value_read'
-    reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
-    reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
-
-    # MCC128-specific settings
+# DaqStreamInfo contains everything needed to configure, open, read, and close an DaqStream
+class DaqStreamInfo:
+    '''
+    #General settings from config file
+    sleep_between_reads = DaqStreamSettings.sleep_between_reads
+    sleep_between_channels = DaqStreamSettings.sleep_between_channels
+    number_of_channels = DaqStreamSettings.number_of_channels
+    low_chan = DaqStreamSettings.low_chan
+    high_chan = DaqStreamSettings.high_chan
+    channels = DaqStreamSettings.channels
+    sensor_type = DaqStreamSettings.sensor_type
+    '''
+        # MCC128-specific settings
     analog_input_range = AnalogInputRange.BIP_10V
     reader_type = 'differential'  # or 'single-ended'
     options = OptionFlags.DEFAULT
@@ -68,19 +70,7 @@ class DaqStreamSettings:
 
     mcc_128_num_channels = mcc128.info().NUM_AI_CHANNELS[input_mode]
     sample_interval = 0.1  # 0.5  # Seconds
-
-
-# DaqStreamInfo contains everything needed to configure, open, read, and close an DaqStream
-class DaqStreamInfo:
-    #General settings
-    sleep_between_reads = DaqStreamSettings.sleep_between_reads
-    sleep_between_channels = DaqStreamSettings.sleep_between_channels
-    number_of_channels = DaqStreamSettings.number_of_channels
-    low_chan = DaqStreamSettings.low_chan
-    high_chan = DaqStreamSettings.high_chan
-    channels = DaqStreamSettings.channels
-    sensor_type = DaqStreamSettings.sensor_type
-    
+    '''
     #MCC128-specific settings
     analog_input_range = DaqStreamSettings.analog_input_range
     reader_type = DaqStreamSettings.reader_type
@@ -90,7 +80,7 @@ class DaqStreamInfo:
 
     mcc_128_num_channels = DaqStreamSettings.mcc_128_num_channels
     sample_interval = DaqStreamSettings.sample_interval
-
+    '''
     # ADS1115 specific
     volts_per_division_table = {0:6.144, 1:4.096, 2:2.048, 4:1.024, 8:0.512, 16:0.256}
     voltsPerDivision = 0
@@ -156,10 +146,25 @@ class MCC128Daq(DaqStream):
     sample_interval = 0.1  # 0.5  # Seconds
 
     def openDaq(self, DaqStreamInfo):
+        # General settings
+        self.guid = uuid.uuid4()
+        
+        self.sleep_between_reads = -1  # -1 = don't give away the time slice
+        self.sleep_between_channels = 0.25
+        self.number_of_channels = 4
+        #low_chan = 0
+        #high_chan = 3
+        self.channels = [True, True, True, True]
+        self.sensor_type = 'mcc_single_value_read'
+        self.reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
+        self.reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
+
+        ####
         self.DaqStreamInfo = DaqStreamInfo
+        
         self.options = DaqStreamInfo.options
-        self.low_chan = DaqStreamInfo.low_chan
-        self.high_chan = DaqStreamInfo.high_chan
+        self.low_chan = 0
+        self.high_chan = 3
         self.input_mode = DaqStreamInfo.input_mode
         self.input_range = DaqStreamInfo.input_range
 
@@ -167,7 +172,7 @@ class MCC128Daq(DaqStream):
         self.sample_interval = DaqStreamInfo.sample_interval
         self.guid = getGUID()
         #print(self.guid)
-
+        
         try:
             # Ensure low_chan and high_chan are valid.
             if self.low_chan < 0 or self.low_chan >= self.mcc_128_num_channels:
@@ -195,12 +200,14 @@ class MCC128Daq(DaqStream):
     
     @property
     def readDaq(self):
+        if self.sleep_between_reads != -1:
+            sleep(self.sleep_between_reads)
         self.this_moment = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
         for ch in range(self.low_chan, self.high_chan + 1):
-            if self.DaqStreamInfo.channels[ch] is True:
+            if self.channels[ch] is True:
                 self.daqChannels[ch] = self.hat.a_in_read(ch)
-                if self.DaqStreamInfo.sleep_between_channels != -1:
-                    sleep(DaqStreamInfo.sleep_between_channels)
+                if self.sleep_between_channels != -1:
+                    sleep(self.sleep_between_channels)
         sensor_data = list()
         sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[2])
         print (sensor_data)
