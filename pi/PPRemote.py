@@ -4,7 +4,7 @@ NEXT:
     Seperate out DAQ specific fields into 
 
 DONE:
-General clean up
+
 
 '''
 import socket
@@ -22,6 +22,24 @@ import configparser
 # TO DO: Read config file to determine what DAQ we are using and only refernce those symbols
 config = configparser.ConfigParser()
 config.read('PPRemote_Config.ini')
+number_of_channels = config['Default']['number_of_channels']
+data_log_frequency = int(config['Default']['data_log_frequency'])
+sensor_read_frequency = config['Default']['sensor_read_frequency']
+network_write_frequency = config['Default']['network_write_frequency']
+to_log = config['Default']['to_log']
+
+''' put in DaqStreamInfo and pass to ADCStreamReader
+sleep_between_reads = -1  # -1 = don't give away the time slice
+sleep_between_channels = 0.25
+number_of_channels = 4
+low_chan = 0
+high_chan = 3
+channels = [True, True, True, True]
+sensor_type = 'mcc_single_value_read'
+reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
+reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
+'''
+#
 daq = config['Default']['DAQ']
 device = config['Default']['Device']
 num_channels = config['Default']['NumChannels']
@@ -34,21 +52,10 @@ num_channels = config['Default']['NumChannels']
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 from pi.ADCStreamReader import *
 
-#The new design:
-#In read_sensor() read time and 4 sensors into a tuple: (time, r0, r1, r2, r3)
-#if channel not used put NaN, all values raw. File header had date, gain, etc.
-
-#Set the rates. Implement these in config file or GUI
-number_of_channels = 1
-data_log_frequency = 1 #Hz  How many data points are logged each second locally, on the pi
-sensor_read_frequency = 0.1 #0.1 #25 #Hz
-network_write_frequency = 10 #10.0 #Hz    How many data points will be graphed each second
-to_log = False
-
-#Calculated from above
-sensor_read_time = float(1/sensor_read_frequency)
-network_write_time = float(1/network_write_frequency)
-data_log_time = float(1/data_log_frequency)
+#Calculated from settings read in from config file
+sensor_read_time = float(1/float(sensor_read_frequency))
+network_write_time = float(1/float(network_write_frequency))
+data_log_time = float(1/float(data_log_frequency))
 '''
 a_gain = 1 #16
 b_gain = 1 #16

@@ -6,20 +6,23 @@ NEXT:
 DONE:
 General clean up
 '''
-
 from __future__ import print_function
+from time import sleep
+import sys
+import datetime
+import timeit, cmd, logging
+from abc import ABC, abstractmethod
+import uuid
+
+
 from daqhats import mcc128, OptionFlags, HatIDs, HatError, AnalogInputMode, \
     AnalogInputRange
 from daqhats_utils import select_hat_device, enum_mask_to_string, \
     input_mode_to_string, input_range_to_string
 
-from time import sleep
-import sys
-import datetime
-import timeit, cmd, logging, smbus2, RPi.GPIO as GPIO
+
+import smbus2, RPi.GPIO as GPIO
 import Adafruit_ADS1x15
-from abc import ABC, abstractmethod
-import uuid
 
 sys.path.insert(1, '/home/pi/grove.py/')
 #from grove.adc import ADC
@@ -33,6 +36,7 @@ from pi.ADS1115Runner import *
 class DaqStreamSettings:
     # General settings
     guid = uuid.uuid4()
+    '''
     sleep_between_reads = -1  # -1 = don't give away the time slice
     sleep_between_channels = 0.25
     number_of_channels = 4
@@ -42,9 +46,18 @@ class DaqStreamSettings:
     sensor_type = 'mcc_single_value_read'
     reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
     reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
-
+    '''
 
     # DaqStreamSettings are the most important settings for DaqStreamInfo
+    sleep_between_reads = -1  # -1 = don't give away the time slice
+    sleep_between_channels = 0.25
+    number_of_channels = 4
+    low_chan = 0
+    high_chan = 3
+    channels = [True, True, True, True]
+    sensor_type = 'mcc_single_value_read'
+    reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
+    reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
 
     # MCC128-specific settings
     analog_input_range = AnalogInputRange.BIP_10V
@@ -131,6 +144,16 @@ class DaqStream(ABC):
 class MCC128Daq(DaqStream):
     daqChannels = [0.0, 0.0, 0.0, 0.0]
     this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
+    
+    # MCC128-specific settings
+    analog_input_range = AnalogInputRange.BIP_10V
+    reader_type = 'differential'  # or 'single-ended'
+    options = OptionFlags.DEFAULT
+    input_mode = AnalogInputMode.DIFF  # or SE
+    input_range = AnalogInputRange.BIP_10V  # BIP_1V
+
+    mcc_128_num_channels = mcc128.info().NUM_AI_CHANNELS[input_mode]
+    sample_interval = 0.1  # 0.5  # Seconds
 
     def openDaq(self, DaqStreamInfo):
         self.DaqStreamInfo = DaqStreamInfo
