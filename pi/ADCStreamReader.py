@@ -14,7 +14,6 @@ import timeit, cmd, logging
 from abc import ABC, abstractmethod
 import uuid
 
-
 from daqhats import mcc128, OptionFlags, HatIDs, HatError, AnalogInputMode, \
     AnalogInputRange
 from daqhats_utils import select_hat_device, enum_mask_to_string, \
@@ -133,6 +132,11 @@ class DaqStream(ABC):
 
 
 class MCC128Daq(DaqStream):
+    from daqhats import mcc128, OptionFlags, HatIDs, HatError, AnalogInputMode, \
+        AnalogInputRange
+    from daqhats_utils import select_hat_device, enum_mask_to_string, \
+        input_mode_to_string, input_range_to_string
+
     daqChannels = [0.0, 0.0, 0.0, 0.0]
     this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
     
@@ -142,7 +146,7 @@ class MCC128Daq(DaqStream):
     options = OptionFlags.DEFAULT
     input_mode = AnalogInputMode.DIFF  # or SE
     input_range = AnalogInputRange.BIP_10V  # BIP_1V
-
+    myHatError = HatError
     mcc_128_num_channels = mcc128.info().NUM_AI_CHANNELS[input_mode]
     sample_interval = 0.1  # 0.5  # Seconds
 
@@ -164,7 +168,6 @@ class MCC128Daq(DaqStream):
         ####
         #self.DaqStreamInfo = DaqStreamInfo
         
-        self.options = OptionFlags.DEFAULT #replace from config file
         self.low_chan = 0
         self.high_chan = 3
         #self.input_mode = DaqStreamInfo.input_mode
@@ -197,7 +200,7 @@ class MCC128Daq(DaqStream):
             self.hat.a_in_range_write(self.input_range)
             self.sensor = self.hat
 
-        except (HatError, ValueError) as error:
+        except (self.myHatError, ValueError) as error:
             print('\n', error)
     
     @property

@@ -120,7 +120,7 @@ def read_sensor():
     global sensor_state
     '''
     global daq_data
-    dsi = DAQStreamInfo().getConfig("DAQStream.ini")
+    #dsi = DAQStreamInfo().getConfig("DAQStream.ini")
     
     #DaqInfo = DaqStreamInfo()
     #adcStreamReader = ADCStreamReader()
