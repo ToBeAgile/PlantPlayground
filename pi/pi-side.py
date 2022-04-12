@@ -6,7 +6,7 @@ import time
 import pickle
 import random #for testing
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
-from ADCStreamReader import ADCStreamReader
+from DAQStreams import ADCStreamReader
 from TrackingData import TrackingData
 import datetime
 

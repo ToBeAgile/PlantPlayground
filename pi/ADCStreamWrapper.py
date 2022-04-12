@@ -3,7 +3,7 @@ import timeit
 
 #sys.path.insert(1, '../')
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
-from pi.ADCStreamReader import ADCStreamReader
+from pi.DAQStreams import ADCStreamReader
 
 WRAPPER_PASSTHRU = 0
 WRAPPER_POSITIVE = 1

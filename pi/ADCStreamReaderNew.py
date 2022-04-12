@@ -23,7 +23,7 @@ from pi.ADS1115Runner import *
 from abc import ABC, abstractmethod
 
 '''
-ADCStreamReader.py Todo:
+DAQStreams.py Todo:
     1. Figure out how to do differential reads and create a stream type for it
     1. Refactor open and read to strategies, extracting rules to an abstract factory that returns both objects
 '''

@@ -8,7 +8,7 @@ import threading
 
 #sys.path.insert(1, '../')
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
-from pi.ADCStreamReader import *
+from pi.DAQStreams import *
 from pi.TrackingData import TrackingData
 
 

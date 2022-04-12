@@ -413,6 +413,7 @@ class GroveGSRSensor:
         value = self.adc.read(self.channel)
         return value
     
+'''
 #the old way of doing things
 class ADCStreamReader:
     Grove = GroveGSRSensor    
@@ -492,3 +493,4 @@ class ADCStreamReader:
         #time.sleep(self.sleep)
         self.differential_value = self.adc.read_adc_difference(self.channel, self.gain, self.data_rate)
         return self.differential_value * self.voltsPerDivision
+'''

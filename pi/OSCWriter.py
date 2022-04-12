@@ -5,7 +5,7 @@ import time
 import timeit
 
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground/')
-from pi.ADCStreamReader import *
+from pi.DAQStreams import *
 
 class OSCWriter():
     

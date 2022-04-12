@@ -81,7 +81,7 @@ reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_e
 #Conditionally import modules for the DAQ
 
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
-from pi.ADCStreamReader import *
+from pi.DAQStreams import *
 
 '''
 a_gain = 1 #16
@@ -120,7 +120,7 @@ def read_sensor():
     global sensor_state
     '''
     global daq_data
-    #dsi = DAQStreamInfo().getConfig("DAQStream.ini")
+    #dsi = DAQStreamInfo().getConfig("DAQStreams.ini")
     
     #DaqInfo = DaqStreamInfo()
     #adcStreamReader = ADCStreamReader()

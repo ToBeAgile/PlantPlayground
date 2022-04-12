@@ -3,7 +3,7 @@ import threading
 import sys
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground/')
 #sys.path.insert(1, '../')
-from pi.ADCStreamReader import *
+from pi.DAQStreams import *
 from pi.ADCStreamWrapper import *
 from pi.OSCHandler import *
 from pi.TrackingData import TrackingData
