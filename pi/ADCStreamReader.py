@@ -50,7 +50,7 @@ class DaqStreamSettings:
     '''
 
 # DaqStreamInfo contains everything needed to configure, open, read, and close an DaqStream
-class DaqStreamInfo:
+#class DaqStreamInfo:
     '''
     #General settings from config file
     sleep_between_reads = DaqStreamSettings.sleep_between_reads
@@ -128,7 +128,7 @@ class DaqStream(ABC):
         pass
 
     @abstractmethod
-    def closeDaq(self, DaqStreamInfo):
+    def closeDaq(self):
         pass
 
 
@@ -275,7 +275,7 @@ class ADS1115Stream(DaqStream):
             return self.differential_value #* self.voltsPerDivision
 
     @property
-    def closeDaq(self, DaqStreamInfo):
+    def closeDaq(self):
         pass
 
 
@@ -295,7 +295,7 @@ class ADS1115i2cStream(DaqStream):
 
     ads1115Runner = ADS1115Runner()
     adc = Adafruit_ADS1x15.ADS1115()
-    DaqInfo = DaqStreamInfo()
+    #DaqInfo = DaqStreamInfo()
     
     #ip = "127.0.0.1"
     #port = 1337
@@ -343,7 +343,7 @@ class ADS1115i2cStream(DaqStream):
 
 
     @property
-    def closeDaq(self, DaqStreamInfo):
+    def closeDaq(self):
         pass
 
 #GroveGSR Sensor
@@ -363,7 +363,7 @@ class GroveGSRStream(DaqStream):
 
     ads1115Runner = ADS1115Runner()
     adc = Adafruit_ADS1x15.ADS1115()
-    DaqInfo = DaqStreamInfo()
+    #DaqInfo = DaqStreamInfo()
     
     #ip = "127.0.0.1"
     #port = 1337
@@ -390,7 +390,7 @@ class GroveGSRStream(DaqStream):
         return self.sensor.GSR
 
     @property
-    def closeDaq(self, DaqStreamInfo):
+    def closeDaq(self):
         pass
 
 
@@ -429,7 +429,7 @@ class ADCStreamReader:
 
     ads1115Runner = ADS1115Runner()
     adc = Adafruit_ADS1x15.ADS1115()
-    DaqInfo = DaqStreamInfo()
+    #DaqInfo = DaqStreamInfo()
     daq = MCC128Daq()
     
     #ip = "127.0.0.1"
