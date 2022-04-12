@@ -130,7 +130,7 @@ def read_sensor():
     data_log_time = float(1/float(1)) #(dsi.data_log_frequency))
 
     adc = DaqStream.getInstance()
-    x = adc.openDaq(dsi)
+    x = adc.openDaq()
     #channel1 = adc.openDaq(DaqInfo)
 
     

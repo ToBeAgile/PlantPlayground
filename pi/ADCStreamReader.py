@@ -120,7 +120,7 @@ class DaqStream(ABC):
         return MCC128Daq()
 
     @abstractmethod
-    def openDaq(self, DaqStreamInfo):
+    def openDaq(self):
         pass
     
     @abstractmethod
@@ -146,7 +146,8 @@ class MCC128Daq(DaqStream):
     mcc_128_num_channels = mcc128.info().NUM_AI_CHANNELS[input_mode]
     sample_interval = 0.1  # 0.5  # Seconds
 
-    def openDaq(self, DaqStreamInfo):
+    def openDaq(self):
+        #def openDaq(self, DaqStreamInfo):
         # General settings
         self.guid = uuid.uuid4()
         
@@ -235,7 +236,7 @@ class ADS1115Stream(DaqStream):
 
     ads1115Runner = ADS1115Runner()
     adc = Adafruit_ADS1x15.ADS1115()
-    DaqInfo = DaqStreamInfo()
+    #DaqInfo = DaqStreamInfo()
     
     #ip = "127.0.0.1"
     #port = 1337
@@ -251,7 +252,7 @@ class ADS1115Stream(DaqStream):
         return ADS1115Stream()
 
     @property
-    def openDaq(self, DaqStreamInfo):
+    def openDaq(self):
         #def open(self, reader_type, channel, gain, data_rate, sleep):
         self.reader_type = reader_type
         self.channel = channel # change to tuple of 4 bools for each active channel
@@ -310,7 +311,7 @@ class ADS1115i2cStream(DaqStream):
         return ADS1115i2cStream()
 
     @property
-    def openDaq(self, DaqStreamInfo):
+    def openDaq(self):
         '''
         def open(self, reader_type, channel, gain, data_rate, sleep):
         self.reader_type = reader_type
@@ -378,7 +379,7 @@ class GroveGSRStream(DaqStream):
         return GroveGSRStream()
 
     @property
-    def openDaq(self, DaqStreamInfo):
+    def openDaq(self):
         self.Daq = ADC()
         self.sensor = GroveGSRSensor(int(0))
         return self.channel
