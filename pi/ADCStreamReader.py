@@ -60,7 +60,7 @@ class DaqStreamInfo:
     high_chan = DaqStreamSettings.high_chan
     channels = DaqStreamSettings.channels
     sensor_type = DaqStreamSettings.sensor_type
-    '''
+
         # MCC128-specific settings
     analog_input_range = AnalogInputRange.BIP_10V
     reader_type = 'differential'  # or 'single-ended'
@@ -71,6 +71,7 @@ class DaqStreamInfo:
     mcc_128_num_channels = mcc128.info().NUM_AI_CHANNELS[input_mode]
     sample_interval = 0.1  # 0.5  # Seconds
     '''
+    '''
     #MCC128-specific settings
     analog_input_range = DaqStreamSettings.analog_input_range
     reader_type = DaqStreamSettings.reader_type
@@ -80,7 +81,7 @@ class DaqStreamInfo:
 
     mcc_128_num_channels = DaqStreamSettings.mcc_128_num_channels
     sample_interval = DaqStreamSettings.sample_interval
-    '''
+
     # ADS1115 specific
     volts_per_division_table = {0:6.144, 1:4.096, 2:2.048, 4:1.024, 8:0.512, 16:0.256}
     voltsPerDivision = 0
@@ -92,7 +93,7 @@ class DaqStreamInfo:
     differential = 0
     value = 0
     value_raw = 0
-    
+    '''
 def getGUID():
     id = uuid.uuid4()
     return id.hex
@@ -160,16 +161,16 @@ class MCC128Daq(DaqStream):
         self.reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
 
         ####
-        self.DaqStreamInfo = DaqStreamInfo
+        #self.DaqStreamInfo = DaqStreamInfo
         
-        self.options = DaqStreamInfo.options
+        self.options = OptionFlags.DEFAULT #replace from config file
         self.low_chan = 0
         self.high_chan = 3
-        self.input_mode = DaqStreamInfo.input_mode
-        self.input_range = DaqStreamInfo.input_range
+        #self.input_mode = DaqStreamInfo.input_mode
+        #self.input_range = DaqStreamInfo.input_range
 
-        self.mcc_128_num_channels = DaqStreamInfo.mcc_128_num_channels
-        self.sample_interval = DaqStreamInfo.sample_interval
+        #self.mcc_128_num_channels = DaqStreamInfo.mcc_128_num_channels
+        #self.sample_interval = DaqStreamInfo.sample_interval
         self.guid = getGUID()
         #print(self.guid)
         

@@ -20,15 +20,47 @@ import unittest
 import configparser
 
 # TO DO: Read config file to determine what DAQ we are using and only refernce those symbols
-config = configparser.ConfigParser()
-config.read('PPRemote_Config.ini')
-# General settings
-number_of_channels = config['Default']['number_of_channels']
-data_log_frequency = int(config['Default']['data_log_frequency'])
-sensor_read_frequency = config['Default']['sensor_read_frequency']
-network_write_frequency = config['Default']['network_write_frequency']
-to_log = config['Default']['to_log']
-sleep_between_reads = config['Default']['sleep_between_reads']
+
+
+class DAQStreamInfo():
+
+    def __init__(self):
+        self.sensor_read_frequency = None
+        self.number_of_channels = None
+        self.data_log_frequency = None
+        self.sensor_read_frequency = None
+        self.network_write_frequency = None
+        self.to_log = None
+        self.sleep_between_reads = None
+        ###
+        self.analog_input_range = None
+        self.reader_type = None
+        self.options = None
+        self.input_mode = None
+        self.input_range = None
+        self.daq = None
+        self.device = None
+        self.num_channels = None
+
+    def getConfig(self, ini_file_name):
+        config = configparser.ConfigParser()
+        config.read(ini_file_name)
+        # General settings
+        self.number_of_channels = config['Default']['number_of_channels']
+        self.data_log_frequency = int(config['Default']['data_log_frequency'])
+        self.sensor_read_frequency = config['Default']['sensor_read_frequency']
+        self.network_write_frequency = config['Default']['network_write_frequency']
+        self.to_log = config['Default']['to_log']
+        self.sleep_between_reads = config['Default']['sleep_between_reads']
+        ###
+        self.analog_input_range = config['Default']['analog_input_range']
+        self.reader_type = config['Default']['reader_type']
+        self.options = config['Default']['options']
+        self.input_mode = config['Default']['input_mode']
+        self.input_range = config['Default']['input_range']
+        self.daq = config['Default']['DAQ']
+        self.device = config['Default']['Device']
+        self.num_channels = config['Default']['NumChannels']
 
 ''' put in DaqStreamInfo and pass to ADCStreamReader
 sleep_between_reads = -1  # -1 = don't give away the time slice
@@ -42,9 +74,6 @@ reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_e
 reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
 '''
 #
-daq = config['Default']['DAQ']
-device = config['Default']['Device']
-num_channels = config['Default']['NumChannels']
 #print(daq, device, num_channels)
 
 #Read config and get DAQ
@@ -54,10 +83,6 @@ num_channels = config['Default']['NumChannels']
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 from pi.ADCStreamReader import *
 
-#Calculated from settings read in from config file
-sensor_read_time = float(1/float(sensor_read_frequency))
-network_write_time = float(1/float(network_write_frequency))
-data_log_time = float(1/float(data_log_frequency))
 '''
 a_gain = 1 #16
 b_gain = 1 #16
@@ -95,11 +120,17 @@ def read_sensor():
     global sensor_state
     '''
     global daq_data
+    dsi = DAQStreamInfo().getConfig("DAQStream.ini")
     
-    DaqInfo = DaqStreamInfo()
+    #DaqInfo = DaqStreamInfo()
     #adcStreamReader = ADCStreamReader()
+    #Calculated from settings read in from config file
+    sensor_read_time = float(1/float(0.1)) #(dsi.sensor_read_frequency))
+    network_write_time = float(1/float(10)) #(dsi.network_write_frequency))
+    data_log_time = float(1/float(1)) #(dsi.data_log_frequency))
+
     adc = DaqStream.getInstance()
-    x = adc.openDaq(DaqInfo)
+    x = adc.openDaq(dsi)
     #channel1 = adc.openDaq(DaqInfo)
 
     
@@ -189,7 +220,7 @@ def log_data():
     file_name = project_code + "-" + now.strftime("%Y-%m-%d") + ".csv"
     full_path = folder_name + file_name
     #file = open(full_path, 'a', newline='', buffering=1)
-    
+    to_log = False #put into config
     if (to_log == False):
         return
     
