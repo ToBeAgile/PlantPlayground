@@ -277,9 +277,10 @@ class ADS1115Stream(DaqStream):
         self.sensor = 0
         self.voltsPerDivision = ((2 * self.adcInfo.volts_per_division_table[self.gain])/65535)*1000
         #return self.channel
-    
+    '''
     @property
     def readDaq(self):
+
         if (self.reader_type == 'differential' ):
             time.sleep(self.sleep)
             self.differential_value = self.adc.read_adc_difference(self.channel, self.gain, self.data_rate)
@@ -288,6 +289,24 @@ class ADS1115Stream(DaqStream):
             time.sleep(self.sleep)            
             self.differential_value = self.adc.read_adc(self.channel, self.gain, self.data_rate)
             return self.differential_value #* self.voltsPerDivision
+        '''
+    @property
+    def readDaq(self):
+        if self.sleep_between_reads != -1:
+            sleep(self.sleep_between_reads)
+        self.this_moment = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
+        for ch in range(self.low_chan, self.high_chan + 1):
+            if self.channels[ch] is True:
+                if (self.reader_type == 'single_ended'):         
+                    self.daqChannels[ch] = self.adc.read_adc(self.ch, self.gain, self.data_rate)
+                elif (self.reader_type == 'differential'):
+                    self.daqChannels[ch] = self.adc.read_adc_difference(self.ch, self.gain, self.data_rate)
+                if self.sleep_between_channels != -1:
+                    sleep(self.sleep_between_channels)
+        sensor_data = list()
+        sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[2])
+        print (sensor_data)
+        return sensor_data
 
     @property
     def closeDaq(self):
