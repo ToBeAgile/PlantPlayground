@@ -13,12 +13,12 @@ import datetime
 import timeit, cmd, logging
 from abc import ABC, abstractmethod
 import uuid
-
+'''
 from daqhats import mcc128, OptionFlags, HatIDs, HatError, AnalogInputMode, \
     AnalogInputRange
 from daqhats_utils import select_hat_device, enum_mask_to_string, \
     input_mode_to_string, input_range_to_string
-
+'''
 
 import smbus2, RPi.GPIO as GPIO
 import Adafruit_ADS1x15
@@ -132,25 +132,26 @@ class DaqStream(ABC):
 
 
 class MCC128Daq(DaqStream):
-    from daqhats import mcc128, OptionFlags, HatIDs, HatError, AnalogInputMode, \
-        AnalogInputRange
-    from daqhats_utils import select_hat_device, enum_mask_to_string, \
-        input_mode_to_string, input_range_to_string
-
-    daqChannels = [0.0, 0.0, 0.0, 0.0]
-    this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
-    
-    # MCC128-specific settings
-    analog_input_range = AnalogInputRange.BIP_10V
-    reader_type = 'differential'  # or 'single-ended'
-    options = OptionFlags.DEFAULT
-    input_mode = AnalogInputMode.DIFF  # or SE
-    input_range = AnalogInputRange.BIP_10V  # BIP_1V
-    myHatError = HatError
-    mcc_128_num_channels = mcc128.info().NUM_AI_CHANNELS[input_mode]
-    sample_interval = 0.1  # 0.5  # Seconds
-
     def openDaq(self):
+        from daqhats import mcc128, OptionFlags, HatIDs, HatError, AnalogInputMode, \
+            AnalogInputRange
+        from daqhats_utils import select_hat_device, enum_mask_to_string, \
+            input_mode_to_string, input_range_to_string
+
+        self.daqChannels = [0.0, 0.0, 0.0, 0.0]
+        self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
+        
+        # MCC128-specific settings
+        self.analog_input_range = AnalogInputRange.BIP_10V
+        self.reader_type = 'differential'  # or 'single-ended'
+        self.options = OptionFlags.DEFAULT
+        self.input_mode = AnalogInputMode.DIFF  # or SE
+        self.input_range = AnalogInputRange.BIP_10V  # BIP_1V
+        self.myHatError = HatError
+        self.mcc_128_num_channels = mcc128.info().NUM_AI_CHANNELS[self.input_mode]
+        self.sample_interval = 0.1  # 0.5  # Seconds
+
+        #def openDaq(self):
         #def openDaq(self, DaqStreamInfo):
         # General settings
         self.guid = uuid.uuid4()
@@ -200,7 +201,7 @@ class MCC128Daq(DaqStream):
             self.hat.a_in_range_write(self.input_range)
             self.sensor = self.hat
 
-        except (self.myHatError, ValueError) as error:
+        except (myHatError, ValueError) as error:
             print('\n', error)
     
     @property
