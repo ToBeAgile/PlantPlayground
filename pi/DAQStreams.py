@@ -1,11 +1,5 @@
-# PPRemote.py - Remote Data Aquisition, Logger, and network broadcaster
-'''
-NEXT:
-    Seperate out DAQ specific fields and imports into their own moduals that are conditionally included 
-    Set up PPRemote_Config.ini file to expose settings
-DONE:
-General clean up
-'''
+# DAQStreams.py - Supports multiple DAQs, called by PPRemote.py
+#
 from __future__ import print_function
 from time import sleep
 import sys
@@ -13,105 +7,13 @@ import datetime
 import timeit, cmd, logging
 from abc import ABC, abstractmethod
 import uuid
-'''
-from daqhats import mcc128, OptionFlags, HatIDs, HatError, AnalogInputMode, \
-    AnalogInputRange
-from daqhats_utils import select_hat_device, enum_mask_to_string, \
-    input_mode_to_string, input_range_to_string
-'''
 
-#import smbus2, RPi.GPIO as GPIO
-#import Adafruit_ADS1x15
-
-#sys.path.insert(1, '/home/pi/grove.py/')
-#from grove.adc import ADC
-
-#from pythonosc.udp_client import SimpleUDPClient
-
-#sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
-#from pi.ADS1115Runner import *
-
-#from pi.PPRemote import daqStreamSetting
-
-class unused_class_DaqStreamSettings:
-    '''
-    # General settings
-    guid = uuid.uuid4()
-    
-    sleep_between_reads = -1  # -1 = don't give away the time slice
-    sleep_between_channels = 0.25
-    number_of_channels = 4
-    low_chan = 0
-    high_chan = 3
-    channels = [True, True, True, True]
-    sensor_type = 'mcc_single_value_read'
-    reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
-    reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
-    '''
-
-# DaqStreamInfo contains everything needed to configure, open, read, and close an DaqStream
-#class DaqStreamInfo:
-    '''
-    #General settings from config file
-    sleep_between_reads = DaqStreamSettings.sleep_between_reads
-    sleep_between_channels = DaqStreamSettings.sleep_between_channels
-    number_of_channels = DaqStreamSettings.number_of_channels
-    low_chan = DaqStreamSettings.low_chan
-    high_chan = DaqStreamSettings.high_chan
-    channels = DaqStreamSettings.channels
-    sensor_type = DaqStreamSettings.sensor_type
-
-        # MCC128-specific settings
-    analog_input_range = AnalogInputRange.BIP_10V
-    reader_type = 'differential'  # or 'single-ended'
-    options = OptionFlags.DEFAULT
-    input_mode = AnalogInputMode.DIFF  # or SE
-    input_range = AnalogInputRange.BIP_10V  # BIP_1V
-
-    mcc_128_num_channels = mcc128.info().NUM_AI_CHANNELS[input_mode]
-    sample_interval = 0.1  # 0.5  # Seconds
-    '''
-    '''
-    #MCC128-specific settings
-    analog_input_range = DaqStreamSettings.analog_input_range
-    reader_type = DaqStreamSettings.reader_type
-    options = DaqStreamSettings.options
-    input_mode = DaqStreamSettings.input_mode
-    input_range = DaqStreamSettings.input_range
-
-    mcc_128_num_channels = DaqStreamSettings.mcc_128_num_channels
-    sample_interval = DaqStreamSettings.sample_interval
-
-    # ADS1115 specific
-    volts_per_division_table = {0:6.144, 1:4.096, 2:2.048, 4:1.024, 8:0.512, 16:0.256}
-    voltsPerDivision = 0
-    status = 'close'
-    gain = 16
-    data_rate = 8
-    sleep = 0
-    channel = 0
-    differential = 0
-    value = 0
-    value_raw = 0
-    '''
 def getGUID():
     id = uuid.uuid4()
     return id.hex
 
 def getDateTime():
     return datetime.datetime.now()
-
-
-'''    
-class ADCStreamReaderFactory:
-    def __init__(self):
-        pass
-        
-    def getADCStream(self, ADCStreamInfo):
-        self.ADCStreamInfo = ADCStreamInfo()
-        
-        return DaqStream
-'''    
 
 class DaqStream(ABC):
 

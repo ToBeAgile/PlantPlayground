@@ -1,11 +1,5 @@
-'''
-PPRemote.py
-NEXT:
-    Refactor, clean up
-
-DONE:
-
-'''
+# PPRemote.py - Remote Data Aquisition, Logger, and network broadcaster
+# Next: read DAQ settings from config file, implement other DAQs
 import socket
 import sys
 import time
