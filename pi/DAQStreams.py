@@ -118,6 +118,7 @@ class DaqStream(ABC):
     @staticmethod
     def getInstance():
         return MCC128Daq()
+        #return ADS1115Stream()
 
     @abstractmethod
     def openDaq(self):
@@ -237,7 +238,7 @@ class ADS1115Stream(DaqStream):
     @property
     def openDaq(self):
         #import smbus2, RPi.GPIO as GPIO
-        #import Adafruit_ADS1x15
+        import Adafruit_ADS1x15
         
         sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
         from pi.ADS1115Runner import ADS1115Runner
