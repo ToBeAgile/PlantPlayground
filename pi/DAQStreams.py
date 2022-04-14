@@ -117,7 +117,7 @@ class DaqStream(ABC):
 
     @staticmethod
     def getInstance():
-        return MCC128Daq()
+        return MCC128Daq() #This device works
         #return ADS1115Stream()
 
     @abstractmethod

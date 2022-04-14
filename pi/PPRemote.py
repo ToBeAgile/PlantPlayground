@@ -1,10 +1,9 @@
 '''
 PPRemote.py
 NEXT:
-    Seperate out DAQ specific fields into 
+    Refactor, clean up
 
 DONE:
-
 
 '''
 import socket
@@ -19,8 +18,8 @@ import os.path
 import unittest
 import configparser
 
-# TO DO: Read config file to determine what DAQ we are using and only refernce those symbols
-
+sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
+from pi.DAQStreams import *
 
 class DAQStreamInfo():
 
@@ -52,7 +51,6 @@ class DAQStreamInfo():
         self.network_write_frequency = config['Default']['network_write_frequency']
         self.to_log = config['Default']['to_log']
         self.sleep_between_reads = config['Default']['sleep_between_reads']
-        ###
         self.analog_input_range = config['Default']['analog_input_range']
         self.reader_type = config['Default']['reader_type']
         self.options = config['Default']['options']
@@ -73,15 +71,6 @@ sensor_type = 'mcc_single_value_read'
 reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
 reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
 '''
-#
-#print(daq, device, num_channels)
-
-#Read config and get DAQ
-#Set a field to represent the DAQ we are using
-#Conditionally import modules for the DAQ
-
-sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
-from pi.DAQStreams import *
 
 '''
 a_gain = 1 #16
@@ -110,20 +99,7 @@ daq_data = 1
 
 
 def read_sensor():
-    '''
-    global a_raw_value
-    global a_value
-    global a_time
-    global b_raw_value
-    global b_value
-    global b_time
-    global sensor_state
-    '''
     global daq_data
-    #dsi = DAQStreamInfo().getConfig("DAQStreams.ini")
-    
-    #DaqInfo = DaqStreamInfo()
-    #adcStreamReader = ADCStreamReader()
     #Calculated from settings read in from config file
     sensor_read_time = float(1/float(0.1)) #(dsi.sensor_read_frequency))
     network_write_time = float(1/float(10)) #(dsi.network_write_frequency))
@@ -135,10 +111,6 @@ def read_sensor():
 
     
     while True:
-        #call readDaq() to return tuple and assign to global data
-        #wait
-        #data_from_sensor = adc.readDaq
-
         daq_data = adc.readDaq
         #print(daq_data)
         #if DaqInfo.sleep_between_reads != -1:
@@ -159,15 +131,6 @@ def read_sensor():
         #read_event.wait(sensor_read_time) #todo depend on a user modified variable
  
 def write_network():
-    '''
-    global a_raw_value
-    global a_value
-    global a_time
-    global b_raw_value
-    global b_value
-    global b_time
-    global sensor_state
-    '''
     global daq_data
 
     #set up the network connection
@@ -185,33 +148,15 @@ def write_network():
         print ("Unable to open the socket: " + str(message))
         sys.exit(1)
 
-
     while True:
         write_event.wait(network_write_time)
-        #Replace global data with tuple and handle on the other end
-        #write channel a
-        #print(daq_data)
-        #data_dict = {"sensor": "a_sensor", "raw_value": a_raw_value, "value": a_value, "time": a_time}
         data_dict = daq_data
         print(data_dict)
         serialized_data = pickle.dumps(data_dict)
         s.send(serialized_data)
 
-        #write channel b
-        #data_dict = {"sensor": "b_sensor", "raw_value": b_raw_value, "value": b_value, "time": b_time}
-        #serialized_data = pickle.dumps(data_dict)
-        #s.send(serialized_data)
 
 def log_data():
-    '''
-    global a_raw_value
-    global a_value
-    global a_time
-    global b_raw_value
-    global b_value
-    global b_time
-    global sensor_state
-'''
     global daq_data
 
     now = datetime.datetime.now()
@@ -248,7 +193,7 @@ def log_data():
     while True:
         log_event.wait(data_log_time)
         #print(daq_data)
-        #writer.writerow(daq_data)
+        writer.writerow(daq_data)
 
         #writer.writerow(["Channel A: " + str(a_time) + ", " + str(a_raw_value) + ", " + str(a_value)
                          #+ '; Channel B: ' + str(b_time) + ", " + str(b_raw_value) + ", " + str(b_value)])
