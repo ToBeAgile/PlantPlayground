@@ -20,19 +20,20 @@ from daqhats_utils import select_hat_device, enum_mask_to_string, \
     input_mode_to_string, input_range_to_string
 '''
 
-import smbus2, RPi.GPIO as GPIO
-import Adafruit_ADS1x15
+#import smbus2, RPi.GPIO as GPIO
+#import Adafruit_ADS1x15
 
-sys.path.insert(1, '/home/pi/grove.py/')
+#sys.path.insert(1, '/home/pi/grove.py/')
 #from grove.adc import ADC
 
 #from pythonosc.udp_client import SimpleUDPClient
 
-sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
-from pi.ADS1115Runner import *
+#sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
+#from pi.ADS1115Runner import *
+
 #from pi.PPRemote import daqStreamSetting
 
-class DaqStreamSettings:
+class unused_class_DaqStreamSettings:
     '''
     # General settings
     guid = uuid.uuid4()
@@ -225,28 +226,6 @@ class MCC128Daq(DaqStream):
 
 
 class ADS1115Stream(DaqStream):
-    GAIN = 16
-    DATA_RATE = 8 # 8, 16, 32, 64, 128, 250, 475, 860
-
-    SLEEP = 2
-    NUMBEROFCHANNELS = 2
-    DIFFERENTIAL1 = 0 
-    DIFFERENTIAL2 = 3
-
-    CHANNEL0 = 0
-    CHANNEL1 = 1
-    CH0SLEEPTIME = 1
-    CH1SLEEPTIME = 1
-
-    ads1115Runner = ADS1115Runner()
-    adc = Adafruit_ADS1x15.ADS1115()
-    #DaqInfo = DaqStreamInfo()
-    
-    #ip = "127.0.0.1"
-    #port = 1337
-    #daq = MCC128Daq()
-    #client = SimpleUDPClient(ip, port)  # Create client
-
     def __init__(self):
        #self.channel = channel
         pass
@@ -257,6 +236,38 @@ class ADS1115Stream(DaqStream):
 
     @property
     def openDaq(self):
+        #import smbus2, RPi.GPIO as GPIO
+        #import Adafruit_ADS1x15
+        
+        sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
+        from pi.ADS1115Runner import ADS1115Runner
+
+        sys.path.insert(1, '/home/pi/grove.py/')
+        from grove.adc import ADC
+        
+        GAIN = 16
+        DATA_RATE = 8 # 8, 16, 32, 64, 128, 250, 475, 860
+
+        SLEEP = 2
+        NUMBEROFCHANNELS = 2
+        DIFFERENTIAL1 = 0 
+        DIFFERENTIAL2 = 3
+
+        CHANNEL0 = 0
+        CHANNEL1 = 1
+        CH0SLEEPTIME = 1
+        CH1SLEEPTIME = 1
+
+        ads1115Runner = ADS1115Runner()
+        adc = Adafruit_ADS1x15.ADS1115()
+        #DaqInfo = DaqStreamInfo()
+        
+        #ip = "127.0.0.1"
+        #port = 1337
+        #daq = MCC128Daq()
+        #client = SimpleUDPClient(ip, port)  # Create client
+
+
         #def open(self, reader_type, channel, gain, data_rate, sleep):
         self.reader_type = reader_type
         self.channel = channel # change to tuple of 4 bools for each active channel
@@ -265,7 +276,7 @@ class ADS1115Stream(DaqStream):
         self.sleep = sleep
         self.sensor = 0
         self.voltsPerDivision = ((2 * self.adcInfo.volts_per_division_table[self.gain])/65535)*1000
-        return self.channel
+        #return self.channel
     
     @property
     def readDaq(self):
@@ -284,6 +295,15 @@ class ADS1115Stream(DaqStream):
 
 
 class ADS1115i2cStream(DaqStream):
+    import smbus2, RPi.GPIO as GPIO
+    import Adafruit_ADS1x15
+    
+    sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
+    from pi.ADS1115Runner import ADS1115Runner
+
+    sys.path.insert(1, '/home/pi/grove.py/')
+    from grove.adc import ADC
+
     GAIN = 16
     DATA_RATE = 8 # 8, 16, 32, 64, 128, 250, 475, 860
 
@@ -324,6 +344,12 @@ class ADS1115i2cStream(DaqStream):
         self.data_rate = data_rate
         self.sleep = sleep
         '''
+        sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
+        from pi.ADS1115Runner import ADS1115Runner
+
+        sys.path.insert(1, '/home/pi/grove.py/')
+        from grove.adc import ADC
+
         self.sensor = 0
         self.voltsPerDivision = ((2 * self.adcInfo.volts_per_division_table[self.gain])/65535)*1000
         # Open for differential_i2c
@@ -352,6 +378,12 @@ class ADS1115i2cStream(DaqStream):
 
 #GroveGSR Sensor
 class GroveGSRStream(DaqStream):
+    import smbus2, RPi.GPIO as GPIO
+    import Adafruit_ADS1x15
+    
+    sys.path.insert(1, '/home/pi/grove.py/')
+    from grove.adc import ADC
+
     GAIN = 16
     DATA_RATE = 8 # 8, 16, 32, 64, 128, 250, 475, 860
 
@@ -365,8 +397,8 @@ class GroveGSRStream(DaqStream):
     CH0SLEEPTIME = 1
     CH1SLEEPTIME = 1
 
-    ads1115Runner = ADS1115Runner()
-    adc = Adafruit_ADS1x15.ADS1115()
+    #ads1115Runner = ADS1115Runner()
+    #adc = Adafruit_ADS1x15.ADS1115()
     #DaqInfo = DaqStreamInfo()
     
     #ip = "127.0.0.1"
@@ -405,6 +437,9 @@ class GroveGSRStream(DaqStream):
 
 
 class GroveGSRSensor:
+    sys.path.insert(1, '/home/pi/grove.py/')
+    from grove.adc import ADC
+    
     def __init__(self, channel):
         self.channel = channel
         self.Daq = ADC()
