@@ -1,5 +1,15 @@
 # PPRemote.py - Remote Data Aquisition, Logger, and network broadcaster
-# Next: read DAQ settings from config file, implement other DAQs
+''' Next:
+Read DAQ settings from config file, implement other DAQs
+Move unneeded files from pi to a backup area
+Read all settings from config file, pass needed ones to DAQStreams
+Get single_ended and differential reads working on ADS1115
+Copy code from ASD1115 to i2C 
+Clean up code, deleted unneeded lines
+Get logging working 
+Get logging headers working 
+Get second DAQ working
+'''
 import socket
 import sys
 import time
@@ -106,17 +116,18 @@ def read_sensor():
     #adc = DaqStreamTester()
     
     # Determine which DAQ to use
-    daq_stream = DAQStreamInfo().getConfig(ini_file_name)
-    daq_to_use = daq_stream.daq_to_use
-    print(daq_to_use)
-    #adc = ADS1115Stream()
+    #daq_stream = DAQStreamInfo().getConfig(ini_file_name) #get reading from ini file to work
+    #daq_to_use = daq_stream.daq_to_use
+    #print(daq_to_use)
+    adc = ADS1115Stream()
+    '''
     if (daq_to_use == 'MCC128Daq'):
         adc = MCC128Daq()
     elif (daq_to_use == 'ADS1115Stream'):
         adc = ADS1115Stream()
     elif (daq_to_use == 'ADS1115i2cStream'):
         adc = MCC128i2cDaq()
-
+    '''
     adc.openDaq()
     #adc.anotherMethod()
     #channel1 = adc.openDaq(DaqInfo)
