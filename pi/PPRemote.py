@@ -18,6 +18,7 @@ from pi.DAQStreams import *
 class DAQStreamInfo():
 
     def __init__(self):
+        self.daq_to_use = None
         self.sensor_read_frequency = None
         self.number_of_channels = None
         self.data_log_frequency = None
@@ -39,6 +40,7 @@ class DAQStreamInfo():
         config = configparser.ConfigParser()
         config.read(ini_file_name)
         # General settings
+        self.daq_to_use = config['Default']['daq_to_use']
         self.number_of_channels = config['Default']['number_of_channels']
         self.data_log_frequency = int(config['Default']['data_log_frequency'])
         self.sensor_read_frequency = config['Default']['sensor_read_frequency']
@@ -99,9 +101,21 @@ def read_sensor():
     network_write_time = float(1/float(10)) #(dsi.network_write_frequency))
     data_log_time = float(1/float(1)) #(dsi.data_log_frequency))
 
-    adc = DaqStream.getInstance()
+    #adc = DaqStream.getInstance()
     #adc = ADS1115Stream()
     #adc = DaqStreamTester()
+    
+    # Determine which DAQ to use
+    daq_stream = DAQStreamInfo().getConfig(ini_file_name)
+    daq_to_use = daq_stream.daq_to_use
+    print(daq_to_use)
+    #adc = ADS1115Stream()
+    if (daq_to_use == 'MCC128Daq'):
+        adc = MCC128Daq()
+    elif (daq_to_use == 'ADS1115Stream'):
+        adc = ADS1115Stream()
+    elif (daq_to_use == 'ADS1115i2cStream'):
+        adc = MCC128i2cDaq()
 
     adc.openDaq()
     #adc.anotherMethod()
