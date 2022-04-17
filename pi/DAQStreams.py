@@ -19,8 +19,8 @@ class DaqStream(ABC):
 
     @staticmethod
     def getInstance():
-        #return MCC128Daq() #This DAQ works on Heavens with MCC128 installed
-        return ADS1115Stream()
+        return MCC128Daq() #This DAQ works on Heavens with MCC128 installed
+        #return ADS1115Stream()
         #return ADS1115i2cStream()
         #return GroveGSRStream
 

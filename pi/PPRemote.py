@@ -110,8 +110,8 @@ def read_sensor():
     #print("Did I open? x is " + str(x))
     
     while True:
-        daq_data = adc.readDaq
-        print("HELLO " + str(daq_data))
+        daq_data = adc.readDaq()
+        #print(daq_data)
         #if DaqInfo.sleep_between_reads != -1:
         #    sleep(DaqInfo.sleep_between_reads)
 '''            
