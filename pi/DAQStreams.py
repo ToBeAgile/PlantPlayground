@@ -1,5 +1,5 @@
 # DAQStreams.py - Supports multiple DAQs, called by PPRemote.py
-#
+# Supported DAQs: MCC128, ADS1115, 
 from __future__ import print_function
 from time import sleep
 import sys
@@ -35,21 +35,6 @@ class DaqStream(ABC):
     @abstractmethod
     def closeDaq(self):
         pass
-
-class DaqStreamTester(DaqStream):
-
-    def openDaq(self):
-        print("DaqstreamTester: OpenDaq")
-        pass
-    
-
-    def readDaq(self):
-        print("DaqstreamTester: readDaq")
-        pass
-
-    def closeDaq(self):
-        pass
-
 
 class MCC128Daq(DaqStream):
     
