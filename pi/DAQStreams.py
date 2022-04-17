@@ -19,8 +19,10 @@ class DaqStream(ABC):
 
     @staticmethod
     def getInstance():
-        return MCC128Daq() #This device works
-        #return ADS1115Stream()
+        #return MCC128Daq() #This DAQ works on Heavens with MCC128 installed
+        return ADS1115Stream()
+        #return ADS1115i2cStream()
+        #return GroveGSRStream
 
     @abstractmethod
     def openDaq(self):
@@ -34,8 +36,23 @@ class DaqStream(ABC):
     def closeDaq(self):
         pass
 
+class DaqStreamTester(DaqStream):
+
+    def openDaq(self):
+        print("DaqstreamTester: OpenDaq")
+        pass
+    
+
+    def readDaq(self):
+        print("DaqstreamTester: readDaq")
+        pass
+
+    def closeDaq(self):
+        pass
+
 
 class MCC128Daq(DaqStream):
+    
     def openDaq(self):
         from daqhats import mcc128, OptionFlags, HatIDs, HatError, AnalogInputMode, \
             AnalogInputRange
@@ -108,7 +125,6 @@ class MCC128Daq(DaqStream):
         except (myHatError, ValueError) as error:
             print('\n', error)
     
-    @property
     def readDaq(self):
         if self.sleep_between_reads != -1:
             sleep(self.sleep_between_reads)
@@ -123,7 +139,6 @@ class MCC128Daq(DaqStream):
         print (sensor_data)
         return sensor_data
 
-    @property
     def closeDaq(self):
         pass
 
@@ -136,8 +151,7 @@ class ADS1115Stream(DaqStream):
     @staticmethod
     def getInstance():
         return ADS1115Stream()
-
-    @property
+        
     def openDaq(self):
         #import smbus2, RPi.GPIO as GPIO
         import Adafruit_ADS1x15
@@ -147,7 +161,10 @@ class ADS1115Stream(DaqStream):
 
         sys.path.insert(1, '/home/pi/grove.py/')
         from grove.adc import ADC
-        
+
+        self.daqChannels = [0.0, 0.0, 0.0, 0.0]
+        self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
+
         GAIN = 16
         DATA_RATE = 8 # 8, 16, 32, 64, 128, 250, 475, 860
 
@@ -162,9 +179,38 @@ class ADS1115Stream(DaqStream):
         CH1SLEEPTIME = 1
 
         ads1115Runner = ADS1115Runner()
-        adc = Adafruit_ADS1x15.ADS1115()
-        #DaqInfo = DaqStreamInfo()
+        self.adc = Adafruit_ADS1x15.ADS1115()
         
+        # General settings
+        self.guid = uuid.uuid4()
+        
+        self.sleep_between_reads = -1  # -1 = don't give away the time slice
+        self.sleep_between_channels = 0.25
+        self.number_of_channels = 4
+        #low_chan = 0
+        #high_chan = 3
+        self.channels = [True, True, True, True]
+        self.sensor_type = 'mcc_single_value_read'
+        self.reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
+        self.reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
+
+        ####
+        #self.DaqStreamInfo = DaqStreamInfo
+        
+        self.low_chan = 0
+        self.high_chan = 3
+        #self.input_mode = DaqStreamInfo.input_mode
+        #self.input_range = DaqStreamInfo.input_range
+
+        #self.mcc_128_num_channels = DaqStreamInfo.mcc_128_num_channels
+        #self.sample_interval = DaqStreamInfo.sample_interval
+        self.guid = getGUID()
+        #print(self.guid)
+
+        #print ("Returning from open...")
+    
+        #DaqInfo = DaqStreamInfo()
+        #print("Hello ASD1115-open")
         #ip = "127.0.0.1"
         #port = 1337
         #daq = MCC128Daq()
@@ -172,16 +218,15 @@ class ADS1115Stream(DaqStream):
 
 
         #def open(self, reader_type, channel, gain, data_rate, sleep):
-        self.reader_type = reader_type
-        self.channel = channel # change to tuple of 4 bools for each active channel
-        self.gain = gain
-        self.data_rate = data_rate
-        self.sleep = sleep
-        self.sensor = 0
-        self.voltsPerDivision = ((2 * self.adcInfo.volts_per_division_table[self.gain])/65535)*1000
+        #self.reader_type = reader_type
+        #self.channel = channel # change to tuple of 4 bools for each active channel
+        self.gain = GAIN
+        self.data_rate = DATA_RATE
+        #self.sleep = sleep
+        #self.sensor = 0
+        #self.voltsPerDivision = ((2 * self.adcInfo.volts_per_division_table[self.gain])/65535)*1000
         #return self.channel
     '''
-    @property
     def readDaq(self):
 
         if (self.reader_type == 'differential' ):
@@ -192,26 +237,26 @@ class ADS1115Stream(DaqStream):
             time.sleep(self.sleep)            
             self.differential_value = self.adc.read_adc(self.channel, self.gain, self.data_rate)
             return self.differential_value #* self.voltsPerDivision
+            ##self.sensor_type = 'mcc_single_value_read'
         '''
-    @property
+
     def readDaq(self):
         if self.sleep_between_reads != -1:
             sleep(self.sleep_between_reads)
         self.this_moment = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
         for ch in range(self.low_chan, self.high_chan + 1):
             if self.channels[ch] is True:
-                if (self.reader_type == 'single_ended'):         
-                    self.daqChannels[ch] = self.adc.read_adc(self.ch, self.gain, self.data_rate)
-                elif (self.reader_type == 'differential'):
-                    self.daqChannels[ch] = self.adc.read_adc_difference(self.ch, self.gain, self.data_rate)
+                if (self.sensor_type == 'mcc_single_value_read'):         
+                    self.daqChannels[ch] = self.adc.read_adc(ch, self.gain, self.data_rate)
+                elif (self.sensor_type == 'mcc_differential_value_read'):
+                    self.daqChannels[ch] = self.adc.read_adc_difference(ch, self.gain, self.data_rate)
                 if self.sleep_between_channels != -1:
                     sleep(self.sleep_between_channels)
         sensor_data = list()
         sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[2])
-        print (sensor_data)
+        #print ("Sensor data: " + sensor_data)
         return sensor_data
 
-    @property
     def closeDaq(self):
         pass
 
@@ -256,7 +301,6 @@ class ADS1115i2cStream(DaqStream):
     def getInstance():
         return ADS1115i2cStream()
 
-    @property
     def openDaq(self):
         '''
         def open(self, reader_type, channel, gain, data_rate, sleep):
@@ -273,7 +317,7 @@ class ADS1115i2cStream(DaqStream):
         from grove.adc import ADC
 
         self.sensor = 0
-        self.voltsPerDivision = ((2 * self.adcInfo.volts_per_division_table[self.gain])/65535)*1000
+        #self.voltsPerDivision = ((2 * self.adcInfo.volts_per_division_table[self.gain])/65535)*1000
         # Open for differential_i2c
         #config_string = '1-000-111-1-000-0-0-0-11'
         config_string = '1-000-111-1-000-0-0-0-11'
@@ -285,16 +329,13 @@ class ADS1115i2cStream(DaqStream):
         # - X - X - disable comparator
         #conf = prepareLEconf('1-000-111-1-100-1-0-0-11')
         #conf = prepareLEconf('0-000-111-1-100-1-0-0-11')
-        return self.channel
+        return #self.channel
 
-    @property
     def readDaq(self):
         #if (self.reader_type == 'differential_i2c'):
         self.value_raw = self.ads1115Runner.i2c_read(channel)
         return self.value_raw #* self.voltsPerDivision
 
-
-    @property
     def closeDaq(self):
         pass
 
@@ -336,18 +377,15 @@ class GroveGSRStream(DaqStream):
     def getInstance():
         return GroveGSRStream()
 
-    @property
     def openDaq(self):
         self.Daq = ADC()
         self.sensor = GroveGSRSensor(int(0))
         return self.channel
     
-    @property
     def readDaq(self):
         time.sleep(self.sleep)            
         return self.sensor.GSR
 
-    @property
     def closeDaq(self):
         pass
 

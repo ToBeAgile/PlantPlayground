@@ -100,13 +100,18 @@ def read_sensor():
     data_log_time = float(1/float(1)) #(dsi.data_log_frequency))
 
     adc = DaqStream.getInstance()
-    x = adc.openDaq()
-    #channel1 = adc.openDaq(DaqInfo)
+    #adc = ADS1115Stream()
+    #adc = DaqStreamTester()
+    print("What is adc: " + str(adc))
 
+    adc.openDaq()
+    #adc.anotherMethod()
+    #channel1 = adc.openDaq(DaqInfo)
+    #print("Did I open? x is " + str(x))
     
     while True:
         daq_data = adc.readDaq
-        #print(daq_data)
+        print("HELLO " + str(daq_data))
         #if DaqInfo.sleep_between_reads != -1:
         #    sleep(DaqInfo.sleep_between_reads)
 '''            
