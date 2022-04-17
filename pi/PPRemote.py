@@ -102,7 +102,6 @@ def read_sensor():
     adc = DaqStream.getInstance()
     #adc = ADS1115Stream()
     #adc = DaqStreamTester()
-    print("What is adc: " + str(adc))
 
     adc.openDaq()
     #adc.anotherMethod()

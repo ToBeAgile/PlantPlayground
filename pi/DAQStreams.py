@@ -19,8 +19,8 @@ class DaqStream(ABC):
 
     @staticmethod
     def getInstance():
-        return MCC128Daq() #This DAQ works on Heavens with MCC128 installed
-        #return ADS1115Stream()
+        #return MCC128Daq() #This DAQ works on Heavens with MCC128 installed
+        return ADS1115Stream()
         #return ADS1115i2cStream()
         #return GroveGSRStream
 
@@ -254,7 +254,7 @@ class ADS1115Stream(DaqStream):
                     sleep(self.sleep_between_channels)
         sensor_data = list()
         sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[2])
-        #print ("Sensor data: " + sensor_data)
+        print ("Sensor data: " + str(sensor_data))
         return sensor_data
 
     def closeDaq(self):
