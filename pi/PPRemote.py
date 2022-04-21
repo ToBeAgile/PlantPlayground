@@ -25,10 +25,13 @@ import configparser
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 from pi.DAQStreams import *
 
+ini_file_name = 'DAQStreams.ini'
+
 class DAQStreamInfo():
 
     def __init__(self):
         self.daq_to_use = None
+        self.single_ended_or_differential = None
         self.sensor_read_frequency = None
         self.number_of_channels = None
         self.data_log_frequency = None
@@ -51,6 +54,7 @@ class DAQStreamInfo():
         config.read(ini_file_name)
         # General settings
         self.daq_to_use = config['Default']['daq_to_use']
+        self.single_ended_or_differential = config['Default']['single_ended_or_differential']
         self.number_of_channels = config['Default']['number_of_channels']
         self.data_log_frequency = int(config['Default']['data_log_frequency'])
         self.sensor_read_frequency = config['Default']['sensor_read_frequency']
@@ -65,7 +69,7 @@ class DAQStreamInfo():
         self.daq = config['Default']['DAQ']
         self.device = config['Default']['Device']
         self.num_channels = config['Default']['NumChannels']
-
+        return self
 ''' put in DaqStreamInfo and pass to ADCStreamReader
 sleep_between_reads = -1  # -1 = don't give away the time slice
 sleep_between_channels = 0.25
@@ -116,22 +120,22 @@ def read_sensor():
     #adc = DaqStreamTester()
     
     # Determine which DAQ to use
-    #daq_stream = DAQStreamInfo().getConfig(ini_file_name) #get reading from ini file to work
-    #daq_to_use = daq_stream.daq_to_use
-    #print(daq_to_use)
-    adc = ADS1115Stream()
-    '''
-    if (daq_to_use == 'MCC128Daq'):
+    daq_info = DAQStreamInfo().getConfig(ini_file_name) #get reading from ini file to work
+    #print(daq_info.daq_to_use)
+    #adc = ADS1115Stream()
+    #daq_info.daq_to_use = 'ADS1115Stream'
+    #print(daq_info.daq_to_use)
+
+    if (daq_info.daq_to_use == '\'MCC128Daq\''):
         adc = MCC128Daq()
-    elif (daq_to_use == 'ADS1115Stream'):
+    elif (daq_info.daq_to_use == '\'ADS1115Stream\''):
         adc = ADS1115Stream()
-    elif (daq_to_use == 'ADS1115i2cStream'):
-        adc = MCC128i2cDaq()
-    '''
+    elif (daq_info.daq_to_use == '\'ADS1115i2cStream\''):
+        adc = ADS1115i2cStream()
+    else:
+        adc = ADS1115i2cStream()
+        
     adc.openDaq()
-    #adc.anotherMethod()
-    #channel1 = adc.openDaq(DaqInfo)
-    #print("Did I open? x is " + str(x))
     
     while True:
         daq_data = adc.readDaq()
