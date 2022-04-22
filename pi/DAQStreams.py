@@ -67,9 +67,22 @@ class DaqStream(ABC):
     @staticmethod
     def getInstance():
         #return MCC128Daq() #This DAQ works on Heavens with MCC128 installed
-        return ADS1115Stream()
+        #return ADS1115Stream()
         #return ADS1115i2cStream()
         #return GroveGSRStream
+        dsi = DAQStreamInfo()
+        daq_info = dsi.getConfig(ini_file_name)
+        #print('daqToUSE:' + daq_info.daq_to_use )
+        if (daq_info.daq_to_use == 'MCC128Daq'):
+            adc = MCC128Daq()
+        elif (daq_info.daq_to_use == 'ADS1115Stream'):
+            adc = ADS1115Stream()
+        elif (daq_info.daq_to_use == 'ADS1115i2cStream'):
+            adc = ADS1115i2cStream()
+        else:
+            adc = ADS1115i2cStream()
+        return adc
+
 
     @abstractmethod
     def openDaq(self):

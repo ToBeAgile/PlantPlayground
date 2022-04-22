@@ -122,10 +122,11 @@ def read_sensor():
     # Determine which DAQ to use
     daq_info = DAQStreamInfo().getConfig(ini_file_name) #get reading from ini file to work
     #print(daq_info.daq_to_use)
-    #adc = ADS1115Stream()
+    adc = DaqStream.getInstance()
     #daq_info.daq_to_use = 'ADS1115Stream'
-    print(daq_info.daq_to_use)
-
+    #print(daq_info.daq_to_use)
+    #print(adc)
+    '''
     if (daq_info.daq_to_use == 'MCC128Daq'):
         adc = MCC128Daq()
     elif (daq_info.daq_to_use == 'ADS1115Stream'):
@@ -134,7 +135,7 @@ def read_sensor():
         adc = ADS1115i2cStream()
     else:
         adc = ADS1115i2cStream()
-        
+    '''    
     adc.openDaq()
     
     while True:
