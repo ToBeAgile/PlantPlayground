@@ -124,13 +124,13 @@ def read_sensor():
     #print(daq_info.daq_to_use)
     #adc = ADS1115Stream()
     #daq_info.daq_to_use = 'ADS1115Stream'
-    #print(daq_info.daq_to_use)
+    print(daq_info.daq_to_use)
 
-    if (daq_info.daq_to_use == '\'MCC128Daq\''):
+    if (daq_info.daq_to_use == 'MCC128Daq'):
         adc = MCC128Daq()
-    elif (daq_info.daq_to_use == '\'ADS1115Stream\''):
+    elif (daq_info.daq_to_use == 'ADS1115Stream'):
         adc = ADS1115Stream()
-    elif (daq_info.daq_to_use == '\'ADS1115i2cStream\''):
+    elif (daq_info.daq_to_use == 'ADS1115i2cStream'):
         adc = ADS1115i2cStream()
     else:
         adc = ADS1115i2cStream()
