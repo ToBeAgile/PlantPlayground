@@ -20,13 +20,12 @@ import threading
 import csv
 import os.path
 import unittest
-import configparser
 
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 from pi.DAQStreams import *
 
 ini_file_name = 'DAQStreams.ini'
-
+'''
 class DAQStreamInfo():
 
     def __init__(self):
@@ -70,6 +69,7 @@ class DAQStreamInfo():
         self.device = config['Default']['Device']
         self.num_channels = config['Default']['NumChannels']
         return self
+        '''
 ''' put in DaqStreamInfo and pass to ADCStreamReader
 sleep_between_reads = -1  # -1 = don't give away the time slice
 sleep_between_channels = 0.25
