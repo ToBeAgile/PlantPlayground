@@ -1,6 +1,6 @@
 # DAQStreams.py - Supports multiple DAQs, called by PPRemote.py
 # Supported DAQs: MCC128, ADS1115, 
-from __future__ import print_function
+#from __future__ import print_function
 from time import sleep
 import sys
 import datetime
@@ -12,10 +12,10 @@ import configparser
 def getGUID():
     id = uuid.uuid4()
     return id.hex
-
+'''
 def getDateTime():
     return datetime.datetime.now()
-
+'''
 ini_file_name = 'DAQStreams.ini'
 
 class DAQStreamInfo():
