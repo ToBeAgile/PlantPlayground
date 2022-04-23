@@ -22,7 +22,7 @@ class DAQStreamInfo():
 
     def __init__(self):
         self.daq_to_use = None
-        self.single_ended_or_differential = None
+        self.sensor_type = None
         self.sensor_read_frequency = None
         self.number_of_channels = None
         self.data_log_frequency = None
@@ -45,7 +45,7 @@ class DAQStreamInfo():
         config.read(ini_file_name)
         # General settings
         self.daq_to_use = config['Default']['daq_to_use']
-        self.single_ended_or_differential = config['Default']['single_ended_or_differential']
+        self.ads1115_sensor_type = config['Default']['ads1115_sensor_type']
         self.number_of_channels = config['Default']['number_of_channels']
         self.data_log_frequency = int(config['Default']['data_log_frequency'])
         self.sensor_read_frequency = config['Default']['sensor_read_frequency']
@@ -204,9 +204,6 @@ class ADS1115Stream(DaqStream):
         sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
         from pi.ADS1115Runner import ADS1115Runner
 
-        sys.path.insert(1, '/home/pi/grove.py/')
-        from grove.adc import ADC
-
         self.daqChannels = [0.0, 0.0, 0.0, 0.0]
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
 
@@ -235,9 +232,10 @@ class ADS1115Stream(DaqStream):
         #low_chan = 0
         #high_chan = 3
         self.channels = [True, True, True, True]
-        self.sensor_type = 'mcc_single_value_read'
-        self.reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
-        self.reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
+        self.ads1115_sensor_type = 'differential_value_read' #'single_value_read' # 'differential_value_read'
+        #self.reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
+        #self.reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
+
 
         ####
         #self.DaqStreamInfo = DaqStreamInfo
@@ -286,15 +284,18 @@ class ADS1115Stream(DaqStream):
         '''
 
     def readDaq(self):
+        stream_info_dict = {0:6.144, 1:4.096, 2:2.048, 4:1.024, 8:0.512, 16:0.256}
         if self.sleep_between_reads != -1:
             sleep(self.sleep_between_reads)
         self.this_moment = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
         for ch in range(self.low_chan, self.high_chan + 1):
             if self.channels[ch] is True:
-                if (self.sensor_type == 'mcc_single_value_read'):         
+                if (self.ads1115_sensor_type == 'single_value_read'):         
                     self.daqChannels[ch] = self.adc.read_adc(ch, self.gain, self.data_rate)
-                elif (self.sensor_type == 'mcc_differential_value_read'):
-                    self.daqChannels[ch] = self.adc.read_adc_difference(ch, self.gain, self.data_rate)
+                elif (self.ads1115_sensor_type == 'differential_value_read'):
+                    adc_reading = self.adc.read_adc_difference(ch, self.gain, self.data_rate)
+                    self.voltsPerDivision = ((2 * stream_info_dict[self.gain])/65535)*1000
+                    self.daqChannels[ch] = adc_reading * self.voltsPerDivision
                 if self.sleep_between_channels != -1:
                     sleep(self.sleep_between_channels)
         sensor_data = list()
