@@ -60,10 +60,14 @@ class DAQStreamInfo():
         self.daq = config['Default']['DAQ']
         self.device = config['Default']['Device']
         self.num_channels = config['Default']['NumChannels']
+        # ADS1115 settings
+        self.gain = config['Default']['gain']
+        
         return self
 
 class DaqStream(ABC):
-
+    daq_info = None
+    
     @staticmethod
     def getInstance():
         #return MCC128Daq() #This DAQ works on Heavens with MCC128 installed
@@ -104,11 +108,16 @@ class MCC128Daq(DaqStream):
         from daqhats_utils import select_hat_device, enum_mask_to_string, \
             input_mode_to_string, input_range_to_string
 
+        dsi = DAQStreamInfo()
+        daq_info = dsi.getConfig(ini_file_name)
+
+        #self.daqChannels = super.daqInfo.Channels
         self.daqChannels = [0.0, 0.0, 0.0, 0.0]
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
         
         # MCC128-specific settings
         self.analog_input_range = AnalogInputRange.BIP_10V
+        #self.reader_type = 'differential'  # or 'single-ended'
         self.reader_type = 'differential'  # or 'single-ended'
         self.options = OptionFlags.DEFAULT
         self.input_mode = AnalogInputMode.DIFF  # or SE
@@ -189,8 +198,12 @@ class MCC128Daq(DaqStream):
 
 
 class ADS1115Stream(DaqStream):
+    daq_info = None
+
     def __init__(self):
        #self.channel = channel
+        dsi = DAQStreamInfo()
+        self.daq_info = dsi.getConfig(ini_file_name)
         pass
 
     @staticmethod
@@ -208,6 +221,7 @@ class ADS1115Stream(DaqStream):
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
 
         GAIN = 16
+        #GAIN = self.daq_info.gain
         DATA_RATE = 8 # 8, 16, 32, 64, 128, 250, 475, 860
 
         SLEEP = 2
