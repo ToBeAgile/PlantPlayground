@@ -219,6 +219,7 @@ class MCC128Daq(DaqStream):
 class ADS1115Stream(DaqStream):
     daq_info = None
     gain = None
+    stream_info_dict = {0:6.144, 1:4.096, 2:2.048, 4:1.024, 8:0.512, 16:0.256}
 
     def __init__(self):
        #self.channel = channel
@@ -258,7 +259,7 @@ class ADS1115Stream(DaqStream):
         self.adc = Adafruit_ADS1x15.ADS1115()
         
         # General settings
-        self.guid = uuid.uuid4()
+        #self.guid = uuid.uuid4()
         
         self.sleep_between_reads = int(self.daq_info.sleep_between_reads)
         # -1 = don't give away the time slice
@@ -267,12 +268,14 @@ class ADS1115Stream(DaqStream):
         #low_chan = 0
         #high_chan = 3
         self.channels = self.daq_info.channels #[True, True, True, True] #self.daq_info.channels #[True, True, True, True] #self.daq_info.channels #
-        print(self.channels)
-        self.ads1115_sensor_type = 'differential_value_read' #'single_value_read' # 'differential_value_read'
+        #print(self.channels)
+        #the new approach involves replacing hard-coded values with:
+        #a test, in config, field declared, read, see test pass
+        #self.ads1115_sensor_type = 'differential_value_read' #'single_value_read' # 'differential_value_read'
+        self.ads1115_sensor_type = self.daq_info.ads1115_sensor_type
         #self.reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
         #self.reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
-
-
+        assert (self.ads1115_sensor_type == 'differential_value_read')
         ####
         #self.DaqStreamInfo = DaqStreamInfo
         
@@ -320,7 +323,6 @@ class ADS1115Stream(DaqStream):
         '''
 
     def readDaq(self):
-        stream_info_dict = {0:6.144, 1:4.096, 2:2.048, 4:1.024, 8:0.512, 16:0.256}
         if self.sleep_between_reads != -1:
             sleep(self.sleep_between_reads)
         self.this_moment = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
@@ -330,7 +332,7 @@ class ADS1115Stream(DaqStream):
                     self.daqChannels[ch] = self.adc.read_adc(ch, self.gain, self.data_rate)
                 elif (self.ads1115_sensor_type == 'differential_value_read'):
                     adc_reading = self.adc.read_adc_difference(ch, self.gain, self.data_rate)
-                    self.voltsPerDivision = ((2 * stream_info_dict[self.gain])/65535)*1000
+                    self.voltsPerDivision = ((2 * self.stream_info_dict[self.gain])/65535)*1000
                     self.daqChannels[ch] = adc_reading * self.voltsPerDivision
                 if self.sleep_between_channels != -1:
                     sleep(self.sleep_between_channels)
