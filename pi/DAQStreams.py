@@ -8,6 +8,7 @@ import timeit, cmd, logging
 from abc import ABC, abstractmethod
 import uuid
 import configparser
+import ast
 
 def getGUID():
     id = uuid.uuid4()
@@ -35,7 +36,7 @@ class DAQStreamInfo():
         number_of_channels = None
         low_chan = None
         high_chan = None
-        channels = None
+        channels = []
         sensor_type = None
         ###
         self.analog_input_range = None
@@ -67,7 +68,7 @@ class DAQStreamInfo():
         self.number_of_channels = config['Default']['number_of_channels']
         self.low_chan = config['Default']['low_chan']
         self.high_chan = config['Default']['high_chan']
-        self.channels = config['Default']['channels']
+        self.channels = ast.literal_eval(config.get('Default', 'channels'))
         self.sensor_type = config['Default']['sensor_type']
         self.analog_input_range = config['Default']['analog_input_range']
         self.reader_type = config['Default']['reader_type']
@@ -265,7 +266,7 @@ class ADS1115Stream(DaqStream):
         self.number_of_channels = int(self.daq_info.number_of_channels)
         #low_chan = 0
         #high_chan = 3
-        self.channels = [True, True, True, True] #self.daq_info.channels #[True, True, True, True] #self.daq_info.channels #
+        self.channels = self.daq_info.channels #[True, True, True, True] #self.daq_info.channels #[True, True, True, True] #self.daq_info.channels #
         print(self.channels)
         self.ads1115_sensor_type = 'differential_value_read' #'single_value_read' # 'differential_value_read'
         #self.reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
