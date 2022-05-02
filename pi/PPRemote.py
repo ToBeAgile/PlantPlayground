@@ -2,7 +2,6 @@
 ''' Next:
 Move unneeded files from pi to a backup area
 Copy code from ASD1115 to i2C 
-Clean up code, deleted unneeded lines
 Get logging working 
 Get logging headers working 
 Get second DAQ working
@@ -22,124 +21,21 @@ sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 from pi.DAQStreams import *
 
 ini_file_name = 'DAQStreams.ini'
-'''
-class DAQStreamInfo():
-
-    def __init__(self):
-        self.daq_to_use = None
-        self.single_ended_or_differential = None
-        self.sensor_read_frequency = None
-        self.number_of_channels = None
-        self.data_log_frequency = None
-        self.sensor_read_frequency = None
-        self.network_write_frequency = None
-        self.to_log = None
-        self.sleep_between_reads = None
-        ###
-        self.analog_input_range = None
-        self.reader_type = None
-        self.options = None
-        self.input_mode = None
-        self.input_range = None
-        self.daq = None
-        self.device = None
-        self.num_channels = None
-
-    def getConfig(self, ini_file_name):
-        config = configparser.ConfigParser()
-        config.read(ini_file_name)
-        # General settings
-        self.daq_to_use = config['Default']['daq_to_use']
-        self.single_ended_or_differential = config['Default']['single_ended_or_differential']
-        self.number_of_channels = config['Default']['number_of_channels']
-        self.data_log_frequency = int(config['Default']['data_log_frequency'])
-        self.sensor_read_frequency = config['Default']['sensor_read_frequency']
-        self.network_write_frequency = config['Default']['network_write_frequency']
-        self.to_log = config['Default']['to_log']
-        self.sleep_between_reads = config['Default']['sleep_between_reads']
-        self.analog_input_range = config['Default']['analog_input_range']
-        self.reader_type = config['Default']['reader_type']
-        self.options = config['Default']['options']
-        self.input_mode = config['Default']['input_mode']
-        self.input_range = config['Default']['input_range']
-        self.daq = config['Default']['DAQ']
-        self.device = config['Default']['Device']
-        self.num_channels = config['Default']['NumChannels']
-        return self
-        '''
-''' put in DaqStreamInfo and pass to ADCStreamReader
-sleep_between_reads = -1  # -1 = don't give away the time slice
-sleep_between_channels = 0.25
-number_of_channels = 4
-low_chan = 0
-high_chan = 3
-channels = [True, True, True, True]
-sensor_type = 'mcc_single_value_read'
-reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
-reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
-'''
-
-'''
-a_gain = 1 #16
-b_gain = 1 #16
-a_data_rate = 128
-b_data_rate = 128
-volts_per_division_table = {2/3:6.144, 1:4.096, 2:2.048, 4:1.024, 8:0.512, 16:0.256}
-a_mv_per_division = ((2 * volts_per_division_table[a_gain])/65535)*1000
-b_mv_per_division = ((2 * volts_per_division_table[b_gain])/65535)*1000
-sensor_state = 0
-channel0 = 0
-channel1 = 1
-chan = 0
-'''
-#Initialize the shared variables across threads
-"""
-a_raw_value = 1 #adc.read_adc_difference(0, gain=a_gain, data_rate=a_data_rate)
-a_value = a_raw_value * a_mv_per_division
-a_time = datetime.datetime.now()
-time.sleep(0.01)
-b_raw_value = 1 #adc.read_adc_difference(3, gain=b_gain, data_rate=b_data_rate)
-b_value = b_raw_value * b_mv_per_division
-b_time = datetime.datetime.now()
-daq_data = 1
-"""
-
 
 def read_sensor():
     global daq_data
     #Calculated from settings read in from config file
-    sensor_read_time = float(1/float(0.1)) #(dsi.sensor_read_frequency))
-    network_write_time = float(1/float(10)) #(dsi.network_write_frequency))
-    data_log_time = float(1/float(1)) #(dsi.data_log_frequency))
-
-    #adc = DaqStream.getInstance()
-    #adc = ADS1115Stream()
-    #adc = DaqStreamTester()
+    #sensor_read_time = float(1/float(0.1)) #(dsi.sensor_read_frequency))
+    #network_write_time = float(1/float(10)) #(dsi.network_write_frequency))
+    #data_log_time = float(1/float(1)) #(dsi.data_log_frequency))
     
     # Determine which DAQ to use
-    daq_info = DAQStreamInfo().getConfig(ini_file_name) #get reading from ini file to work
-    #print(daq_info.daq_to_use)
     adc = DaqStream.getInstance()
-    #daq_info.daq_to_use = 'ADS1115Stream'
-    #print(daq_info.daq_to_use)
-    #print(adc)
-    '''
-    if (daq_info.daq_to_use == 'MCC128Daq'):
-        adc = MCC128Daq()
-    elif (daq_info.daq_to_use == 'ADS1115Stream'):
-        adc = ADS1115Stream()
-    elif (daq_info.daq_to_use == 'ADS1115i2cStream'):
-        adc = ADS1115i2cStream()
-    else:
-        adc = ADS1115i2cStream()
-    '''    
     adc.openDaq()
     
     while True:
         daq_data = adc.readDaq()
-        #print(daq_data)
-        #if DaqInfo.sleep_between_reads != -1:
-        #    sleep(DaqInfo.sleep_between_reads)
+        
 '''            
         if (number_of_channels > 1):
             b_raw_value = adc.read(channel1)
