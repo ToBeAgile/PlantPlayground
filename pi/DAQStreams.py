@@ -135,25 +135,16 @@ class MCC128Daq(DaqStream):
         daq_info = dsi.getConfig(ini_file_name)
 
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
-        #self.guid = uuid.uuid4()
         self.guid = getGUID()
-
         self.daqChannels = [0.0, 0.0, 0.0, 0.0]
         
         #general config settings
-        #self.sleep_between_reads = -1
         self.sleep_between_reads = daq_info.sleep_between_reads
-        #print(self.sleep_between_reads)
-        assert(self.sleep_between_reads == -1)
+        #assert(self.sleep_between_reads == -1)
         # -1 = don't give away the time slice
         #self.sleep_between_channels = 0.25
         self.sleep_between_channels = daq_info.sleep_between_channels
-        assert( self.sleep_between_channels == 0.25)
-        #self.number_of_channels = 4
-        #low_chan = 0
-        #high_chan = 3
-        #self.channels = [True, True, True, True]
-        #self.sensor_type = 'mcc_single_value_read'
+        #assert( self.sleep_between_channels == 0.25)
         self.number_of_channels = daq_info.number_of_channels
         self.low_chan = daq_info.low_chan
         self.high_chan = daq_info.high_chan
@@ -183,7 +174,6 @@ class MCC128Daq(DaqStream):
             self.input_mode = AnalogInputMode.DIFF
         elif(daq_info.options == AnalogInputMode.SE):
             self.input_mode = AnalogInputMode.SE
-        #print(self.input_mode)
         #self.daq_info.input_range #AnalogInputRange.BIP_10V
         self.input_range = AnalogInputRange.BIP_10V 
         if (daq_info.input_range == AnalogInputRange.BIP_10V):    
@@ -191,25 +181,7 @@ class MCC128Daq(DaqStream):
         elif (daq_info.input_range == AnalogInputRange.BIP_1V):
             self.input_range = AnalogInputRange.BIP_1V  # BIP_10V
         self.sample_interval = daq_info.sample_interval #0.1  # 0.5  # Seconds
-        
         self.mcc_128_num_channels = daq_info.number_of_channels #mcc128.info().NUM_AI_CHANNELS[self.input_mode]
-
-        #def openDaq(self):
-        #def openDaq(self, DaqStreamInfo):
-        # General settings
-        #self.reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
-        #self.reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
-
-        ####
-        #self.DaqStreamInfo = DaqStreamInfo
-        
-        #self.input_mode = DaqStreamInfo.input_mode
-        #self.input_range = DaqStreamInfo.input_range
-
-        #self.mcc_128_num_channels = daq_info.mcc_128_num_channels
-        #self.sample_interval = DaqStreamInfo.sample_interval
-        #self.guid = getGUID()
-        #print(self.guid)
         self.myHatError = HatError
 
         try:
@@ -261,7 +233,6 @@ class ADS1115Stream(DaqStream):
     stream_info_dict = {0:6.144, 1:4.096, 2:2.048, 4:1.024, 8:0.512, 16:0.256}
 
     def __init__(self):
-       #self.channel = channel
         dsi = DAQStreamInfo()
         self.daq_info = dsi.getConfig(ini_file_name)
 
@@ -270,7 +241,6 @@ class ADS1115Stream(DaqStream):
         return ADS1115Stream()
         
     def openDaq(self):
-        #import smbus2, RPi.GPIO as GPIO
         import Adafruit_ADS1x15
         
         sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
@@ -282,84 +252,26 @@ class ADS1115Stream(DaqStream):
         #GAIN = 16
         self.gain = int(self.daq_info.gain)
         self.data_rate = int(self.daq_info.data_rate) # 8, 16, 32, 64, 128, 250, 475, 860
-        #print ("GAIN IS: " + str(self.gain))
-        #print("Data rate: " + self.daq_info.data_rate)
-        #SLEEP = 2
-        #NUMBEROFCHANNELS = 2
-        #DIFFERENTIAL1 = 0 
-        #DIFFERENTIAL2 = 3
-
-        #CHANNEL0 = 0
-        #CHANNEL1 = 1
-        #CH0SLEEPTIME = 1
-        #CH1SLEEPTIME = 1
 
         ads1115Runner = ADS1115Runner()
         self.adc = Adafruit_ADS1x15.ADS1115()
         
-        # General settings
-        #self.guid = uuid.uuid4()
-        
+        # General settings        
         self.sleep_between_reads = int(self.daq_info.sleep_between_reads)
         # -1 = don't give away the time slice
         self.sleep_between_channels = float(self.daq_info.sleep_between_channels)
         self.number_of_channels = int(self.daq_info.number_of_channels)
-        #low_chan = 0
-        #high_chan = 3
         self.channels = self.daq_info.channels #[True, True, True, True] #self.daq_info.channels #[True, True, True, True] #self.daq_info.channels #
-        #print(self.channels)
-        #the new approach involves replacing hard-coded values with:
-        #a test, in config, field declared, read, see test pass
         #self.ads1115_sensor_type = 'differential_value_read' #'single_value_read' # 'differential_value_read'
         self.ads1115_sensor_type = self.daq_info.ads1115_sensor_type
         #self.reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
         #self.reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
         assert (self.ads1115_sensor_type == 'differential_value_read')
         ####
-        #self.DaqStreamInfo = DaqStreamInfo
-        
         self.low_chan = int(self.daq_info.low_chan)
         self.high_chan = int(self.daq_info.high_chan)
-        #self.input_mode = DaqStreamInfo.input_mode
-        #self.input_range = DaqStreamInfo.input_range
 
-        #self.mcc_128_num_channels = DaqStreamInfo.mcc_128_num_channels
-        #self.sample_interval = DaqStreamInfo.sample_interval
         self.guid = getGUID()
-        #print(self.guid)
-
-        #print ("Returning from open...")
-    
-        #DaqInfo = DaqStreamInfo()
-        #print("Hello ASD1115-open")
-        #ip = "127.0.0.1"
-        #port = 1337
-        #daq = MCC128Daq()
-        #client = SimpleUDPClient(ip, port)  # Create client
-
-
-        #def open(self, reader_type, channel, gain, data_rate, sleep):
-        #self.reader_type = reader_type
-        #self.channel = channel # change to tuple of 4 bools for each active channel
-        #self.gain = GAIN
-        #self.data_rate = DATA_RATE
-        #self.sleep = sleep
-        #self.sensor = 0
-        #self.voltsPerDivision = ((2 * self.adcInfo.volts_per_division_table[self.gain])/65535)*1000
-        #return self.channel
-    '''
-    def readDaq(self):
-
-        if (self.reader_type == 'differential' ):
-            time.sleep(self.sleep)
-            self.differential_value = self.adc.read_adc_difference(self.channel, self.gain, self.data_rate)
-            return self.differential_value #* self.voltsPerDivision
-        elif (self.reader_type == 'single_ended'):
-            time.sleep(self.sleep)            
-            self.differential_value = self.adc.read_adc(self.channel, self.gain, self.data_rate)
-            return self.differential_value #* self.voltsPerDivision
-            ##self.sensor_type = 'mcc_single_value_read'
-        '''
 
     def readDaq(self):
         if self.sleep_between_reads != -1:
