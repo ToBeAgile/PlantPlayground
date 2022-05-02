@@ -1,5 +1,5 @@
 # DAQStreams.py - Supports multiple DAQs, called by PPRemote.py
-# Supported DAQs: MCC128, ADS1115, 
+# Supported DAQs: MCC128, ADS1115, ADS1115i2c
 #from __future__ import print_function
 from time import sleep
 import sys
@@ -327,16 +327,43 @@ class ADS1115i2cStream(DaqStream):
     #port = 1337
     #daq = MCC128Daq()
     #client = SimpleUDPClient(ip, port)  # Create client
+    daq_info = None
+    gain = None
+    stream_info_dict = {0:6.144, 1:4.096, 2:2.048, 4:1.024, 8:0.512, 16:0.256}
 
     def __init__(self):
-       #self.channel = channel
-        pass
+        dsi = DAQStreamInfo()
+        self.daq_info = dsi.getConfig(ini_file_name)
 
     @staticmethod
     def getInstance():
         return ADS1115i2cStream()
 
     def openDaq(self):
+        self.daqChannels = [0.0, 0.0, 0.0, 0.0]
+        self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
+
+        #GAIN = 16
+        self.gain = int(self.daq_info.gain)
+        self.data_rate = int(self.daq_info.data_rate) # 8, 16, 32, 64, 128, 250, 475, 860
+
+        # General settings        
+        self.sleep_between_reads = int(self.daq_info.sleep_between_reads)
+        # -1 = don't give away the time slice
+        self.sleep_between_channels = float(self.daq_info.sleep_between_channels)
+        self.number_of_channels = int(self.daq_info.number_of_channels)
+        self.channels = self.daq_info.channels #[True, True, True, True] #self.daq_info.channels #[True, True, True, True] #self.daq_info.channels #
+        #self.ads1115_sensor_type = 'differential_value_read' #'single_value_read' # 'differential_value_read'
+        self.ads1115_sensor_type = self.daq_info.ads1115_sensor_type
+        #self.reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
+        #self.reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
+        assert (self.ads1115_sensor_type == 'differential_value_read')
+        ####
+        self.low_chan = int(self.daq_info.low_chan)
+        self.high_chan = int(self.daq_info.high_chan)
+
+        self.guid = getGUID()
+
         '''
         def open(self, reader_type, channel, gain, data_rate, sleep):
         self.reader_type = reader_type
@@ -367,6 +394,24 @@ class ADS1115i2cStream(DaqStream):
         return #self.channel
 
     def readDaq(self):
+        if self.sleep_between_reads != -1:
+            sleep(self.sleep_between_reads)
+        self.this_moment = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
+        for ch in range(self.low_chan, self.high_chan + 1):
+            if self.channels[ch] is True:
+                if (self.ads1115_sensor_type == 'single_value_read'):         
+                    self.daqChannels[ch] = self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
+                elif (self.ads1115_sensor_type == 'differential_value_read'):
+                    adc_reading = self.ads1115Runner.i2c_read(ch) #self.adc.read_adc_difference(ch, self.gain, self.data_rate)
+                    self.voltsPerDivision = ((2 * self.stream_info_dict[self.gain])/65535)*1000
+                    self.daqChannels[ch] = adc_reading * self.voltsPerDivision
+                if self.sleep_between_channels != -1:
+                    sleep(self.sleep_between_channels)
+        sensor_data = list()
+        sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[2])
+        print ("i2c Sensor data: " + str(sensor_data))
+        return sensor_data
+
         #if (self.reader_type == 'differential_i2c'):
         self.value_raw = self.ads1115Runner.i2c_read(channel)
         return self.value_raw #* self.voltsPerDivision

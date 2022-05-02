@@ -1,7 +1,8 @@
 # PPRemote.py - Remote Data Aquisition, Logger, and network broadcaster
 ''' Next:
 Move unneeded files from pi to a backup area
-Copy code from ASD1115 to i2C 
+Do single-ended and differential reads on ASD1115i2C
+Get new DAQ working
 Get logging working 
 Get logging headers working 
 Get second DAQ working
