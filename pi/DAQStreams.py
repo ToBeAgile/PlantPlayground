@@ -95,7 +95,7 @@ class DaqStream(ABC):
         #return GroveGSRStream
         dsi = DAQStreamInfo()
         daq_info = dsi.getConfig(ini_file_name)
-        #print('daqToUSE:' + daq_info.daq_to_use )
+        print('daqToUSE:' + daq_info.daq_to_use )
         if (daq_info.daq_to_use == 'MCC128Daq'):
             adc = MCC128Daq()
         elif (daq_info.daq_to_use == 'ADS1115Stream'):
@@ -150,25 +150,25 @@ class MCC128Daq(DaqStream):
         # General settings
         self.guid = uuid.uuid4()
         
-        #self.sleep_between_reads = -1  # -1 = don't give away the time slice
-        #self.sleep_between_channels = 0.25
-        #self.number_of_channels = 4
-        #low_chan = 0
-        #high_chan = 3
-        #self.channels = [True, True, True, True]
-        #self.sensor_type = 'mcc_single_value_read'
+        self.sleep_between_reads = -1  # -1 = don't give away the time slice
+        self.sleep_between_channels = 0.25
+        self.number_of_channels = 4
+        low_chan = 0
+        high_chan = 3
+        self.channels = [True, True, True, True]
+        self.sensor_type = 'mcc_single_value_read'
         #self.reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
         #self.reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
 
         ####
         #self.DaqStreamInfo = DaqStreamInfo
         
-        #self.low_chan = 0
-        #self.high_chan = 3
+        self.low_chan = 0
+        self.high_chan = 3
         #self.input_mode = DaqStreamInfo.input_mode
         #self.input_range = DaqStreamInfo.input_range
 
-        #self.mcc_128_num_channels = DaqStreamInfo.mcc_128_num_channels
+        #self.mcc_128_num_channels = daq_info.mcc_128_num_channels
         #self.sample_interval = DaqStreamInfo.sample_interval
         self.guid = getGUID()
         #print(self.guid)
@@ -195,7 +195,7 @@ class MCC128Daq(DaqStream):
             self.hat.a_in_range_write(self.input_range)
             self.sensor = self.hat
 
-        except (myHatError, ValueError) as error:
+        except (self.myHatError, ValueError) as error:
             print('\n', error)
     
     def readDaq(self):
