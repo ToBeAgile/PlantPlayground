@@ -1,9 +1,6 @@
 # PPRemote.py - Remote Data Aquisition, Logger, and network broadcaster
 ''' Next:
-Read DAQ settings from config file, implement other DAQs
 Move unneeded files from pi to a backup area
-Read all settings from config file, pass needed ones to DAQStreams
-Get single_ended and differential reads working on ADS1115
 Copy code from ASD1115 to i2C 
 Clean up code, deleted unneeded lines
 Get logging working 
