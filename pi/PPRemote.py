@@ -18,8 +18,8 @@ import csv
 import os.path
 import unittest
 
-sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
-from pi.DAQStreams import *
+sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground/pi')
+from DAQStreams import *
 
 ini_file_name = 'DAQStreams.ini'
 global daq_data
