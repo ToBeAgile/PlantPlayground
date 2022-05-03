@@ -22,9 +22,9 @@ sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
 from pi.DAQStreams import *
 
 ini_file_name = 'DAQStreams.ini'
-
+global daq_data
+    
 def read_sensor():
-    global daq_data
     #Calculated from settings read in from config file
     #sensor_read_time = float(1/float(0.1)) #(dsi.sensor_read_frequency))
     #network_write_time = float(1/float(10)) #(dsi.network_write_frequency))
@@ -53,8 +53,6 @@ def read_sensor():
         #read_event.wait(sensor_read_time) #todo depend on a user modified variable
  
 def write_network():
-    global daq_data
-
     #set up the network connection
     host =  '192.168.4.39' # was '192.168.0.18' '127.0.1.1' #
     port = 50000
@@ -79,8 +77,6 @@ def write_network():
 
 
 def log_data():
-    global daq_data
-
     now = datetime.datetime.now()
     folder_name = "..//data//"
     project_code = "R0"
