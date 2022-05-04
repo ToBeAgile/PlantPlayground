@@ -22,9 +22,11 @@ sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground/pi')
 from DAQStreams import *
 
 ini_file_name = 'DAQStreams.ini'
-global daq_data
+#global daq_data
+daq_data = list()
     
 def read_sensor():
+    global daq_data
     #Calculated from settings read in from config file
     #sensor_read_time = float(1/float(0.1)) #(dsi.sensor_read_frequency))
     #network_write_time = float(1/float(10)) #(dsi.network_write_frequency))
@@ -36,6 +38,7 @@ def read_sensor():
     
     while True:
         daq_data = adc.readDaq()
+        #print(daq_data)
         
 '''            
         if (number_of_channels > 1):
@@ -53,6 +56,7 @@ def read_sensor():
         #read_event.wait(sensor_read_time) #todo depend on a user modified variable
  
 def write_network():
+    global daq_data
     #set up the network connection
     host =  '192.168.4.39' # was '192.168.0.18' '127.0.1.1' #
     port = 50000
@@ -77,14 +81,18 @@ def write_network():
 
 
 def log_data():
+    global daq_data
     now = datetime.datetime.now()
-    folder_name = "..//data//"
+    folder_name = "../data/"
     project_code = "R0"
     file_name = project_code + "-" + now.strftime("%Y-%m-%d") + ".csv"
     full_path = folder_name + file_name
     #file = open(full_path, 'a', newline='', buffering=1)
-    to_log = False #put into config
-    if (to_log == False):
+    #to_log = False #put into config
+    dsi = DAQStreamInfo()
+    daq_info = dsi.getConfig(ini_file_name)
+    print(daq_info.to_log)
+    if (daq_info.to_log == False):
         return
     
     if os.path.isfile(full_path):
@@ -97,8 +105,8 @@ def log_data():
         file = open(full_path, 'w', newline='', buffering=1)            
         writer = csv.writer(file)
         #writer and write the header
-        writer.writerow(["Plant bioelectric data log by David Scott Bernstein. Project: Setup, File name: " + file_name])
-        writer.writerow(["Software: PlantPlayground, File: PP-Remote.py, Version 0.2"])
+        writer.writerow(["Plant bioelectric data log ToBeAgile: Setup, File name: " + file_name])
+        writer.writerow(["Software: PlantPlayground, File: PPRemote.py, Version 0.3"])
         #writer.writerow(["Reading 2 differential channels in milivolts with a sensor read frequency of " + str(sensor_read_time) + "."])
         #writer.writerow(["Reading 4 channel(s) in milivolts with a sensor read frequency of " + str(sensor_read_time) + "."])
         #writer.writerow(["Channel B is connected to nothing, Channel A is connected my old Op Amp from 35 years ago and then to a plant."])
@@ -109,7 +117,8 @@ def log_data():
         #writer.writerow(["Channel A Open Type: " + reader_type_a + "Channel B Open Type: " + reader_type_b + "."])
 
     while True:
-        log_event.wait(data_log_time)
+        #log_event.wait(data_log_time)
+        sleep(daq_info.data_log_frequency)
         #print(daq_data)
         writer.writerow(daq_data)
 
@@ -123,7 +132,10 @@ log_event = threading.Event()
 #floats, ints, and dictionaries should all be thread safe in Python (floats and ints are immutable). Test this
 threading.Thread(target=read_sensor).start()
 threading.Thread(target=write_network).start()
-threading.Thread(target=log_data).start()
+dsi = DAQStreamInfo()
+daq_info = dsi.getConfig(ini_file_name)
+if (daq_info.to_log == 'True'):
+    threading.Thread(target=log_data).start()
 
 #class GettingStartedTest(unittest.TestCase):
 #    def test_simple(self):
