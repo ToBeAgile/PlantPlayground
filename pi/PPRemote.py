@@ -58,9 +58,9 @@ def read_sensor():
 def write_network():
     global daq_data
     #set up the network connection
-    host =  '192.168.4.39' # was '192.168.0.18' '127.0.1.1' #
+    host =  '192.168.0.4' #'192.168.4.39' # was '192.168.0.18' '127.0.1.1' #
     port = 50000
-
+    print("going into write network...")
     s = None
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -73,9 +73,9 @@ def write_network():
         sys.exit(1)
 
     while True:
-        write_event.wait(network_write_time)
+        write_event.wait(1) #network_write_time)
         data_dict = daq_data
-        print(data_dict)
+        #print(data_dict)
         serialized_data = pickle.dumps(data_dict)
         s.send(serialized_data)
 
