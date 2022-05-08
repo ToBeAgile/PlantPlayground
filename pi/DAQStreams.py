@@ -1,3 +1,4 @@
+# DAQStreams.py 1.0 - May 8, 2022 (c)reated by David Scott Bernstein
 # DAQStreams.py - Supports multiple DAQs, called by PPRemote.py
 # Supported DAQs: MCC128, ADS1115, ADS1115i2c
 #from __future__ import print_function
