@@ -53,6 +53,9 @@ class DAQStreamInfo():
         ###
         self.gain = None
         self.data_rate = None
+        self.ads1115_sensor_type = None
+        self.ads1256_sensor_type = None
+        self.scan_mode = 0
 
     def getConfig(self, ini_file_name):
         config = configparser.ConfigParser()
@@ -86,7 +89,10 @@ class DAQStreamInfo():
         # ADS1115 settings
         self.gain = config['Default']['gain']
         self.data_rate = config['Default']['data_rate']
-        
+        self.ads1115_sensor_type = config['Default']['ads1115_sensor_type']
+        # ADS1256 settings
+        self.ads1256_sensor_type = config['Default']['ads1256_sensor_type']
+        self.ScanMode = config['Default']['ScanMode']
         return self
 
 class DaqStream(ABC):
@@ -430,14 +436,11 @@ class ADS1256Stream(DaqStream):
     sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
     #from pi.ADS1256 import ADS1256 as ADS1256
     import pi.ADS1256 as ADS1256
-    print('Phase 1 ADS1256 initialization starting...')
+    #print('Phase 1 ADS1256 initialization starting...')
     ADC = ADS1256.ADS1256()
-    print('Partly initialized ADS1256')
     ADC.ADS1256_init()
-    print('Initialized ADS1256')
+    #print('Initialized ADS1256')
 
-
-    print('Now in ADS1256...')
     '''
     #from ADS1115i2cStream
     import smbus2, RPi.GPIO as GPIO
@@ -483,6 +486,7 @@ class ADS1256Stream(DaqStream):
         return ADS1256Stream()
 
     def openDaq(self):
+        '''
         try:
             pass
         except :
@@ -490,13 +494,15 @@ class ADS1256Stream(DaqStream):
             self.GPIO.cleanup()
             print ("\r\nException opening ADS1256 DAQ, Program end...")
             exit()
-        
+        print("In Open of ASD1256Stream...")
+        '''
         self.daqChannels = [0.0, 0.0, 0.0, 0.0]
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
 
         #GAIN = 16
         self.gain = int(self.daq_info.gain)
         self.data_rate = int(self.daq_info.data_rate) # 8, 16, 32, 64, 128, 250, 475, 860
+        self.ADC.ADS1256_ConfigADC(self.gain, self.data_rate)
 
         # General settings        
         self.sleep_between_reads = int(self.daq_info.sleep_between_reads)
@@ -505,10 +511,10 @@ class ADS1256Stream(DaqStream):
         self.number_of_channels = int(self.daq_info.number_of_channels)
         self.channels = self.daq_info.channels #[True, True, True, True] #self.daq_info.channels #[True, True, True, True] #self.daq_info.channels #
         #self.ads1115_sensor_type = 'differential_value_read' #'single_value_read' # 'differential_value_read'
-        self.ads1115_sensor_type = self.daq_info.ads1115_sensor_type
+        self.ads1256_sensor_type = self.daq_info.ads1256_sensor_type
         #self.reader_type_a = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
         #self.reader_type_b = 'mcc_single_value_read'  # 'grove_gsr' # 'dummy_read' #'single_ended' #'differential_i2c' #'single_ended' #'differential'
-        assert (self.ads1115_sensor_type == 'differential_value_read')
+        #assert (self.ads1256_sensor_type == 'differential_value_read')
         ####
         self.low_chan = int(self.daq_info.low_chan)
         self.high_chan = int(self.daq_info.high_chan)
@@ -550,17 +556,18 @@ class ADS1256Stream(DaqStream):
         self.this_moment = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
         for ch in range(self.low_chan, self.high_chan + 1):
             if self.channels[ch] is True:
-                if (self.ads1115_sensor_type == 'single_value_read'):         
-                    self.daqChannels[ch] = self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
-                elif (self.ads1115_sensor_type == 'differential_value_read'):
-                    adc_reading = self.ads1115Runner.i2c_read(ch) #self.adc.read_adc_difference(ch, self.gain, self.data_rate)
+                if (self.ads1256_sensor_type == 'single_value_read'):         
+                    self.daqChannels[ch] = self.ADC.ADS1256_GetChannalValue(ch) #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
+                elif (self.ads1256_sensor_type == 'differential_value_read'):
+                    #FIX THIS TO HANDLE DIFFERENTIAL READS (in open)
+                    adc_reading = 1 #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc_difference(ch, self.gain, self.data_rate)
                     self.voltsPerDivision = ((2 * self.stream_info_dict[self.gain])/65535)*1000
                     self.daqChannels[ch] = adc_reading * self.voltsPerDivision
                 if self.sleep_between_channels != -1:
                     sleep(self.sleep_between_channels)
         sensor_data = list()
-        sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[2])
-        print ("ADS1115i2cStream sensor data: " + str(sensor_data))
+        sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
+        print ("ADS1256Stream sensor data: " + str(sensor_data))
         return sensor_data
 
         #if (self.reader_type == 'differential_i2c'):
