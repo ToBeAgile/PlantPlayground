@@ -429,54 +429,7 @@ class ADS1115i2cStream(DaqStream):
         pass
 
 class ADS1256Stream(DaqStream):
-    import time
-    #import ADS1256
-    import RPi.GPIO as GPIO
 
-    sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
-    #from pi.ADS1256 import ADS1256 as ADS1256
-    import pi.ADS1256 as ADS1256
-    #print('Phase 1 ADS1256 initialization starting...')
-    ADC = ADS1256.ADS1256()
-    ADC.ADS1256_init()
-    #print('Initialized ADS1256')
-
-    '''
-    #from ADS1115i2cStream
-    import smbus2, RPi.GPIO as GPIO
-    import Adafruit_ADS1x15
-    
-    sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
-    from pi.ADS1115Runner import ADS1115Runner
-
-    sys.path.insert(1, '/home/pi/grove.py/')
-    from grove.adc import ADC
-
-    GAIN = 16
-    DATA_RATE = 8 # 8, 16, 32, 64, 128, 250, 475, 860
-
-    SLEEP = 2
-    NUMBEROFCHANNELS = 2
-    DIFFERENTIAL1 = 0 
-    DIFFERENTIAL2 = 3
-
-    CHANNEL0 = 0
-    CHANNEL1 = 1
-    CH0SLEEPTIME = 1
-    CH1SLEEPTIME = 1
-
-    ads1115Runner = ADS1115Runner()
-    adc = Adafruit_ADS1x15.ADS1115()
-    #DaqInfo = DaqStreamInfo()
-    
-    #ip = "127.0.0.1"
-    #port = 1337
-    #daq = MCC128Daq()
-    #client = SimpleUDPClient(ip, port)  # Create client
-    daq_info = None
-    gain = None
-    stream_info_dict = {0:6.144, 1:4.096, 2:2.048, 4:1.024, 8:0.512, 16:0.256}
-    '''
     def __init__(self):
         dsi = DAQStreamInfo()
         self.daq_info = dsi.getConfig(ini_file_name)
@@ -486,24 +439,30 @@ class ADS1256Stream(DaqStream):
         return ADS1256Stream()
 
     def openDaq(self):
-        '''
-        try:
-            pass
-        except :
-            print("Oops!", sys.exc_info()[0], "occurred.")
-            self.GPIO.cleanup()
-            print ("\r\nException opening ADS1256 DAQ, Program end...")
-            exit()
-        print("In Open of ASD1256Stream...")
-        '''
+        import time
+        #import ADS1256
+        import RPi.GPIO as GPIO
+
+        sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
+        #from pi.ADS1256 import ADS1256 as ADS1256
+        import pi.ADS1256 as ADS1256
+        #print('Phase 1 ADS1256 initialization starting...')
+        self.ADC = ADS1256.ADS1256()
+        self.ADC.ADS1256_init()
+        #print('Initialized ADS1256')
+
         self.daqChannels = [0.0, 0.0, 0.0, 0.0]
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
-
         #GAIN = 16
         self.gain = int(self.daq_info.gain)
         self.data_rate = int(self.daq_info.data_rate) # 8, 16, 32, 64, 128, 250, 475, 860
         self.ADC.ADS1256_ConfigADC(self.gain, self.data_rate)
+        
+        self.scan_mode = int(self.daq_info.scan_mode)
+        self.ADC.ADS1256_SetMode(self.scan_mode)
 
+        #print(self.scan_mode)
+        
         # General settings        
         self.sleep_between_reads = int(self.daq_info.sleep_between_reads)
         # -1 = don't give away the time slice
@@ -518,7 +477,13 @@ class ADS1256Stream(DaqStream):
         ####
         self.low_chan = int(self.daq_info.low_chan)
         self.high_chan = int(self.daq_info.high_chan)
-
+        # Set channels for single-ended (scan_mode = 0) and differential (scan_mode = 1), yes, channel is misspelled
+        if(self.scan_mode == 0):
+            for i in range(0, self.number_of_channels):
+                self.ADC.ADS1256_SetChannal(i)
+        elif(self.scan_mode == 1):
+            for i in range(0, self.number_of_channels):
+                self.ADC.ADS1256_SetDiffChannal(i)
         self.guid = getGUID()
 
         '''
@@ -556,13 +521,14 @@ class ADS1256Stream(DaqStream):
         self.this_moment = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
         for ch in range(self.low_chan, self.high_chan + 1):
             if self.channels[ch] is True:
-                if (self.ads1256_sensor_type == 'single_value_read'):         
+                if (True): #self.scan_mode == 0): # 0 = Single-ended input  8 channel; 1 = Differential input  4 channe 
                     self.daqChannels[ch] = self.ADC.ADS1256_GetChannalValue(ch) #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
-                elif (self.ads1256_sensor_type == 'differential_value_read'):
+                '''elif (self.scan_mode == 1):
                     #FIX THIS TO HANDLE DIFFERENTIAL READS (in open)
                     adc_reading = 1 #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc_difference(ch, self.gain, self.data_rate)
                     self.voltsPerDivision = ((2 * self.stream_info_dict[self.gain])/65535)*1000
                     self.daqChannels[ch] = adc_reading * self.voltsPerDivision
+                '''
                 if self.sleep_between_channels != -1:
                     sleep(self.sleep_between_channels)
         sensor_data = list()
