@@ -2,12 +2,10 @@
 # PPRemote.py - Remote Data Aquisition, Logger, and network broadcaster
 
 ''' Next:
-Move unneeded files from pi to a backup area
-Do single-ended and differential reads on ASD1115i2C
-Get new DAQ working
-Get logging working 
-Get logging headers working 
-Get second DAQ working
+Get all channels on ASDS1256 working
+Verify readings from ADS1256 using potentimeter
+Clean up loggin headers
+
 ''' 
 import socket
 import sys
@@ -40,29 +38,16 @@ def read_sensor():
     
     while True:
         daq_data = adc.readDaq()
+        #update to pass functions for read and convert to mV
         #print(daq_data)
-        
-'''            
-        if (number_of_channels > 1):
-            b_raw_value = adc.read(channel1)
-            b_value = b_raw_value * b_mv_per_division
-            b_time = datetime.datetime.now().strftime("%H:%M:%S:%f")
- '''
-
-        #b_raw_value = adc.read_adc_difference(3, gain=b_gain, data_rate=860)
-        #b_value = (adc.read_adc_difference(3, gain=b_gain, data_rate=b_data_rate)) * b_mv_per_division
-        #b_raw_value = adc.read(channel1)
-        #b_value = b_raw_value * b_mv_per_division
-        #b_time = datetime.datetime.now().strftime("%H:%M:%S:%f")  
-        #print("Channel A: ", a_time, a_raw_value, a_value, " Channel B: ", b_time, b_raw_value, b_value)        
-        #read_event.wait(sensor_read_time) #todo depend on a user modified variable
  
+#fix this by comparing to early working version
 def write_network():
     global daq_data
     #set up the network connection
-    host =  '192.168.0.4' #'192.168.4.39' # was '192.168.0.18' '127.0.1.1' #
+    host =  '192.168.4.39' # was '192.168.0.18' '127.0.1.1' #'192.168.0.4' #
     port = 50000
-    print("going into write network...")
+    #print("going into write network...")
     s = None
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
