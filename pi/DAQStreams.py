@@ -100,7 +100,7 @@ class DaqStream(ABC):
         #return GroveGSRStream
         dsi = DAQStreamInfo()
         daq_info = dsi.getConfig(ini_file_name)
-        #print('daqToUSE:' + daq_info.daq_to_use )
+        print('daqToUSE:' + daq_info.daq_to_use )
         if (daq_info.daq_to_use == 'MCC128Daq'):
             adc = MCC128Daq()
         elif (daq_info.daq_to_use == 'ADS1115Stream'):
@@ -423,8 +423,20 @@ class ADS1115i2cStream(DaqStream):
         pass
 
 class ADS1256Stream(DaqStream):
+    import time
+    #import ADS1256
+    import RPi.GPIO as GPIO
+
     sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
-    from pi.ADS1256 import ADS1256
+    #from pi.ADS1256 import ADS1256 as ADS1256
+    import pi.ADS1256 as ADS1256
+    print('Phase 1 ADS1256 initialization starting...')
+    ADC = ADS1256.ADS1256()
+    print('Partly initialized ADS1256')
+    ADC.ADS1256_init()
+    print('Initialized ADS1256')
+
+
     print('Now in ADS1256...')
     '''
     #from ADS1115i2cStream
@@ -471,6 +483,14 @@ class ADS1256Stream(DaqStream):
         return ADS1256Stream()
 
     def openDaq(self):
+        try:
+            pass
+        except :
+            print("Oops!", sys.exc_info()[0], "occurred.")
+            self.GPIO.cleanup()
+            print ("\r\nException opening ADS1256 DAQ, Program end...")
+            exit()
+        
         self.daqChannels = [0.0, 0.0, 0.0, 0.0]
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
 
