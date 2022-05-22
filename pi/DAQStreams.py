@@ -228,7 +228,7 @@ class MCC128Daq(DaqStream):
                 if self.sleep_between_channels != -1:
                     sleep(self.sleep_between_channels)
         sensor_data = list()
-        sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[2])
+        sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
         print (sensor_data)
         return sensor_data
 
@@ -297,7 +297,7 @@ class ADS1115Stream(DaqStream):
                 if self.sleep_between_channels != -1:
                     sleep(self.sleep_between_channels)
         sensor_data = list()
-        sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[2])
+        sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
         print ("ADS1115Stream sensor data: " + str(sensor_data))
         return sensor_data
 
@@ -417,7 +417,7 @@ class ADS1115i2cStream(DaqStream):
                 if self.sleep_between_channels != -1:
                     sleep(self.sleep_between_channels)
         sensor_data = list()
-        sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[2])
+        sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
         print ("ADS1115i2cStream sensor data: " + str(sensor_data))
         return sensor_data
 
