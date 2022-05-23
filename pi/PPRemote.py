@@ -95,6 +95,7 @@ def log_data():
         #writer and write the header
         writer.writerow(['Plant bioelectric data log: Setup, File name: ' + file_name])
         writer.writerow(['Software: PlantPlayground, File: PPRemote.py, Version 0.4'])
+        #do we want to create another file with the same GUID with details about the session?
         #what info do we want? DAQs? number of channels? gain? sample rate? etc.
         #write sub-header from file
         writer.writerow(['GUID,Time,Ch0,ch1,ch2,ch3'])
