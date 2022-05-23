@@ -99,14 +99,6 @@ def log_data():
         #what info do we want? DAQs? number of channels? gain? sample rate? etc.
         #write sub-header from file
         writer.writerow(['GUID,Time,Ch0,ch1,ch2,ch3'])
-        #writer.writerow(["Reading 2 differential channels in milivolts with a sensor read frequency of " + str(sensor_read_time) + "."])
-        #writer.writerow(["Reading 4 channel(s) in milivolts with a sensor read frequency of " + str(sensor_read_time) + "."])
-        #writer.writerow(["Channel B is connected to nothing, Channel A is connected my old Op Amp from 35 years ago and then to a plant."])
-        #writer.writerow(["The plant is in a Faraday cage and the Pi 4 is in a Faraday cage inside the Faraday cage with a common ground."])
-        #writer.writerow(["Gain: " + str(a_gain) + ", Data Rate: " + str(a_data_rate) + ", Volts per Division: " + str(a_mv_per_division) + "."])
-        #writer.writerow(["Channels A and B are connected using a silver-silver chloride wire that I made myself."])
-        #writer.writerow(["Gain: " + str(b_gain) + ", Data Rate: " + str(b_data_rate) + ", Volts per Division: " + str(b_mv_per_division) + "."])
-        #writer.writerow(["Channel A Open Type: " + reader_type_a + "Channel B Open Type: " + reader_type_b + "."])
 
     while True:
         #log_event.wait(data_log_time)
@@ -114,8 +106,6 @@ def log_data():
         #print(daq_data)
         writer.writerow(daq_data)
 
-        #writer.writerow(["Channel A: " + str(a_time) + ", " + str(a_raw_value) + ", " + str(a_value)
-                         #+ '; Channel B: ' + str(b_time) + ", " + str(b_raw_value) + ", " + str(b_value)])
     file.close()
 
 read_event = threading.Event()
