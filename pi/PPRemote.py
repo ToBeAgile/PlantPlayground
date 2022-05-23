@@ -45,14 +45,15 @@ def read_sensor():
 def write_network():
     global daq_data
     #set up the network connection
-    host =  '192.168.4.39' # was '192.168.0.18' '127.0.1.1' #'192.168.0.4' #
+    host =  '192.168.4.39' #'192.168.4.39' # was '192.168.0.18' '127.0.1.1' #'192.168.0.4' #
     port = 50000
     #print("going into write network...")
     s = None
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        print("waiting for host...")
         s.connect((host, port))
-
+        print("Connected...")
     except socket.error as message:
         if s:
             s.close()
@@ -62,7 +63,7 @@ def write_network():
     while True:
         write_event.wait(1) #network_write_time)
         data_dict = daq_data
-        #print(data_dict)
+        print('helloww')#data_dict)
         serialized_data = pickle.dumps(data_dict)
         s.send(serialized_data)
 
