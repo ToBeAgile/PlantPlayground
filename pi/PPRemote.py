@@ -79,7 +79,7 @@ def log_data():
     #to_log = False #put into config
     dsi = DAQStreamInfo()
     daq_info = dsi.getConfig(ini_file_name)
-    print(daq_info.to_log)
+    #print(daq_info.to_log)
     if (daq_info.to_log == False):
         return
     
@@ -93,8 +93,11 @@ def log_data():
         file = open(full_path, 'w', newline='', buffering=1)            
         writer = csv.writer(file)
         #writer and write the header
-        writer.writerow(["Plant bioelectric data log ToBeAgile: Setup, File name: " + file_name])
-        writer.writerow(["Software: PlantPlayground, File: PPRemote.py, Version 0.3"])
+        writer.writerow(['Plant bioelectric data log: Setup, File name: ' + file_name])
+        writer.writerow(['Software: PlantPlayground, File: PPRemote.py, Version 0.4'])
+        #what info do we want? DAQs? number of channels? gain? sample rate? etc.
+        #write sub-header from file
+        writer.writerow(['GUID,Time,Ch0,ch1,ch2,ch3'])
         #writer.writerow(["Reading 2 differential channels in milivolts with a sensor read frequency of " + str(sensor_read_time) + "."])
         #writer.writerow(["Reading 4 channel(s) in milivolts with a sensor read frequency of " + str(sensor_read_time) + "."])
         #writer.writerow(["Channel B is connected to nothing, Channel A is connected my old Op Amp from 35 years ago and then to a plant."])
