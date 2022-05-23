@@ -54,7 +54,7 @@ def write_network():
         print("waiting for host...")
         s.connect((host, port))
         print("Connected...")
-    except socket.error as message:
+    except socket.error as message: 
         if s:
             s.close()
         print ("Unable to open the socket: " + str(message))
