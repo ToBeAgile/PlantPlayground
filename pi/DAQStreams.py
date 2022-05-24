@@ -9,15 +9,12 @@ import timeit, cmd, logging
 from abc import ABC, abstractmethod
 import uuid
 
-
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground/pi')
 from DAQStreamInfo import *
-
 
 def getGUID():
     id = uuid.uuid4()
     return id.hex
-
 
 class DaqStream(ABC):
     daq_info = None
@@ -329,6 +326,7 @@ class ADS1256Stream(DaqStream):
         self.ADC = ADS1256.ADS1256()
         self.ADC.ADS1256_init()
 
+        self.number_of_channels = self.daq_info.number_of_channels
         self.daqChannels = [0.0, 0.0, 0.0, 0.0]
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
         self.gain = int(self.daq_info.gain)
@@ -337,6 +335,12 @@ class ADS1256Stream(DaqStream):
         
         self.scan_mode = int(self.daq_info.scan_mode)
         self.ADC.ADS1256_SetMode(self.scan_mode)
+        if(self.scan_mode == 0):
+            for i in range(0, self.number_of_channels):
+                self.ADC.ADS1256_SetChannal(i)
+        elif(self.scan_mode == 1):
+            for i in range(0, self.number_of_channels):
+                self.ADC.ADS1256_SetDiffChannal(i)
 
         # General settings        
         self.sleep_between_reads = int(self.daq_info.sleep_between_reads)
@@ -349,12 +353,6 @@ class ADS1256Stream(DaqStream):
         self.low_chan = int(self.daq_info.low_chan)
         self.high_chan = int(self.daq_info.high_chan)
         # Set channels for single-ended (scan_mode = 0) and differential (scan_mode = 1), yes, channel is misspelled
-        if(self.scan_mode == 0):
-            for i in range(0, self.number_of_channels):
-                self.ADC.ADS1256_SetChannal(i)
-        elif(self.scan_mode == 1):
-            for i in range(0, self.number_of_channels):
-                self.ADC.ADS1256_SetDiffChannal(i)
         self.guid = getGUID()
 
 
