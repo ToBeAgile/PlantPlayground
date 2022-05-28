@@ -24,7 +24,10 @@ from DAQStreams import *
 ini_file_name = 'DAQStreams.ini'
 #global daq_data
 daq_data = list()
-    
+
+dsi = DAQStreamInfo()
+daq_info = dsi.getConfig(ini_file_name)
+
 def read_sensor():
     global daq_data
     #Calculated from settings read in from config file
@@ -70,18 +73,14 @@ def write_network():
 
 def log_data():
     global daq_data
+    if (daq_info.to_log == False):
+        return
+    
     now = datetime.datetime.now()
     folder_name = "../data/"
     project_code = "R0"
     file_name = project_code + "-" + now.strftime("%Y-%m-%d") + ".csv"
     full_path = folder_name + file_name
-    #file = open(full_path, 'a', newline='', buffering=1)
-    #to_log = False #put into config
-    dsi = DAQStreamInfo()
-    daq_info = dsi.getConfig(ini_file_name)
-    #print(daq_info.to_log)
-    if (daq_info.to_log == False):
-        return
     
     if os.path.isfile(full_path):
         #with open(full_path, 'a', newline='', buffering=1) as file:
@@ -114,8 +113,6 @@ log_event = threading.Event()
 #floats, ints, and dictionaries should all be thread safe in Python (floats and ints are immutable). Test this
 threading.Thread(target=read_sensor).start()
 threading.Thread(target=write_network).start()
-dsi = DAQStreamInfo()
-daq_info = dsi.getConfig(ini_file_name)
 if (daq_info.to_log == 'True'):
     threading.Thread(target=log_data).start()
 

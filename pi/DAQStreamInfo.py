@@ -49,12 +49,12 @@ class DAQStreamInfo:
         self.daq_to_use = config['Default']['daq_to_use']
         self.ads1115_sensor_type = config['Default']['ads1115_sensor_type']
         self.number_of_channels = config['Default']['number_of_channels']
-        self.data_log_frequency = int(config['Default']['data_log_frequency'])
+        self.data_log_frequency = float(config['Default']['data_log_frequency'])
         self.sensor_read_frequency = config['Default']['sensor_read_frequency']
         self.network_write_frequency = config['Default']['network_write_frequency']
         self.to_log = config['Default']['to_log']
         ###
-        self.sleep_between_reads = int(config['Default']['sleep_between_reads'])
+        self.sleep_between_reads = float(config['Default']['sleep_between_reads'])
         self.sleep_between_channels = float(config['Default']['sleep_between_channels'])
         self.number_of_channels = int(config['Default']['number_of_channels'])
         self.low_chan = int(config['Default']['low_chan'])
