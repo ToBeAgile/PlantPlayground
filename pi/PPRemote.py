@@ -41,6 +41,7 @@ def read_sensor():
     
     while True:
         daq_data = adc.readDaq()
+        #daq_data = adc.readDaq2(daq_method, conversion_method)
         #update to pass functions for read and convert to mV
         #print(daq_data)
  

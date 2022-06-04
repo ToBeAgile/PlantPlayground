@@ -328,7 +328,6 @@ class ADS1256Stream(DaqStream):
 
         self.number_of_channels = self.daq_info.number_of_channels
         self.daqChannels = [0.0, 0.0, 0.0, 0.0]
-        self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
         self.gain = int(self.daq_info.gain)
         self.data_rate = int(self.daq_info.data_rate) # 8, 16, 32, 64, 128, 250, 475, 860
         self.ADC.ADS1256_ConfigADC(self.gain, self.data_rate)
@@ -354,8 +353,14 @@ class ADS1256Stream(DaqStream):
         self.high_chan = int(self.daq_info.high_chan)
         # Set channels for single-ended (scan_mode = 0) and differential (scan_mode = 1), yes, channel is misspelled
         self.guid = getGUID()
+        self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
+        #set up for readDaq2
+        self.daq_method = self.ADC.ADS1256_GetChannalValue
+        self.conversion_method = self.no_conversion
 
-
+    def no_conversion(self) -> int:
+        return 1
+    
     def readDaq(self):
         if self.sleep_between_reads != -1:
             sleep(self.sleep_between_reads)
@@ -363,13 +368,13 @@ class ADS1256Stream(DaqStream):
         for ch in range(self.low_chan, self.high_chan + 1):
             if self.channels[ch] is True:
                 if (True): #self.scan_mode == 0): # 0 = Single-ended input  8 channel; 1 = Differential input  4 channe 
-                    self.daqChannels[ch] = self.ADC.ADS1256_GetChannalValue(ch) #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
-                '''elif (self.scan_mode == 1):
+                    self.daqChannels[ch] =  self.daq_method(ch) * self.conversion_method() #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
+                    #self.daqChannels[ch] = self.ADC.ADS1256_GetChannalValue(ch) #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
+                    #elif (self.scan_mode == 1):
                     #FIX THIS TO HANDLE DIFFERENTIAL READS (in open)
-                    adc_reading = 1 #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc_difference(ch, self.gain, self.data_rate)
-                    self.voltsPerDivision = ((2 * self.stream_info_dict[self.gain])/65535)*1000
-                    self.daqChannels[ch] = adc_reading * self.voltsPerDivision
-                '''
+                    #adc_reading = 1 #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc_difference(ch, self.gain, self.data_rate)
+                    #self.voltsPerDivision = ((2 * self.stream_info_dict[self.gain])/65535)*1000
+                    #self.daqChannels[ch] = adc_reading * self.voltsPerDivision
                 if self.sleep_between_channels != -1:
                     sleep(self.sleep_between_channels)
         sensor_data = list()
@@ -377,10 +382,22 @@ class ADS1256Stream(DaqStream):
         print ("ADS1256Stream sensor data: " + str(sensor_data))
         return sensor_data
 
-        #if (self.reader_type == 'differential_i2c'):
-        #self.value_raw = self.ads1115Runner.i2c_read(channel)
-        #return self.value_raw #* self.voltsPerDivision
-
+    def readDaq2(self, daq_method, conversion_method):
+        if self.sleep_between_reads != -1:
+            sleep(self.sleep_between_reads)
+        self.this_moment = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
+        for ch in range(self.low_chan, self.high_chan + 1):
+            if self.channels[ch] is True:
+                self.daqChannels[ch] = daq_method(ch) #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
+                self.daqChannels[ch] = self.daqChannels[ch] * conversion_method()
+                if self.sleep_between_channels != -1:
+                    sleep(self.sleep_between_channels)
+        sensor_data = list()
+        sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
+        print ("ADS1256Stream sensor data: " + str(sensor_data))
+        return sensor_data
+    
     def closeDaq(self):
         pass
+
 
