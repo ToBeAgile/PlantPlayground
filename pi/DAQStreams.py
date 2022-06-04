@@ -367,21 +367,16 @@ class ADS1256Stream(DaqStream):
         self.this_moment = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
         for ch in range(self.low_chan, self.high_chan + 1):
             if self.channels[ch] is True:
-                if (True): #self.scan_mode == 0): # 0 = Single-ended input  8 channel; 1 = Differential input  4 channe 
-                    self.daqChannels[ch] =  self.daq_method(ch) * self.conversion_method() #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
-                    #self.daqChannels[ch] = self.ADC.ADS1256_GetChannalValue(ch) #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
-                    #elif (self.scan_mode == 1):
-                    #FIX THIS TO HANDLE DIFFERENTIAL READS (in open)
-                    #adc_reading = 1 #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc_difference(ch, self.gain, self.data_rate)
-                    #self.voltsPerDivision = ((2 * self.stream_info_dict[self.gain])/65535)*1000
-                    #self.daqChannels[ch] = adc_reading * self.voltsPerDivision
+                #self.scan_mode == 0): # 0 = Single-ended input  8 channel; 1 = Differential input  4 channe 
+                self.daqChannels[ch] =  self.daq_method(ch) * self.conversion_method() #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
+                #self.daqChannels[ch] = self.ADC.ADS1256_GetChannalValue(ch) #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
                 if self.sleep_between_channels != -1:
                     sleep(self.sleep_between_channels)
         sensor_data = list()
         sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
         print ("ADS1256Stream sensor data: " + str(sensor_data))
         return sensor_data
-
+    '''
     def readDaq2(self, daq_method, conversion_method):
         if self.sleep_between_reads != -1:
             sleep(self.sleep_between_reads)
@@ -396,7 +391,7 @@ class ADS1256Stream(DaqStream):
         sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
         print ("ADS1256Stream sensor data: " + str(sensor_data))
         return sensor_data
-    
+    '''
     def closeDaq(self):
         pass
 
