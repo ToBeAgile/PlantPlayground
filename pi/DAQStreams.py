@@ -229,7 +229,7 @@ class ADS1115i2cStream(DaqStream):
     from pi.ADS1115Runner import ADS1115Runner
 
     sys.path.insert(1, '/home/pi/grove.py/')
-    from grove.adc import ADC
+    #from grove.adc import ADC
 
     GAIN = 16
     DATA_RATE = 8 # 8, 16, 32, 64, 128, 250, 475, 860
