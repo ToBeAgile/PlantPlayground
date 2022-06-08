@@ -71,34 +71,44 @@ def write_network():
         serialized_data = pickle.dumps(data_dict)
         s.send(serialized_data)
 
+def get_file_name() -> str:
+    now = datetime.datetime.now()
+    folder_name = "../data/"
+    project_code = "R0"
+    file_name = project_code + "-" + now.strftime("%Y-%m-%d") + ".csv"
+    full_path = folder_name + file_name
+    return full_path
+
+def append_to_exisiting_file():
+    #with open(full_path, 'a', newline='', buffering=1) as file:
+    #writer = csv.writer(file)
+    file = open(full_path, 'a', newline='', buffering=1)
+    writer = csv.writer(file)
+    return writer
+
+def open_new_file_and_write_header():
+    #with open(full_path, 'w', newline='', buffering=1) as file:
+    file = open(full_path, 'w', newline='', buffering=1)            
+    writer = csv.writer(file)
+    #writer and write the header
+    writer.writerow(['Plant bioelectric data log: Setup, File name: ' + file_name])
+    writer.writerow(['Software: PlantPlayground, File: PPRemote.py, Version 1.0'])
+    #do we want to create another file with the same GUID with details about the session?
+    #what info do we want? DAQs? number of channels? gain? sample rate? etc.
+    #write sub-header from file
+    writer.writerow(['GUID,Time,Ch0,ch1,ch2,ch3'])
+    return writer
 
 def log_data():
     global daq_data
     if (daq_info.to_log == False):
         return
     
-    now = datetime.datetime.now()
-    folder_name = "../data/"
-    project_code = "R0"
-    file_name = project_code + "-" + now.strftime("%Y-%m-%d") + ".csv"
-    full_path = folder_name + file_name
-    
+    full_path = get_file_name()
     if os.path.isfile(full_path):
-        #with open(full_path, 'a', newline='', buffering=1) as file:
-            #writer = csv.writer(file)
-        file = open(full_path, 'a', newline='', buffering=1)
-        writer = csv.writer(file)
+        writer = append_to_existing_file()
     else:
-        #with open(full_path, 'w', newline='', buffering=1) as file:
-        file = open(full_path, 'w', newline='', buffering=1)            
-        writer = csv.writer(file)
-        #writer and write the header
-        writer.writerow(['Plant bioelectric data log: Setup, File name: ' + file_name])
-        writer.writerow(['Software: PlantPlayground, File: PPRemote.py, Version 1.0'])
-        #do we want to create another file with the same GUID with details about the session?
-        #what info do we want? DAQs? number of channels? gain? sample rate? etc.
-        #write sub-header from file
-        writer.writerow(['GUID,Time,Ch0,ch1,ch2,ch3'])
+        writer = open_new_file_and_write_header()
 
     while True:
         #log_event.wait(data_log_time)
