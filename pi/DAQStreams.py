@@ -57,7 +57,7 @@ class DaqStream(ABC):
                     sleep(self.sleep_between_channels)
         sensor_data = list()
         sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
-        print ("ADS1256Stream sensor data: " + str(sensor_data))
+        print ("DAQStream sensor data: " + str(sensor_data))
         return sensor_data
 
     @abstractmethod
@@ -338,25 +338,10 @@ class ADS1256Stream(DaqStream):
 
         sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
         import pi.ADS1256 as ADS1256
-        self.ADC = ADS1256.ADS1256()
-        self.ADC.ADS1256_init()
-
+        
+        # General settings        
         self.number_of_channels = self.daq_info.number_of_channels
         self.daqChannels = [0.0, 0.0, 0.0, 0.0]
-        self.gain = int(self.daq_info.gain)
-        self.data_rate = int(self.daq_info.data_rate) # 8, 16, 32, 64, 128, 250, 475, 860
-        self.ADC.ADS1256_ConfigADC(self.gain, self.data_rate)
-        
-        self.scan_mode = int(self.daq_info.scan_mode)
-        self.ADC.ADS1256_SetMode(self.scan_mode)
-        if(self.scan_mode == 0):
-            for i in range(0, self.number_of_channels):
-                self.ADC.ADS1256_SetChannal(i)
-        elif(self.scan_mode == 1):
-            for i in range(0, self.number_of_channels):
-                self.ADC.ADS1256_SetDiffChannal(i)
-
-        # General settings        
         self.sleep_between_reads = int(self.daq_info.sleep_between_reads)
         # -1 = don't give away the time slice
         self.sleep_between_channels = float(self.daq_info.sleep_between_channels)
@@ -369,7 +354,25 @@ class ADS1256Stream(DaqStream):
         # Set channels for single-ended (scan_mode = 0) and differential (scan_mode = 1), yes, channel is misspelled
         self.guid = getGUID()
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
-        #set up for readDaq2
+
+        # ADS1256 Specific Setting
+        self.ADC = ADS1256.ADS1256()
+        self.ADC.ADS1256_init()
+
+        self.gain = int(self.daq_info.gain)
+        self.data_rate = int(self.daq_info.data_rate) # 8, 16, 32, 64, 128, 250, 475, 860
+        self.ADC.ADS1256_ConfigADC(self.gain, self.data_rate)
+        
+        self.scan_mode = int(self.daq_info.scan_mode)
+        self.ADC.ADS1256_SetMode(self.scan_mode)
+        if(self.scan_mode == 0):
+            for i in range(0, self.number_of_channels):
+                self.ADC.ADS1256_SetChannal(i)
+        elif(self.scan_mode == 1):
+            for i in range(0, self.number_of_channels):
+                self.ADC.ADS1256_SetDiffChannal(i)
+        
+        #set up for readDaq
         self.daq_method = self.ADC.ADS1256_GetChannalValue
         self.conversion_method = self.no_conversion
 
