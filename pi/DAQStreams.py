@@ -56,9 +56,6 @@ class DaqStream(ABC):
         self.daq_method = None
         self.conversion_method = None
         
-    def no_conversion(self) -> int:
-        return 1
-                
     #@abstractmethod
     def openDaq(self):
         # General settings        
@@ -76,8 +73,8 @@ class DaqStream(ABC):
         # Set channels for single-ended (scan_mode = 0) and differential (scan_mode = 1), yes, channel is misspelled
         self.guid = getGUID()
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
-        self.daq_method = self.ADC.ADS1256_GetChannalValue()
-        self.conversion_method = no_conversion()
+        #self.daq_method = self.ADC.ADS1256_GetChannalValue()
+        #self.conversion_method = no_conversion()
         
 
     #@abstractmethod
@@ -92,7 +89,7 @@ class DaqStream(ABC):
             if self.daq_info.channels[ch] is True:
                 #self.scan_mode == 0): # 0 = Single-ended input  8 channel; 1 = Differential input  4 channe 
                 #self.daqChannels[ch] = self.daq_method(ch)
-                self.daqChannels[ch] =  self.daq_method(ch) #* self.conversion_method() #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
+                self.daqChannels[ch] =  self.daq_method(ch) * self.conversion_method() #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
                 #self.ADC.ADS1256_GetChannalValue(ch) #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
                 if self.daq_info.sleep_between_channels != -1:
                     sleep(self.daq_info.sleep_between_channels)
@@ -414,8 +411,16 @@ class ADS1256Stream(DaqStream):
                 self.ADC.ADS1256_SetDiffChannal(i)
         
         #set up for readDaq
-        self.daq_method = self.ADC.ADS1256_GetChannalValue
+        #self.daq_method = self.ADC.ADS1256_GetChannalValue
         #self.conversion_method = self.no_conversion
+                
+        self.daq_method = self.ADC.ADS1256_GetChannalValue
+        self.conversion_method = self.no_conversion
+                                 
+    def no_conversion(self) -> int:
+        return 1
+                
+
 
     '''    
     def readDaq(self):
