@@ -30,10 +30,6 @@ daq_info = dsi.getConfig(ini_file_name)
 
 def read_sensor():
     global daq_data
-    #Calculated from settings read in from config file
-    #sensor_read_time = float(1/float(0.1)) #(dsi.sensor_read_frequency))
-    #network_write_time = float(1/float(10)) #(dsi.network_write_frequency))
-    #data_log_time = float(1/float(1)) #(dsi.data_log_frequency))
     
     # Determine which DAQ to use
     adc = DaqStream.getInstance()
@@ -41,10 +37,8 @@ def read_sensor():
     
     while True:
         daq_data = adc.readDaq()
-        #daq_data = adc.readDaq2(daq_method, conversion_method)
-        #update to pass functions for read and convert to mV
-        #print(daq_data)
- 
+
+
 #fix this by comparing to early working version
 def write_network():
     global daq_data
@@ -87,10 +81,9 @@ def append_to_exisiting_file():
     return writer
 
 def open_new_file_and_write_header():
-    #with open(full_path, 'w', newline='', buffering=1) as file:
     file = open(full_path, 'w', newline='', buffering=1)            
     writer = csv.writer(file)
-    #writer and write the header
+    #write the header
     writer.writerow(['Plant bioelectric data log: Setup, File name: ' + file_name])
     writer.writerow(['Software: PlantPlayground, File: PPRemote.py, Version 1.0'])
     #do we want to create another file with the same GUID with details about the session?
