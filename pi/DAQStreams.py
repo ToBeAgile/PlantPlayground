@@ -153,24 +153,10 @@ class MCC128Daq(DaqStream):
     def no_conversion(self) -> int:
         return 1
     
-    def readDaq2(self):
-        if self.sleep_between_reads != -1:
-            sleep(self.sleep_between_reads)
-        self.this_moment = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
-        for ch in range(self.low_chan, self.high_chan + 1):
-            if self.channels[ch] is True:
-                self.daqChannels[ch] = self.hat.a_in_read(ch)
-                if self.sleep_between_channels != -1:
-                    sleep(self.sleep_between_channels)
-        sensor_data = list()
-        sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
-        print (sensor_data)
-        return sensor_data
-
     def closeDaq(self):
         pass
 
-
+#CLASSES: ADS1115SingleEnded, ADS1115Differential
 class ADS1115Stream(DaqStream):
     daq_info = None
     gain = None
@@ -237,7 +223,7 @@ class ADS1115Stream(DaqStream):
     def closeDaq(self):
         pass
 
-
+#CLASSES: ADS1115i2cSingleEnded, ADS1115i2cDifferential
 class ADS1115i2cStream(DaqStream):
     import smbus2, RPi.GPIO as GPIO
     import Adafruit_ADS1x15
