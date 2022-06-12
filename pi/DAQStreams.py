@@ -110,6 +110,46 @@ class DaqStream(ABC):
     def closeDaq(self):
         pass
 
+class ADS1256Stream(DaqStream):
+
+    @staticmethod
+    def getInstance():
+        return ADS1256Stream()
+
+    def openDaq(self):
+        super().openDaq()
+
+        import time
+        import RPi.GPIO as GPIO
+
+        # ADS1256 Specific Setting
+        sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
+        import pi.ADS1256 as ADS1256
+        self.ADC = ADS1256.ADS1256()
+        self.ADC.ADS1256_init()
+        self.gain = int(self.daq_info.gain)
+        self.data_rate = int(self.daq_info.data_rate) # 8, 16, 32, 64, 128, 250, 475, 860
+        self.ADC.ADS1256_ConfigADC(self.gain, self.data_rate)
+        
+        self.scan_mode = int(self.daq_info.scan_mode)
+        self.ADC.ADS1256_SetMode(self.scan_mode)
+        if(self.scan_mode == 0):
+            for i in range(0, self.daq_info.number_of_channels):
+                self.ADC.ADS1256_SetChannal(i)
+        elif(self.scan_mode == 1):
+            for i in range(0, self.number_of_channels):
+                self.ADC.ADS1256_SetDiffChannal(i)
+                
+        self.daq_method = self.ADC.ADS1256_GetChannalValue
+        self.conversion_method = self.no_conversion
+                                 
+    def no_conversion(self) -> int: 
+        return 1
+                
+    def closeDaq(self):
+        pass
+    
+
 class MCC128Daq(DaqStream):
     
     def openDaq(self):
@@ -322,45 +362,6 @@ class ADS1115i2cStream(DaqStream):
         #self.value_raw = self.ads1115Runner.i2c_read(channel)
         #return self.value_raw #* self.voltsPerDivision
 
-    def closeDaq(self):
-        pass
-
-class ADS1256Stream(DaqStream):
-
-    @staticmethod
-    def getInstance():
-        return ADS1256Stream()
-
-    def openDaq(self):
-        super().openDaq()
-
-        import time
-        import RPi.GPIO as GPIO
-
-        # ADS1256 Specific Setting
-        sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
-        import pi.ADS1256 as ADS1256
-        self.ADC = ADS1256.ADS1256()
-        self.ADC.ADS1256_init()
-        self.gain = int(self.daq_info.gain)
-        self.data_rate = int(self.daq_info.data_rate) # 8, 16, 32, 64, 128, 250, 475, 860
-        self.ADC.ADS1256_ConfigADC(self.gain, self.data_rate)
-        
-        self.scan_mode = int(self.daq_info.scan_mode)
-        self.ADC.ADS1256_SetMode(self.scan_mode)
-        if(self.scan_mode == 0):
-            for i in range(0, self.daq_info.number_of_channels):
-                self.ADC.ADS1256_SetChannal(i)
-        elif(self.scan_mode == 1):
-            for i in range(0, self.number_of_channels):
-                self.ADC.ADS1256_SetDiffChannal(i)
-                
-        self.daq_method = self.ADC.ADS1256_GetChannalValue
-        self.conversion_method = self.no_conversion
-                                 
-    def no_conversion(self) -> int: 
-        return 1
-                
     def closeDaq(self):
         pass
 
