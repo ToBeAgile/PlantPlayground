@@ -71,10 +71,33 @@ class DaqStream(ABC):
         self.low_chan = int(self.daq_info.low_chan)
         self.high_chan = int(self.daq_info.high_chan)
         
+        try:
+            # Ensure low_chan and high_chan are valid.
+            if self.low_chan < 0 or self.low_chan >= self.number_of_channels:
+                error_message = ('Error: Invalid low_chan selection - must be '
+                                 '0 - {0:d}'.format(self.number_of_channels - 1))
+                raise Exception(error_message)
+            if self.high_chan < 0 or self.high_chan >= self.number_of_channels:
+                error_message = ('Error: Invalid high_chan selection - must be '
+                                 '0 - {0:d}'.format(self.number_of_channels - 1))
+                raise Exception(error_message)
+            if self.low_chan > self.high_chan:
+                error_message = ('Error: Invalid channels - high_chan must be '
+                                 'greater than or equal to low_chan')
+                raise Exception(error_message)
+        except:
+            print('Channel setup error...')
+            
+        self.dac_method = self.hat.a_in_read(ch)
+        self.conversion_method = self.no_conversion
+                                 
         self.guid = getGUID()
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
         #print("DaqStreams Open...")
         
+    def no_conversion(self) -> int:
+        return 1
+       
     def readDaq(self):
         if self.daq_info.sleep_between_reads != -1:
             sleep(self.daq_info.sleep_between_reads)
@@ -104,7 +127,7 @@ class MCC128Daq(DaqStream):
 
         dsi = DAQStreamInfo()
         daq_info = dsi.getConfig(ini_file_name)
-
+        '''
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
         self.guid = getGUID()
         self.daqChannels = [0.0, 0.0, 0.0, 0.0]
@@ -117,7 +140,7 @@ class MCC128Daq(DaqStream):
         self.high_chan = daq_info.high_chan
         self.channels = daq_info.channels
         self.sensor_type = daq_info.sensor_type
-
+        '''
         # MCC128-specific settings
         self.analog_input_range = daq_info.analog_input_range
         assert( self.analog_input_range == 'AnalogInputRange.BIP_10V')
@@ -138,23 +161,32 @@ class MCC128Daq(DaqStream):
         elif (daq_info.input_range == AnalogInputRange.BIP_1V):
             self.input_range = AnalogInputRange.BIP_1V  # BIP_10V
         self.sample_interval = daq_info.sample_interval #0.1  # 0.5  # Seconds
-        self.mcc_128_num_channels = daq_info.number_of_channels #mcc128.info().NUM_AI_CHANNELS[self.input_mode]
+        self.number_of_channels = daq_info.number_of_channels #mcc128.info().NUM_AI_CHANNELS[self.input_mode]
         self.myHatError = HatError
+        # Get an instance of the selected hat device object.
+        address = select_hat_device(HatIDs.MCC_128)
+        self.hat = mcc128(address)
 
+        self.hat.a_in_mode_write(self.input_mode)
+        self.hat.a_in_range_write(self.input_range)
+        self.sensor = self.hat
+
+        '''
         try:
             # Ensure low_chan and high_chan are valid.
-            if self.low_chan < 0 or self.low_chan >= self.mcc_128_num_channels:
+            if self.low_chan < 0 or self.low_chan >= self.number_of_channels:
                 error_message = ('Error: Invalid low_chan selection - must be '
-                                 '0 - {0:d}'.format(self.mcc_128_num_channels - 1))
+                                 '0 - {0:d}'.format(self.number_of_channels - 1))
                 raise Exception(error_message)
-            if self.high_chan < 0 or self.high_chan >= self.mcc_128_num_channels:
+            if self.high_chan < 0 or self.high_chan >= self.number_of_channels:
                 error_message = ('Error: Invalid high_chan selection - must be '
-                                 '0 - {0:d}'.format(self.mcc_128_num_channels - 1))
+                                 '0 - {0:d}'.format(self.number_of_channels - 1))
                 raise Exception(error_message)
             if self.low_chan > self.high_chan:
                 error_message = ('Error: Invalid channels - high_chan must be '
                                  'greater than or equal to low_chan')
                 raise Exception(error_message)
+            
             # Get an instance of the selected hat device object.
             address = select_hat_device(HatIDs.MCC_128)
             self.hat = mcc128(address)
@@ -162,11 +194,9 @@ class MCC128Daq(DaqStream):
             self.hat.a_in_mode_write(self.input_mode)
             self.hat.a_in_range_write(self.input_range)
             self.sensor = self.hat
-
-        except (self.myHatError, ValueError) as error:
-            print('\n', error)
+            '''
     
-    def readDaq(self):
+    def readDaq2(self):
         if self.sleep_between_reads != -1:
             sleep(self.sleep_between_reads)
         self.this_moment = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
