@@ -73,6 +73,7 @@ class DaqStream(ABC):
         
         self.guid = getGUID()
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
+        #print("DaqStreams Open...")
         
     def readDaq(self):
         if self.daq_info.sleep_between_reads != -1:
@@ -358,6 +359,9 @@ class ADS1256Stream(DaqStream):
         return ADS1256Stream()
 
     def openDaq(self):
+        super().openDaq()
+        #print("ADS1256Stream Open...")
+
         import time
         import RPi.GPIO as GPIO
 
