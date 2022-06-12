@@ -88,16 +88,9 @@ class DaqStream(ABC):
         except:
             print('Channel setup error...')
             
-        self.dac_method = self.hat.a_in_read(ch)
-        self.conversion_method = self.no_conversion
-                                 
         self.guid = getGUID()
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
-        #print("DaqStreams Open...")
-        
-    def no_conversion(self) -> int:
-        return 1
-       
+                                        
     def readDaq(self):
         if self.daq_info.sleep_between_reads != -1:
             sleep(self.daq_info.sleep_between_reads)
@@ -124,44 +117,27 @@ class MCC128Daq(DaqStream):
             AnalogInputRange
         from daqhats_utils import select_hat_device, enum_mask_to_string, \
             input_mode_to_string, input_range_to_string
-
-        dsi = DAQStreamInfo()
-        daq_info = dsi.getConfig(ini_file_name)
-        '''
-        self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
-        self.guid = getGUID()
-        self.daqChannels = [0.0, 0.0, 0.0, 0.0]
-        
-        #general config settings
-        self.sleep_between_reads = daq_info.sleep_between_reads
-        self.sleep_between_channels = daq_info.sleep_between_channels
-        self.number_of_channels = daq_info.number_of_channels
-        self.low_chan = daq_info.low_chan
-        self.high_chan = daq_info.high_chan
-        self.channels = daq_info.channels
-        self.sensor_type = daq_info.sensor_type
-        '''
         # MCC128-specific settings
-        self.analog_input_range = daq_info.analog_input_range
+        self.analog_input_range = self.daq_info.analog_input_range
         assert( self.analog_input_range == 'AnalogInputRange.BIP_10V')
         #self.reader_type = 'differential'  # or 'single-ended'
-        self.reader_type = daq_info.reader_type
+        self.reader_type = self.daq_info.reader_type
                 
-        self.options = daq_info.options
+        self.options = self.daq_info.options
         self.input_mode = AnalogInputMode.DIFF
         #self.input_mode = daq_info.input_mode #AnalogInputMode.DIFF  # or SE
-        if(daq_info.options == 'AnalogInputMode.DIFF'):
+        if(self.daq_info.options == 'AnalogInputMode.DIFF'):
             self.input_mode = AnalogInputMode.DIFF
-        elif(daq_info.options == AnalogInputMode.SE):
+        elif(self.daq_info.options == AnalogInputMode.SE):
             self.input_mode = AnalogInputMode.SE
         #self.daq_info.input_range #AnalogInputRange.BIP_10V
         self.input_range = AnalogInputRange.BIP_10V 
-        if (daq_info.input_range == AnalogInputRange.BIP_10V):    
+        if (self.daq_info.input_range == AnalogInputRange.BIP_10V):    
             self.input_range = AnalogInputRange.BIP_10V  # BIP_1V
-        elif (daq_info.input_range == AnalogInputRange.BIP_1V):
+        elif (self.daq_info.input_range == AnalogInputRange.BIP_1V):
             self.input_range = AnalogInputRange.BIP_1V  # BIP_10V
-        self.sample_interval = daq_info.sample_interval #0.1  # 0.5  # Seconds
-        self.number_of_channels = daq_info.number_of_channels #mcc128.info().NUM_AI_CHANNELS[self.input_mode]
+        self.sample_interval = self.daq_info.sample_interval #0.1  # 0.5  # Seconds
+        self.number_of_channels = self.daq_info.number_of_channels #mcc128.info().NUM_AI_CHANNELS[self.input_mode]
         self.myHatError = HatError
         # Get an instance of the selected hat device object.
         address = select_hat_device(HatIDs.MCC_128)
@@ -170,31 +146,12 @@ class MCC128Daq(DaqStream):
         self.hat.a_in_mode_write(self.input_mode)
         self.hat.a_in_range_write(self.input_range)
         self.sensor = self.hat
-
-        '''
-        try:
-            # Ensure low_chan and high_chan are valid.
-            if self.low_chan < 0 or self.low_chan >= self.number_of_channels:
-                error_message = ('Error: Invalid low_chan selection - must be '
-                                 '0 - {0:d}'.format(self.number_of_channels - 1))
-                raise Exception(error_message)
-            if self.high_chan < 0 or self.high_chan >= self.number_of_channels:
-                error_message = ('Error: Invalid high_chan selection - must be '
-                                 '0 - {0:d}'.format(self.number_of_channels - 1))
-                raise Exception(error_message)
-            if self.low_chan > self.high_chan:
-                error_message = ('Error: Invalid channels - high_chan must be '
-                                 'greater than or equal to low_chan')
-                raise Exception(error_message)
-            
-            # Get an instance of the selected hat device object.
-            address = select_hat_device(HatIDs.MCC_128)
-            self.hat = mcc128(address)
-
-            self.hat.a_in_mode_write(self.input_mode)
-            self.hat.a_in_range_write(self.input_range)
-            self.sensor = self.hat
-            '''
+        
+        self.daq_method = self.hat.a_in_read
+        self.conversion_method = self.no_conversion
+                                 
+    def no_conversion(self) -> int:
+        return 1
     
     def readDaq2(self):
         if self.sleep_between_reads != -1:
@@ -390,7 +347,6 @@ class ADS1256Stream(DaqStream):
 
     def openDaq(self):
         super().openDaq()
-        #print("ADS1256Stream Open...")
 
         import time
         import RPi.GPIO as GPIO
@@ -415,8 +371,9 @@ class ADS1256Stream(DaqStream):
                 
         self.daq_method = self.ADC.ADS1256_GetChannalValue
         self.conversion_method = self.no_conversion
+        print(daq_method)
                                  
-    def no_conversion(self) -> int:
+    def no_conversion(self) -> int: 
         return 1
                 
     def closeDaq(self):
