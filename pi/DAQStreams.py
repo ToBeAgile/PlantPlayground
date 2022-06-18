@@ -159,10 +159,9 @@ class MCC128Daq(DaqStream):
             input_mode_to_string, input_range_to_string
         # MCC128-specific settings
         self.analog_input_range = self.daq_info.analog_input_range
-        assert( self.analog_input_range == 'AnalogInputRange.BIP_10V')
+        #assert( self.analog_input_range == 'AnalogInputRange.BIP_10V')
         #self.reader_type = 'differential'  # or 'single-ended'
         self.reader_type = self.daq_info.reader_type
-                
         self.options = self.daq_info.options
         self.input_mode = AnalogInputMode.DIFF
         #self.input_mode = daq_info.input_mode #AnalogInputMode.DIFF  # or SE
@@ -196,7 +195,6 @@ class MCC128Daq(DaqStream):
     def closeDaq(self):
         pass
 
-#CLASSES: ADS1115SingleEnded, ADS1115Differential
 class ADS1115Stream(DaqStream):
     daq_info = None
     gain = None
@@ -219,47 +217,25 @@ class ADS1115Stream(DaqStream):
         self.daqChannels = [0.0, 0.0, 0.0, 0.0]
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
 
-        #GAIN = 16
         self.gain = int(self.daq_info.gain)
         self.data_rate = int(self.daq_info.data_rate) # 8, 16, 32, 64, 128, 250, 475, 860
 
         ads1115Runner = ADS1115Runner()
         self.adc = Adafruit_ADS1x15.ADS1115()
         
-        # General settings        
-        self.sleep_between_reads = int(self.daq_info.sleep_between_reads)
-        # -1 = don't give away the time slice
-        self.sleep_between_channels = float(self.daq_info.sleep_between_channels)
-        self.number_of_channels = int(self.daq_info.number_of_channels)
-        self.channels = self.daq_info.channels #[True, True, True, True] #self.daq_info.channels #[True, True, True, True] #self.daq_info.channels #
-        #self.ads1115_sensor_type = 'differential_value_read' #'single_value_read' # 'differential_value_read'
-        self.ads1115_sensor_type = self.daq_info.ads1115_sensor_type
-        assert (self.ads1115_sensor_type == 'differential_value_read')
-        ####
-        self.low_chan = int(self.daq_info.low_chan)
-        self.high_chan = int(self.daq_info.high_chan)
-
         self.guid = getGUID()
+        
+        if (self.daq_info.reader_type == 'single_ended'):         
+            self.daq_method = self.adc.read_adc #(ch, self.gain, self.data_rate)
+        else:
+            self.daq_method = self.adc.read_adc_difference #(ch, self.gain, self.data_rate)
 
-    def readDaq(self):
-        if self.sleep_between_reads != -1:
-            sleep(self.sleep_between_reads)
-        self.this_moment = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
-        for ch in range(self.low_chan, self.high_chan + 1):
-            if self.channels[ch] is True:
-                if (self.ads1115_sensor_type == 'single_value_read'):         
-                    self.daqChannels[ch] = self.adc.read_adc(ch, self.gain, self.data_rate)
-                elif (self.ads1115_sensor_type == 'differential_value_read'):
-                    adc_reading = self.adc.read_adc_difference(ch, self.gain, self.data_rate)
-                    self.voltsPerDivision = ((2 * self.stream_info_dict[self.gain])/65535)*1000
-                    self.daqChannels[ch] = adc_reading * self.voltsPerDivision
-                if self.sleep_between_channels != -1:
-                    sleep(self.sleep_between_channels)
-        sensor_data = list()
-        sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
-        print ("ADS1115Stream sensor data: " + str(sensor_data))
-        return sensor_data
-
+        self.conversion_method = self.convert_to_volts
+                                 
+    def convert_to_volts(self) -> int:
+        voltsPerDivision = ((2 * self.stream_info_dict[self.gain])/65535)*1000
+        return voltsPerDivision
+                
     def closeDaq(self):
         pass
 
