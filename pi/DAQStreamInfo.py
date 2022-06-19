@@ -1,4 +1,4 @@
-# DAQStreamInfo.py 1.0 - May 23, 2022 (c)reated by David Scott Bernstein
+# DAQStreamInfo.py 1.0 - May 23, 2022 - June 19, 2022 (c)reated by David Scott Bernstein
 # DAQStreamInfo.py - config file handling called by DAQStreams.py
 import configparser
 import ast
@@ -38,8 +38,6 @@ class DAQStreamInfo:
         ###
         self.gain = None
         self.data_rate = None
-        self.ads1115_sensor_type = None
-        self.ads1256_sensor_type = None
         self.scan_mode = 0
 
     def getConfig(self, ini_file_name):
@@ -71,11 +69,6 @@ class DAQStreamInfo:
         self.device = config['Default']['Device']
         self.num_channels = config['Default']['NumChannels']
         self.hat_error = config['Default']['mcc_hat_error']
-        # ADS1115 settings
         self.gain = config['Default']['gain']
         self.data_rate = config['Default']['data_rate']
-        #self.ads1115_sensor_type = config['Default']['ads1115_sensor_type']
-        # ADS1256 settings
-        self.ads1256_sensor_type = config['Default']['ads1256_sensor_type']
-        self.ScanMode = config['Default']['ScanMode']
         return self

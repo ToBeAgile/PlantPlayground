@@ -1,7 +1,6 @@
-# DAQStreams.py 1.0 - May 8, 2022 (c)reated by David Scott Bernstein
+# DAQStreams.py 1.0 - May 8, 2022 - June 19, 2022 (c)reated by David Scott Bernstein
 # DAQStreams.py - Supports multiple DAQs, called by PPRemote.py
-# Supported DAQs: MCC128, ADS1115, ADS1115i2c, ADS1256
-#from __future__ import print_function
+# Supported DAQs: ADS1256, MCC128, ADS1115, ADS1115i2c
 from time import sleep
 import sys
 import datetime
@@ -56,18 +55,17 @@ class DaqStream(ABC):
         self.daq_method = None
         self.conversion_method = None
         
-    #@abstractmethod
+    @abstractmethod
+    # This method is abstract because a subclass must define and return a daq_method that readDaq will call
     def openDaq(self) -> callable:
         # General settings        
         self.number_of_channels = self.daq_info.number_of_channels
         self.daqChannels = [0.0, 0.0, 0.0, 0.0]
         self.sleep_between_reads = int(self.daq_info.sleep_between_reads)
-        # -1 = don't give away the time slice
         self.sleep_between_channels = float(self.daq_info.sleep_between_channels)
         self.number_of_channels = int(self.daq_info.number_of_channels)
-        self.channels = self.daq_info.channels #[True, True, True, True] #self.daq_info.channels #[True, True, True, True] #self.daq_info.channels #
-        #self.ads1115_sensor_type = 'differential_value_read' #'single_value_read' # 'differential_value_read'
-        self.ads1256_sensor_type = self.daq_info.ads1256_sensor_type
+        self.channels = self.daq_info.channels
+        #self.ads1256_sensor_type = self.daq_info.ads1256_sensor_type
         self.low_chan = int(self.daq_info.low_chan)
         self.high_chan = int(self.daq_info.high_chan)
         
@@ -90,18 +88,16 @@ class DaqStream(ABC):
             
         self.guid = getGUID()
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
-                               
+    
+    # This generic read works for any DAQ by passing in the daq_method() to use
+    # This function pointer is returned by the the subclasses openDaq method and passed into this method to call
     def readDaq(self, daq_method):
-        # This is the generic read for any DAQ by passing in the daq_method() and conversion_method() to call
-        # These function pointers are defined the the subclasses openDaq method
         if self.daq_info.sleep_between_reads != -1:
             sleep(self.daq_info.sleep_between_reads)
         self.this_moment = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
         for ch in range(self.daq_info.low_chan, self.daq_info.high_chan + 1):
             if self.daq_info.channels[ch] is True:
-                #self.scan_mode == 0): # 0 = Single-ended input  8 channel; 1 = Differential input  4 channe 
-                self.daqChannels[ch] =  daq_method(ch) #* self.conversion_method() #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
-                #self.ADC.ADS1256_GetChannalValue(ch) #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
+                self.daqChannels[ch] =  daq_method(ch)
                 if self.daq_info.sleep_between_channels != -1:
                     sleep(self.daq_info.sleep_between_channels)
         sensor_data = list()
@@ -119,8 +115,6 @@ class ADS1256Stream(DaqStream):
         return ADS1256Stream()
 
     def openDaq(self):
-        super().openDaq()
-
         import time
         import RPi.GPIO as GPIO
 
@@ -132,8 +126,12 @@ class ADS1256Stream(DaqStream):
         self.gain = int(self.daq_info.gain)
         self.data_rate = int(self.daq_info.data_rate) # 8, 16, 32, 64, 128, 250, 475, 860
         self.ADC.ADS1256_ConfigADC(self.gain, self.data_rate)
+        self.sensor_type = self.daq_info.sensor_type
         
-        self.scan_mode = int(self.daq_info.scan_mode)
+        if self.sensor_type == 'single_ended':
+            self.scan_mode = 0
+        else: # sensor_type defaults to differntial
+            self.scan_mode = 1
         self.ADC.ADS1256_SetMode(self.scan_mode)
         if(self.scan_mode == 0): # Single_ended mode
             for i in range(0, self.daq_info.number_of_channels):
@@ -321,30 +319,6 @@ class ADS1115i2cStream(DaqStream):
         voltsPerDivision = ((2 * self.stream_info_dict[self.gain])/65535)*1000
         return voltsPerDivision
 
-    '''
-    def readDaq(self):
-        if self.sleep_between_reads != -1:
-            sleep(self.sleep_between_reads)
-        self.this_moment = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
-        for ch in range(self.low_chan, self.high_chan + 1):
-            if self.channels[ch] is True:
-                if (self.ads1115_sensor_type == 'single_value_read'):         
-                    self.daqChannels[ch] = self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
-                elif (self.ads1115_sensor_type == 'differential_value_read'):
-                    adc_reading = self.ads1115Runner.i2c_read(ch) #self.adc.read_adc_difference(ch, self.gain, self.data_rate)
-                    self.voltsPerDivision = ((2 * self.stream_info_dict[self.gain])/65535)*1000
-                    self.daqChannels[ch] = adc_reading * self.voltsPerDivision
-                if self.sleep_between_channels != -1:
-                    sleep(self.sleep_between_channels)
-        sensor_data = list()
-        sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
-        print ("ADS1115i2cStream sensor data: " + str(sensor_data))
-        return sensor_data
-
-        #if (self.reader_type == 'differential_i2c'):
-        #self.value_raw = self.ads1115Runner.i2c_read(channel)
-        #return self.value_raw #* self.voltsPerDivision
-    '''
     def closeDaq(self):
         pass
 

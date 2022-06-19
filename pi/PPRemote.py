@@ -1,10 +1,9 @@
-# PPRemote.py 1.0 - May 8, 2022 (c)reated by David Scott Bernstein
+# PPRemote.py 1.0 - May 8, 2022 - June 19, 2022 (c)reated by David Scott Bernstein
 # PPRemote.py - Remote Data Aquisition, Logger, and network broadcaster
 
 ''' Next:
-Get all channels on ASDS1256 working
 Verify readings from ADS1256 using potentimeter
-Clean up loggin headers
+Clean up logging headers
 
 ''' 
 import socket
@@ -119,10 +118,6 @@ threading.Thread(target=read_sensor).start()
 threading.Thread(target=write_network).start()
 if (daq_info.to_log == 'True'):
     threading.Thread(target=log_data).start()
-
-#class GettingStartedTest(unittest.TestCase):
-#    def test_simple(self):
-#        verify("Hello ApprovalTests")
 
 #if __name__ == "__main__":
 #    unittest.main()
