@@ -191,6 +191,7 @@ class MCC128Daq(DaqStream):
         
         self.daq_method = self.hat.a_in_read
         self.conversion_method = self.no_conversion
+        return self.daq_method
                                  
     def no_conversion(self) -> int:
         return 1
