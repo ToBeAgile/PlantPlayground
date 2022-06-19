@@ -288,29 +288,14 @@ class ADS1115i2cStream(DaqStream):
         self.daqChannels = [0.0, 0.0, 0.0, 0.0]
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
 
-        #GAIN = 16
         self.gain = int(self.daq_info.gain)
         self.data_rate = int(self.daq_info.data_rate) # 8, 16, 32, 64, 128, 250, 475, 860
-
-        # General settings        
-        self.sleep_between_reads = int(self.daq_info.sleep_between_reads)
-        # -1 = don't give away the time slice
-        self.sleep_between_channels = float(self.daq_info.sleep_between_channels)
-        self.number_of_channels = int(self.daq_info.number_of_channels)
-        self.channels = self.daq_info.channels #[True, True, True, True] #self.daq_info.channels #[True, True, True, True] #self.daq_info.channels #
-        #self.ads1115_sensor_type = 'differential_value_read' #'single_value_read' # 'differential_value_read'
-        self.ads1115_sensor_type = self.daq_info.ads1115_sensor_type
-        self.low_chan = int(self.daq_info.low_chan)
-        self.high_chan = int(self.daq_info.high_chan)
-        self.guid = getGUID()
-        
         sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
         from pi.ADS1115Runner import ADS1115Runner
 
         self.sensor = 0
         #self.voltsPerDivision = ((2 * self.adcInfo.volts_per_division_table[self.gain])/65535)*1000
         # Open for differential_i2c
-        #config_string = '1-000-111-1-000-0-0-0-11'
         config_string = '1-000-111-1-000-0-0-0-11'
         self.ads1115Runner.i2c_reader_init(config_string)
         #adc = ADCStreamReader()
@@ -320,8 +305,22 @@ class ADS1115i2cStream(DaqStream):
         # - X - X - disable comparator
         #conf = prepareLEconf('1-000-111-1-100-1-0-0-11')
         #conf = prepareLEconf('0-000-111-1-100-1-0-0-11')
-        return #self.channel
+        self.guid = getGUID()
+        
+        if (self.daq_info.sensor_type == 'single_ended'):         
+            self.daq_method = self.ads1115Runner.i2c_read #self.adc.read_adc #(ch, self.gain, self.data_rate)
+        else:
+            self.daq_method = self.ads1115Runner.i2c_read #(ch, self.gain, self.data_rate)
 
+        self.conversion_method = self.convert_to_volts
+        #print("daq_method: " + str(self.daq_method))
+        return self.daq_method
+                                 
+    def convert_to_volts(self) -> int:
+        voltsPerDivision = ((2 * self.stream_info_dict[self.gain])/65535)*1000
+        return voltsPerDivision
+
+    '''
     def readDaq(self):
         if self.sleep_between_reads != -1:
             sleep(self.sleep_between_reads)
@@ -344,7 +343,7 @@ class ADS1115i2cStream(DaqStream):
         #if (self.reader_type == 'differential_i2c'):
         #self.value_raw = self.ads1115Runner.i2c_read(channel)
         #return self.value_raw #* self.voltsPerDivision
-
+    '''
     def closeDaq(self):
         pass
 
