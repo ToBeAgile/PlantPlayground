@@ -144,7 +144,7 @@ class ADS1256Stream(DaqStream):
                 
         self.daq_method = self.ADC.ADS1256_GetChannalValue
         self.conversion_method = self.no_conversion
-        return (self.daq_method * self.conversion_method)
+        return (self.daq_method)
                                  
     def no_conversion(self) -> int: 
         return 1
