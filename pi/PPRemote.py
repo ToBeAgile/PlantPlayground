@@ -30,14 +30,14 @@ daq_info = dsi.getConfig(ini_file_name)
 
 def read_sensor():
     global daq_data
-    
+    daq_method: callable
+
     # Determine which DAQ to use
     adc = DaqStream.getInstance()
-    adc.openDaq()
+    daq_method = adc.openDaq()
     
     while True:
-        daq_data = adc.readDaq()
-
+        daq_data = adc.readDaq(daq_method)
 
 #fix this by comparing to early working version
 def write_network():

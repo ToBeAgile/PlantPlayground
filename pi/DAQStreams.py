@@ -57,7 +57,7 @@ class DaqStream(ABC):
         self.conversion_method = None
         
     #@abstractmethod
-    def openDaq(self):
+    def openDaq(self) -> callable:
         # General settings        
         self.number_of_channels = self.daq_info.number_of_channels
         self.daqChannels = [0.0, 0.0, 0.0, 0.0]
@@ -90,21 +90,23 @@ class DaqStream(ABC):
             
         self.guid = getGUID()
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
-                                        
-    def readDaq(self):
+                               
+    def readDaq(self, daq_method):
+        # This is the generic read for any DAQ by passing in the daq_method() and conversion_method() to call
+        # These function pointers are defined the the subclasses openDaq method
         if self.daq_info.sleep_between_reads != -1:
             sleep(self.daq_info.sleep_between_reads)
         self.this_moment = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
         for ch in range(self.daq_info.low_chan, self.daq_info.high_chan + 1):
             if self.daq_info.channels[ch] is True:
                 #self.scan_mode == 0): # 0 = Single-ended input  8 channel; 1 = Differential input  4 channe 
-                self.daqChannels[ch] =  self.daq_method(ch) * self.conversion_method() #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
+                self.daqChannels[ch] =  daq_method(ch) #* self.conversion_method() #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
                 #self.ADC.ADS1256_GetChannalValue(ch) #self.ads1115Runner.i2c_read(ch) #self.adc.read_adc(ch, self.gain, self.data_rate)
                 if self.daq_info.sleep_between_channels != -1:
                     sleep(self.daq_info.sleep_between_channels)
         sensor_data = list()
         sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
-        print ("DAQStream sensor data: " + str(sensor_data))
+        print (str(sensor_data))
         return sensor_data
 
     def closeDaq(self):
@@ -133,15 +135,16 @@ class ADS1256Stream(DaqStream):
         
         self.scan_mode = int(self.daq_info.scan_mode)
         self.ADC.ADS1256_SetMode(self.scan_mode)
-        if(self.scan_mode == 0):
+        if(self.scan_mode == 0): # Single_ended mode
             for i in range(0, self.daq_info.number_of_channels):
                 self.ADC.ADS1256_SetChannal(i)
-        elif(self.scan_mode == 1):
+        elif(self.scan_mode == 1): # Differential mode
             for i in range(0, self.number_of_channels):
                 self.ADC.ADS1256_SetDiffChannal(i)
                 
         self.daq_method = self.ADC.ADS1256_GetChannalValue
         self.conversion_method = self.no_conversion
+        return (self.daq_method * self.conversion_method)
                                  
     def no_conversion(self) -> int: 
         return 1
@@ -208,7 +211,9 @@ class ADS1115Stream(DaqStream):
     def getInstance():
         return ADS1115Stream()
         
-    def openDaq(self):
+    def openDaq(self) -> callable:
+        #super().openDaq()
+
         import Adafruit_ADS1x15
         
         sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')
@@ -225,12 +230,14 @@ class ADS1115Stream(DaqStream):
         
         self.guid = getGUID()
         
-        if (self.daq_info.reader_type == 'single_ended'):         
+        if (self.daq_info.sensor_type == 'single_ended'):         
             self.daq_method = self.adc.read_adc #(ch, self.gain, self.data_rate)
         else:
             self.daq_method = self.adc.read_adc_difference #(ch, self.gain, self.data_rate)
 
         self.conversion_method = self.convert_to_volts
+        #print("daq_method: " + str(self.daq_method))
+        return self.daq_method
                                  
     def convert_to_volts(self) -> int:
         voltsPerDivision = ((2 * self.stream_info_dict[self.gain])/65535)*1000

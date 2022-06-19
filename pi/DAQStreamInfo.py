@@ -47,7 +47,7 @@ class DAQStreamInfo:
         config.read(ini_file_name)
         # General settings
         self.daq_to_use = config['Default']['daq_to_use']
-        self.ads1115_sensor_type = config['Default']['ads1115_sensor_type']
+        #self.ads1115_sensor_type = config['Default']['ads1115_sensor_type']
         self.number_of_channels = config['Default']['number_of_channels']
         self.data_log_frequency = float(config['Default']['data_log_frequency'])
         self.sensor_read_frequency = config['Default']['sensor_read_frequency']
@@ -74,7 +74,7 @@ class DAQStreamInfo:
         # ADS1115 settings
         self.gain = config['Default']['gain']
         self.data_rate = config['Default']['data_rate']
-        self.ads1115_sensor_type = config['Default']['ads1115_sensor_type']
+        #self.ads1115_sensor_type = config['Default']['ads1115_sensor_type']
         # ADS1256 settings
         self.ads1256_sensor_type = config['Default']['ads1256_sensor_type']
         self.ScanMode = config['Default']['ScanMode']
