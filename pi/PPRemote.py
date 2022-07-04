@@ -2,8 +2,10 @@
 # PPRemote.py - Remote Data Aquisition, Logger, and network broadcaster
 
 ''' Next:
+Move GUID in header of log and out of each line
 Verify readings from ADS1256 using potentimeter
-Clean up logging headers
+Design impedence spectroscopy system:
+    Write sin wave element, read DAQ channel and store in array
 
 ''' 
 import socket
@@ -29,7 +31,7 @@ daq_info = dsi.getConfig(ini_file_name)
 
 def read_sensor():
     global daq_data
-    daq_method: callable
+    #daq_method: callable
 
     # Determine which DAQ to use
     adc = DaqStream.getInstance()
@@ -83,6 +85,8 @@ def open_new_file_and_write_header():
     file = open(full_path, 'w', newline='', buffering=1)            
     writer = csv.writer(file)
     #write the header
+    #'Data logger file: ' + file_name
+    #'GUID: ' + guid
     writer.writerow(['Plant bioelectric data log: Setup, File name: ' + file_name])
     writer.writerow(['Software: PlantPlayground, File: PPRemote.py, Version 1.0'])
     #do we want to create another file with the same GUID with details about the session?

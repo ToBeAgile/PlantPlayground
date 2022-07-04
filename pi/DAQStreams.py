@@ -114,7 +114,7 @@ class ADS1256Stream(DaqStream):
     def getInstance():
         return ADS1256Stream()
 
-    def openDaq(self):
+    def openDaq(self) -> callable:
         import time
         import RPi.GPIO as GPIO
 
