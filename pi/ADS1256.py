@@ -1,4 +1,4 @@
-import config
+import config_adc as config
 import RPi.GPIO as GPIO
 
 
