@@ -29,6 +29,10 @@ daq_data = list()
 dsi = DAQStreamInfo()
 daq_info = dsi.getConfig(ini_file_name)
 
+def getGUID():
+    id = uuid.uuid4()
+    return id.hex
+
 def read_sensor():
     global daq_data
     #daq_method: callable
@@ -74,25 +78,27 @@ def get_file_name() -> str:
     full_path = folder_name + file_name
     return full_path
 
-def append_to_exisiting_file():
+def append_to_existing_file():
     #with open(full_path, 'a', newline='', buffering=1) as file:
     #writer = csv.writer(file)
-    file = open(full_path, 'a', newline='', buffering=1)
+    file = open(get_file_name(), 'a', newline='', buffering=1)
     writer = csv.writer(file)
     return writer
 
 def open_new_file_and_write_header():
-    file = open(full_path, 'w', newline='', buffering=1)            
+    _full_path = get_file_name()
+    file = open(_full_path, 'w', newline='', buffering=1)            
     writer = csv.writer(file)
-    #write the header
+    #write the header with the GUID
     #'Data logger file: ' + file_name
     #'GUID: ' + guid
-    writer.writerow(['Plant bioelectric data log: Setup, File name: ' + file_name])
+    writer.writerow(['Plant bioelectric data log: Setup, File name: ' + _full_path])
     writer.writerow(['Software: PlantPlayground, File: PPRemote.py, Version 1.0'])
-    #do we want to create another file with the same GUID with details about the session?
+    writer.writerow(['GUID: ' + getGUID() ]) #+ ', Created: ' + now.strftime("%Y-%m-%d")])
+    #do we want to create another file with the same GUID containing details about the session?
     #what info do we want? DAQs? number of channels? gain? sample rate? etc.
     #write sub-header from file
-    writer.writerow(['GUID,Time,Ch0,ch1,ch2,ch3'])
+    writer.writerow(['Time,Ch0,ch1,ch2,ch3'])
     return writer
 
 def log_data():
