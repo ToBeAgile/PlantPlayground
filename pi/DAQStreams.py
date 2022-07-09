@@ -90,7 +90,8 @@ class DaqStream(ABC):
             
         self.guid = getGUID()
         self.this_moment = datetime.datetime.now().strftime("%H:%M:%S:%f")
-    
+        print ('GUID: ' + str(self.guid))
+        
     # This generic read works for any DAQ by passing in the daq_method() to use
     # This function pointer is returned by the the subclasses openDaq method and passed into this method to call
     def readDaq(self, daq_method):
@@ -146,10 +147,31 @@ class ADS1256StreamIS(DaqStream):
         self.daq_method = self.ADC.ADS1256_GetChannalValue
         self.conversion_method = self.no_conversion
         return (self.daq_method)
+    
+    def converted_daq_method(self):
+        raw_result = self.daq_method()
+        conversion_factor = self.conversion_method()
+        return (raw_result * conversion_factor)
                                  
     def no_conversion(self) -> int: 
         return 1
-                
+
+    def readDaq(self, daq_method):
+        if self.daq_info.sleep_between_reads != -1:
+            sleep(self.daq_info.sleep_between_reads)
+        self.this_moment = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
+        #ping
+        for ch in range(self.daq_info.low_chan, self.daq_info.high_chan + 1):
+            if self.daq_info.channels[ch] is True:
+                self.daqChannels[ch] =  daq_method(ch)
+                if self.daq_info.sleep_between_channels != -1:
+                    sleep(self.daq_info.sleep_between_channels)
+        sensor_data = list()
+        #sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
+        sensor_data = (self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
+        print ('IS: ' + str(sensor_data))
+        return sensor_data
+
     def closeDaq(self):
         pass
     
