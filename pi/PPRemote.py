@@ -2,7 +2,6 @@
 # PPRemote.py - Remote Data Aquisition, Logger, and network broadcaster
 
 ''' Next:
-Move GUID in header of log and out of each line
 Verify readings from ADS1256 using potentimeter
 Design impedence spectroscopy system:
     Write sin wave element, read DAQ channel and store in array

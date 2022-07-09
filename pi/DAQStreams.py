@@ -101,7 +101,8 @@ class DaqStream(ABC):
                 if self.daq_info.sleep_between_channels != -1:
                     sleep(self.daq_info.sleep_between_channels)
         sensor_data = list()
-        sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
+        #sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
+        sensor_data = (self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
         print (str(sensor_data))
         return sensor_data
 
