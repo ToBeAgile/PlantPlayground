@@ -119,8 +119,8 @@ class ADS1256StreamIS(DaqStream):
         return ADS1256StreamIS()
 
     def openDaq(self) -> callable:
-        import time
-        import RPi.GPIO as GPIO
+        #import time
+        #import RPi.GPIO as GPIO
 
         # ADS1256 Specific Setting
         sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground')

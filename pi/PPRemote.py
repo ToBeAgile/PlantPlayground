@@ -9,17 +9,16 @@ Design impedence spectroscopy system:
 ''' 
 import socket
 import sys
-import time
 import pickle
-import random
 import datetime
 import threading
 import csv
 import os.path
-import unittest
+import time
 
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground/pi')
 from DAQStreams import *
+from DAQStreamInfo import *
 
 ini_file_name = 'DAQStreams.ini'
 #global daq_data
@@ -34,7 +33,7 @@ def getGUID():
 
 def read_sensor():
     global daq_data
-    #daq_method: callable
+    daq_method: callable
 
     # Determine which DAQ to use
     adc = DaqStream.getInstance()
@@ -65,7 +64,7 @@ def write_network():
     while True:
         write_event.wait(1) #network_write_time)
         data_dict = daq_data
-        print('helloww')#data_dict)
+        print('hello')#data_dict)
         serialized_data = pickle.dumps(data_dict)
         s.send(serialized_data)
 
