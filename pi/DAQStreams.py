@@ -172,6 +172,15 @@ class ADS1256StreamIS(DaqStream):
         print ('IS: ' + str(sensor_data))
         return sensor_data
 
+    def get_sin_oscillator(self, freq, sample_rate):
+        increment = (2 * math.pi * freq)/ sample_rate
+        return (math.sin(v) for v in itertools.count(start=0, step=increment))
+
+    def writeDAC(self):
+        osc = get_sin_oscillator(freq=1, sample_rate=512)
+        #??
+        pass
+    
     def closeDaq(self):
         pass
     
