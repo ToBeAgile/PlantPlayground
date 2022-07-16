@@ -64,7 +64,7 @@ def write_network():
     while True:
         write_event.wait(1) #network_write_time)
         data_dict = daq_data
-        print('hello')#data_dict)
+        #print('hello')#data_dict)
         serialized_data = pickle.dumps(data_dict)
         s.send(serialized_data)
 
