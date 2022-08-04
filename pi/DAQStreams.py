@@ -11,6 +11,7 @@ import uuid
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground/pi')
 from DAQStreamInfo import *
 from oscillator_thread import *
+from DAC8532 import *
 
 def getGUID():
     id = uuid.uuid4()
@@ -150,6 +151,10 @@ class ADS1256StreamIS(DaqStream):
         self.daq_method = self.ADC.ADS1256_GetChannalValue
         self.conversion_method = self.no_conversion
         # Set up oscillator for resistence spectrometer
+        self.dac = DAC8532()
+        self.dac.DAC8532_Out_Voltage(DAC8532.channel_A, 0)
+        self.dac.DAC8532_Out_Voltage(DAC8532.channel_B, 0)
+
         self.dac1_frequency = float(self.daq_info.dac1_frequency)
         self.dac1_sample_rate = float(self.daq_info.dac1_sample_rate)
         self.dac1_interval = float(self.daq_info.dac2_interval)
@@ -157,14 +162,12 @@ class ADS1256StreamIS(DaqStream):
         self.dac2_sample_rate = float(self.daq_info.dac2_sample_rate)
         self.dac2_interval = float(self.daq_info.dac2_interval)
 
-        
         t1 = threading.Thread(target=self.launch_thread1, args=(self.dac1_frequency, self.dac1_sample_rate, self.dac1_interval))
         t2 = threading.Thread(target=self.launch_thread2, args=(self.dac2_frequency, self.dac2_sample_rate, self.dac2_interval))
         t1.start()
         t2.start()
         #t1.join()
         #t2.join()
-        
         return (self.daq_method)
     
     def converted_daq_method(self):
@@ -176,20 +179,26 @@ class ADS1256StreamIS(DaqStream):
         return 1
     
     def launch_thread1(self, freq, rate, interval):
-            osc = oscillator(freq, rate, interval)
-            gen = osc.get_sine_oscillator()
+            osc1 = oscillator(freq, rate, interval)
+            gen1 = osc1.get_sine_oscillator()
             
             while True:
-                self.oscillator1 = next(gen)
+                self.oscillator1 = next(gen1)
+                if self.oscillator1 > 3.2:
+                    self.oscillator1 = 3.2
+                self.dac.DAC8532_Out_Voltage(self.dac.channel_A, self.oscillator1 * 3)
                 #print("Thread 1: " + str(oscillator1))
                 sleep(interval)
             
     def launch_thread2(self, freq, rate, interval):
-            osc = oscillator(freq, rate, interval)
-            gen = osc.get_sine_oscillator()
+            osc2 = oscillator(freq, rate, interval)
+            gen2 = osc2.get_sine_oscillator()
             
             while True:
-                self.oscillator2 = next(gen)
+                self.oscillator2 = next(gen2)
+                if self.oscillator1 > 3.2:
+                    self.oscillator1 = 3.2
+                self.dac.DAC8532_Out_Voltage(self.dac.channel_B, self.oscillator2 * 3)
                 #print("Thread 2: " + str(oscillator2))
                 sleep(interval)
 
