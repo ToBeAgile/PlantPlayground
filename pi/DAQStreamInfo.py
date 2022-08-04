@@ -39,6 +39,14 @@ class DAQStreamInfo:
         self.gain = None
         self.data_rate = None
         self.scan_mode = 0
+        ###
+        self.dac1_frequency = 0
+        self.dac1_sample_rate = 0
+        self.dac1_interval = 0
+        self.dac2_frequency = 0
+        self.dac2_sample_rate = 0
+        self.dac2_interval = 0
+        
 
     def getConfig(self, ini_file_name):
         config = configparser.ConfigParser()
@@ -71,4 +79,12 @@ class DAQStreamInfo:
         self.hat_error = config['Default']['mcc_hat_error']
         self.gain = config['Default']['gain']
         self.data_rate = config['Default']['data_rate']
+        ###ADS1256 specific
+        self.dac1_frequency = config['Default']['dac1_frequency']
+        self.dac1_sample_rate = config['Default']['dac1_sample_rate']
+        self.dac1_interval = config['Default']['dac1_interval']
+        self.dac2_frequency = config['Default']['dac2_frequency']
+        self.dac2_sample_rate = config['Default']['dac2_sample_rate']
+        self.dac2_interval = config['Default']['dac2_interval']
+        
         return self

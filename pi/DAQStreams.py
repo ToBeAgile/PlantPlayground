@@ -10,6 +10,7 @@ import uuid
 
 sys.path.insert(1, '/home/pi/Documents/Code/PlantPlayground/pi')
 from DAQStreamInfo import *
+from oscillator_thread import *
 
 def getGUID():
     id = uuid.uuid4()
@@ -113,6 +114,8 @@ class DaqStream(ABC):
         pass
 
 class ADS1256StreamIS(DaqStream):
+    oscillator1 = 0
+    oscillator2 = 0
 
     @staticmethod
     def getInstance():
@@ -146,6 +149,22 @@ class ADS1256StreamIS(DaqStream):
                 
         self.daq_method = self.ADC.ADS1256_GetChannalValue
         self.conversion_method = self.no_conversion
+        # Set up oscillator for resistence spectrometer
+        self.dac1_frequency = float(self.daq_info.dac1_frequency)
+        self.dac1_sample_rate = float(self.daq_info.dac1_sample_rate)
+        self.dac1_interval = float(self.daq_info.dac2_interval)
+        self.dac2_frequency = float(self.daq_info.dac2_frequency)
+        self.dac2_sample_rate = float(self.daq_info.dac2_sample_rate)
+        self.dac2_interval = float(self.daq_info.dac2_interval)
+
+        
+        t1 = threading.Thread(target=self.launch_thread1, args=(self.dac1_frequency, self.dac1_sample_rate, self.dac1_interval))
+        t2 = threading.Thread(target=self.launch_thread2, args=(self.dac2_frequency, self.dac2_sample_rate, self.dac2_interval))
+        t1.start()
+        t2.start()
+        #t1.join()
+        #t2.join()
+        
         return (self.daq_method)
     
     def converted_daq_method(self):
@@ -155,6 +174,24 @@ class ADS1256StreamIS(DaqStream):
                                  
     def no_conversion(self) -> int: 
         return 1
+    
+    def launch_thread1(self, freq, rate, interval):
+            osc = oscillator(freq, rate, interval)
+            gen = osc.get_sine_oscillator()
+            
+            while True:
+                self.oscillator1 = next(gen)
+                #print("Thread 1: " + str(oscillator1))
+                sleep(interval)
+            
+    def launch_thread2(self, freq, rate, interval):
+            osc = oscillator(freq, rate, interval)
+            gen = osc.get_sine_oscillator()
+            
+            while True:
+                self.oscillator2 = next(gen)
+                #print("Thread 2: " + str(oscillator2))
+                sleep(interval)
 
     def readDaq(self, daq_method):
         if self.daq_info.sleep_between_reads != -1:
@@ -168,7 +205,7 @@ class ADS1256StreamIS(DaqStream):
                     sleep(self.daq_info.sleep_between_channels)
         sensor_data = list()
         #sensor_data = (self.guid, self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
-        sensor_data = (self.this_moment, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
+        sensor_data = (self.this_moment, self.oscillator1, self.oscillator2, self.daqChannels[0], self.daqChannels[1], self.daqChannels[2], self.daqChannels[3])
         print ('IS: ' + str(sensor_data))
         return sensor_data
 
