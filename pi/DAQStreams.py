@@ -152,8 +152,11 @@ class ADS1256StreamIS(DaqStream):
         self.conversion_method = self.no_conversion
         # Set up oscillator for resistence spectrometer
         self.dac = DAC8532()
-        self.dac.DAC8532_Out_Voltage(DAC8532.channel_A, 0)
-        self.dac.DAC8532_Out_Voltage(DAC8532.channel_B, 0)
+        
+        self.dac.DAC8532_Out_Voltage(self.dac.channel_A, 0)
+        self.dac.DAC8532_Out_Voltage(self.dac.channel_B, 0)
+        self.dac.DAC8532_Out_Voltage(0x30, 3)
+        self.dac.DAC8532_Out_Voltage(0x34, 3)
 
         self.dac1_frequency = float(self.daq_info.dac1_frequency)
         self.dac1_sample_rate = float(self.daq_info.dac1_sample_rate)
@@ -186,8 +189,8 @@ class ADS1256StreamIS(DaqStream):
                 self.oscillator1 = next(gen1)
                 if self.oscillator1 > 3.2:
                     self.oscillator1 = 3.2
-                self.dac.DAC8532_Out_Voltage(self.dac.channel_A, self.oscillator1 * 3)
-                #print("Thread 1: " + str(oscillator1))
+                self.dac.DAC8532_Out_Voltage(0x30, self.oscillator1)
+                print("Thread 1: " + str(self.oscillator1))
                 sleep(interval)
             
     def launch_thread2(self, freq, rate, interval):
@@ -198,8 +201,8 @@ class ADS1256StreamIS(DaqStream):
                 self.oscillator2 = next(gen2)
                 if self.oscillator1 > 3.2:
                     self.oscillator1 = 3.2
-                self.dac.DAC8532_Out_Voltage(self.dac.channel_B, self.oscillator2 * 3)
-                #print("Thread 2: " + str(oscillator2))
+                self.dac.DAC8532_Out_Voltage(0x34, self.oscillator2)
+                print("Thread 2: " + str(self.oscillator2))
                 sleep(interval)
 
     def readDaq(self, daq_method):
