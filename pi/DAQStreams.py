@@ -184,26 +184,39 @@ class ADS1256StreamIS(DaqStream):
     def launch_thread1(self, freq, rate, interval):
             osc1 = oscillator(freq, rate, interval)
             gen1 = osc1.get_sine_oscillator()
-            
-            while True:
-                self.oscillator1 = next(gen1)
-                if self.oscillator1 > 3.2:
-                    self.oscillator1 = 3.2
-                self.dac.DAC8532_Out_Voltage(0x30, self.oscillator1)
-                print("Thread 1: " + str(self.oscillator1))
-                sleep(interval)
-            
+            try:
+                while True:
+                    self.oscillator1 = next(gen1)
+                    if self.oscillator1 > 1:
+                        self.oscillator1 = 1
+                    self.dac.DAC8532_Out_Voltage(0x30, abs(10 * self.oscillator1))
+                    #print("Thread 1: " + str(self.oscillator1))
+                    sleep(interval)
+            except :
+                self.dac.DAC8532_Out_Voltage(0x30, 0)
+                self.dac.DAC8532_Out_Voltage(0x34, 0)
+                GPIO.cleanup()
+                print ("\r\nProgram end     ")
+                exit()
+
     def launch_thread2(self, freq, rate, interval):
             osc2 = oscillator(freq, rate, interval)
             gen2 = osc2.get_sine_oscillator()
-            
-            while True:
-                self.oscillator2 = next(gen2)
-                if self.oscillator1 > 3.2:
-                    self.oscillator1 = 3.2
-                self.dac.DAC8532_Out_Voltage(0x34, self.oscillator2)
-                print("Thread 2: " + str(self.oscillator2))
-                sleep(interval)
+            try:
+                while True:
+                    self.oscillator2 = next(gen2)
+                    if self.oscillator1 > 1:
+                        self.oscillator1 = 1
+                    self.dac.DAC8532_Out_Voltage(0x34, abs(10 * self.oscillator2))
+                    #print("Thread 2: " + str(self.oscillator2))
+                    sleep(interval)
+            except :
+                self.dac.DAC8532_Out_Voltage(0x30, 0)
+                self.dac.DAC8532_Out_Voltage(0x34, 0)
+                GPIO.cleanup()
+                print ("\r\nProgram end     ")
+                exit()
+
 
     def readDaq(self, daq_method):
         if self.daq_info.sleep_between_reads != -1:
